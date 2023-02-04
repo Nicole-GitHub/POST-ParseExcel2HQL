@@ -255,7 +255,45 @@ public class Tools {
 		setCell(style, cell, row, 8, "DW");
 		
 	}
-
+	
+	/**
+	 * 取Excel欄位值
+	 * 
+	 * @param sheet
+	 * @param rownum
+	 * @param cellnum
+	 * @param fieldName
+	 * @return
+	 * @throws Exception 
+	 */
+	public static String getCellValue(Row row, int cellnum, String fieldName) throws Exception {
+		try {
+			Cell cell = row.getCell(cellnum);
+			if (!cellNotBlank(cell))
+				return "";
+			else if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC)
+				return String.valueOf((int) cell.getNumericCellValue()).trim();
+			else if (cell.getCellType() == Cell.CELL_TYPE_STRING)
+				return cell.getStringCellValue().trim();
+			else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+				if (cell.getCachedFormulaResultType() == Cell.CELL_TYPE_NUMERIC)
+					return String.valueOf((int) cell.getNumericCellValue()).trim();
+				else if (cell.getCellType() == Cell.CELL_TYPE_STRING)
+					return cell.getStringCellValue().trim();
+			}
+		} catch (Exception ex) {
+			throw new Exception(className + " getCellValue " + fieldName + " 格式錯誤");
+		}
+		return "";
+	}
+	
+	/**
+     * 不為空
+     */
+	private static boolean cellNotBlank(Cell cell) {
+		return cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK;
+	}
+	
 	/**
 	 * 取今日日期 YYYY/MM/DD
 	 * 
