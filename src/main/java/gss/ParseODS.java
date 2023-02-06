@@ -46,7 +46,7 @@ public class ParseODS {
 			// INSERT INTO Script
 			rsINSERT = "INSERT INTO " + mapProp.get("raw.dbname") + "." + tableName + " \n"
 					+ "SELECT \n" + rsSelectCols.substring(0, rsSelectCols.lastIndexOf(",")) + " \n"
-					+ "FROM " + mapProp.get("raw.dbname") + "." + tableName + "_files";
+					+ "FROM " + mapProp.get("meta.dbname") + "." + tableName + "_files";
 			
 			map.put("CREATESQL", rsCREATE);
 			map.put("INSERTSQL", rsINSERT);

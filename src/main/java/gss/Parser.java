@@ -97,11 +97,12 @@ System.out.println("path: " + path + "\n fileName: " + fileName);
 							String sql = "INSERT INTO " + tableName + " \n" + mapCols.get("Select") + " \n" + mapTable.get("FromWhere") 
 									+ (!StringUtils.isBlank(mapCols.get("Group")) ? " \n" + mapCols.get("Group") : "")
 									+ (!StringUtils.isBlank(mapCols.get("Order")) ? " \n" + mapCols.get("Order") : "");
-							sql = sql.replace("{tmp}", mapProp.get("tmp.dbname")).replace("{raw}", mapProp.get("raw.dbname"));
-								
+							sql = sql.replace("{tmp}.", mapProp.get("tmp.dbname") + "." + layoutMap.get("TableName") + "_")
+									.replace("{raw}", mapProp.get("raw.dbname"));
+
 							map = new HashMap<String, String>();
 							map.put("Folder", fileName);
-							map.put("HQLName", "ETL_" + mapTable.get("Step") + "_" + target);
+							map.put("HQLName", "D" + layoutMap.get("TableName").substring(5,6) + "_" + mapTable.get("Step"));
 							map.put("SQL",sql);
 							mapList.add(map);
 						}
@@ -124,12 +125,12 @@ System.out.println("path: " + path + "\n fileName: " + fileName);
 					map = new HashMap<String, String>();
 					map.put("Folder", fileName);
 					map.put("HQLName", "ODS_L01_" + odsMap.get("TableName"));
-					map.put("SQL", odsMap.get("CREATESQL"));
+					map.put("SQL", odsMap.get("INSERTSQL"));
 					mapList.add(map);
 					map = new HashMap<String, String>();
 					map.put("Folder", fileName);
 					map.put("HQLName", "create_" + odsMap.get("TableName"));
-					map.put("SQL", odsMap.get("INSERTSQL"));
+					map.put("SQL", odsMap.get("CREATESQL"));
 					mapList.add(map);
 				}
 			}
