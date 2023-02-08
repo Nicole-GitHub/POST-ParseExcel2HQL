@@ -29,19 +29,23 @@ public class ParseODS {
 				if (row == null || !Tools.isntBlank(row.getCell(1)))
 					break;
 				
-				String colEName = Tools.getCellValue(row, c++, "欄位英文名稱");
+				String dwColEName = Tools.getCellValue(row, c++, "DW欄位英文名稱");
+				c++;// 來源欄位英文名稱
 				c++;// 欄位中文名稱
 				String dataStart = Tools.getCellValue(row, c++, "資料起點");
-				String datalen = Tools.getCellValue(row, c++, "資料長度");
-
-				rsCreateCols += "\t" + colEName + " VARCHAR(" + datalen + ") NULL ,\n";
-				rsSelectCols += "\tTRIM(SUBSTRING(" + dataStart + "," + datalen + ")) AS " + colEName + " ,\n";
+				String dataEnd = Tools.getCellValue(row, c++, "資料終點");
+				int datalen = Integer.parseInt(dataEnd) - Integer.parseInt(dataStart) + 1;
+				
+				rsCreateCols += "\t" + dwColEName + " VARCHAR(" + datalen + ") NULL ,\n";
+				rsSelectCols += "\tTRIM(SUBSTRING(" + dataStart + "," + datalen + ")) AS " + dwColEName + " ,\n";
 			}
 			String tableName = Tools.getCellValue(sheetODS.getRow(0), 4, "TABLE名稱");
 			
 			// CREATE TABLE Script
-			rsCREATE = "CREATE TABLE " + mapProp.get("raw.dbname") + "." + tableName + " (\n";
-			rsCREATE += rsCreateCols.substring(0, rsCreateCols.lastIndexOf(",")) + "\n);";
+			rsCREATE = "drop table if exists " + mapProp.get("raw.dbname") + "." + tableName + ";\n"
+					+ "CREATE TABLE IF NOT EXISTS " + mapProp.get("raw.dbname") + "." + tableName + " (\n"
+					+ rsCreateCols.substring(0, rsCreateCols.lastIndexOf(",")) + "\n)\n"
+					+ "PARTITIONED BY(ACT_YM varchar(6), batchid BIGINT);";
 			
 			// INSERT INTO Script
 			rsINSERT = "INSERT INTO " + mapProp.get("raw.dbname") + "." + tableName + " \n"

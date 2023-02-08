@@ -20,18 +20,21 @@ public class Parser {
 
 		System.out.println("=== NOW TIME: " + new Date());
 		System.out.println("=== os.name: " + os);
-		
+		System.out.println("=== Parser.class.Path: " + Parser.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 		// 判斷當前執行的啟動方式是IDE還是jar
+//		String runPath = Parser.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+//		boolean isStartupFromJar = runPath.endsWith(".jar");
 		boolean isStartupFromJar = new File(Parser.class.getProtectionDomain().getCodeSource().getLocation().getPath()).isFile();
 		System.out.println("=== isStartupFromJar: " + isStartupFromJar);
 		String fileName = "";
 		String path = System.getProperty("user.dir") + File.separator; // Jar
+//		System.out.println("=== Parser.class.Path2: "+path);
 		if(!isStartupFromJar) {// IDE
 			path = os.contains("Mac") ? "/Users/nicole/Dropbox/POST/POST-ParseExcel2HQL/" // Mac
 							: "C:/Users/nicole_tsou/Dropbox/POST/POST-ParseExcel2HQL/"; // win
 
 //			fileName = "檔案定義檔.xlsx|檔案定義檔2.xlsx";
-			fileName = "T_IFTW_ACCASHOUTLAY-實際現金流(現金支出).xlsx";
+			fileName = "T_IFTW_IDRIDERADD-保單基礎數據檔(意外險附約) - 複製.xlsx";
 		}
 
 		/**
@@ -75,14 +78,23 @@ System.out.println("path: " + path + "\n fileName: " + fileName);
 			Map<String, String> mapProp = Property.getProperties(path);
 			for (String fileName : fileNameList) {
 				System.out.println("fileName:" + path + fileName);
+				
+				// 防呆 Excel必需要有Layout頁籤
 				throwException(path + fileName);
 				
-				tableMapList = ParseTable.run(Tools.getSheet(path + fileName, "資料關聯"));
-				colsMapList = ParseCols.run(Tools.getSheet(path + fileName, "欄位處理邏輯"));
 				layoutMap = ParseLayout.run(Tools.getSheet(path + fileName, "Layout"), mapProp);
-				if(Tools.getSheet(path + fileName, "ODS") == null)
-					odsMap = null;
-				else
+
+				//若無資料關聯或欄位處理邏輯頁籤則不產邏輯相關hql
+				if(Tools.getSheet(path + fileName, "資料關聯") != null && Tools.getSheet(path + fileName, "欄位處理邏輯") != null)
+				{
+					tableMapList = ParseTable.run(Tools.getSheet(path + fileName, "資料關聯"));
+					colsMapList = ParseCols.run(Tools.getSheet(path + fileName, "欄位處理邏輯"));
+				}
+				
+				if(tableMapList.size() > 0)
+					
+				//若無ODS頁籤則不產ODS相關hql
+				if(Tools.getSheet(path + fileName, "ODS") != null)
 					odsMap = ParseODS.run(Tools.getSheet(path + fileName, "ODS"), mapProp);
 				
 				fileName = fileName.substring(0,fileName.lastIndexOf("."));
@@ -121,7 +133,7 @@ System.out.println("path: " + path + "\n fileName: " + fileName);
 				mapList.add(map);
 				
 				// ODS
-				if (odsMap != null) {
+				if (odsMap.size() > 0) {
 					map = new HashMap<String, String>();
 					map.put("Folder", fileName);
 					map.put("HQLName", "ODS_L01_" + odsMap.get("TableName"));
@@ -182,10 +194,10 @@ System.out.println("path: " + path + "\n fileName: " + fileName);
 	 * @throws Exception
 	 */
 	private static void throwException(String path) throws Exception {
-		if(Tools.getSheet(path, "資料關聯") == null)
-			throw new Exception(className + " runParse Error: 缺少頁韱:資料關聯");
-		if(Tools.getSheet(path, "欄位處理邏輯") == null)
-			throw new Exception(className + " runParse Error: 缺少頁韱:欄位處理邏輯");
+//		if(Tools.getSheet(path, "資料關聯") == null)
+//			throw new Exception(className + " runParse Error: 缺少頁韱:資料關聯");
+//		if(Tools.getSheet(path, "欄位處理邏輯") == null)
+//			throw new Exception(className + " runParse Error: 缺少頁韱:欄位處理邏輯");
 		if(Tools.getSheet(path, "Layout") == null)
 			throw new Exception(className + " runParse Error: 缺少頁韱:Layout");
 	}

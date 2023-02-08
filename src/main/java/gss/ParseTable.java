@@ -30,7 +30,7 @@ public class ParseTable {
 
 		try {
 			// 找出欲解析的資料有幾行
-			for (int i = 0; i < sheetTable.getLastRowNum(); i++) {
+			for (int i = 0; i <= sheetTable.getLastRowNum(); i++) {
 				row = sheetTable.getRow(i);
 				if (row == null) {
 					rowcount = i;
@@ -52,6 +52,7 @@ public class ParseTable {
 
 				String step = Tools.getCellValue(row, c++, "步驟").toUpperCase();
 				String target = Tools.getCellValue(row, c++, "目的");
+				String partition = Tools.getCellValue(row, c++, "Partition");
 				// ================= 資料表1 ===================
 				String table1 = Tools.getCellValue(row, c++, "資料表");
 				String table1Alias = Tools.getCellValue(row, c++, "別名");
@@ -112,6 +113,7 @@ public class ParseTable {
 
 				map.put("Step", step);
 				map.put("Target", target);
+				map.put("Partition", partition);
 				map.put("FromWhere", rs);
 				mapListTable.add(map);
 			}
