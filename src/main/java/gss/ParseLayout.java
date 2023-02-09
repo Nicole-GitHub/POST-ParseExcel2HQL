@@ -92,7 +92,6 @@ public class ParseLayout {
 				for (Map<String, String> map : rsCreatePartitionList) {
 					String createPartitonCol = map.get("Col").toString();
 					str = str.trim();
-					System.out.println("createPartitonCol:" + createPartitonCol);
 					if (createPartitonCol.equalsIgnoreCase(str)) {
 						rsCreatePartition += map.get("Script").toString().substring(1);;
 						break;
