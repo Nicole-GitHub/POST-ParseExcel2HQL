@@ -52,7 +52,6 @@ public class ParseTable {
 
 				String step = Tools.getCellValue(row, c++, "步驟").toUpperCase();
 				String target = Tools.getCellValue(row, c++, "目的");
-				String partition = Tools.getCellValue(row, c++, "Partition");
 				// ================= 資料表1 ===================
 				String table1 = Tools.getCellValue(row, c++, "資料表");
 				String table1Alias = Tools.getCellValue(row, c++, "別名");
@@ -74,9 +73,9 @@ public class ParseTable {
 					throw new Exception("JOIN欄位數量兩邊不一致 左邊:" + table1JoinColsNum + ",右邊:" + table2JoinColsNum);
 
 				for (int i = 0; i < table1JoinColsNum; i++) {
-					rsJoinOn += (i > 0 ? " AND " : " ON ") 
+					rsJoinOn += (i > 0 ? " AND " : " \n\tON ") 
 							+ table1Alias + "." + table1JoinColsArr[i] 
-							+ "=" + table2Alias + "." + table2JoinColsArr[i] + " ";
+							+ " = " + table2Alias + "." + table2JoinColsArr[i] + " ";
 				}
 				
 				// 若為left join或right join則將次要table的where內容放在on裡
@@ -105,15 +104,10 @@ public class ParseTable {
 					rsWhere = "WHERE " + rsWhere;
 				}
 				
-//				String rsWhere = (StringUtils.isBlank(table1Where) && StringUtils.isBlank(table2Where)) ? " "
-//								:" WHERE " + (StringUtils.isBlank(table1Where) ? table2Where : table1Where) 
-//								+ (StringUtils.isBlank(table2Where) ? " " : " AND " + table2Where);
-
 				rs = rsFrom + (!StringUtils.isBlank(rsWhere) ? "\n" + rsWhere : "");
-
+				
 				map.put("Step", step);
 				map.put("Target", target);
-				map.put("Partition", partition);
 				map.put("FromWhere", rs);
 				mapListTable.add(map);
 			}

@@ -1,6 +1,7 @@
 package gss;
 
 import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -129,25 +130,20 @@ public class FileTools {
 		return "";
 	}
 	
+
 	/**
-	 * 刪除檔案
-	 * 
-	 * @param fileName 檔名稱
-	 * @return
+	 * 刪除路徑下的所有資料夾與資料
+	 * @param file
 	 */
-	public static boolean delFile(String path, String fileName) {
-		Boolean bool = false;
-		filenameTemp = path + fileName + ".txt";
-		File file = new File(filenameTemp);
-		try {
-			if (file.exists()) {
-				file.delete();
-				bool = true;
+	public static void deleteFolder(File file) {
+		for (File subFile : file.listFiles()) {
+			if (subFile.isDirectory()) {
+				deleteFolder(subFile);
+			} else {
+				subFile.delete();
 			}
-		} catch (Exception e) {
-			// TODO: handle exception
 		}
-		return bool;
+		file.delete();
 	}
 
 }
