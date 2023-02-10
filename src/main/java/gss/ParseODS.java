@@ -60,6 +60,8 @@ public class ParseODS {
 						mapPartition.put("Col", dwColEName);
 						mapPartition.put("Script", createScript);
 						rsCreatePartitionList.add(mapPartition);
+						mapPartition = new HashMap<String, String>();
+						mapPartition.put("Col", dwColEName);
 						mapPartition.put("Script", selectScript);
 						rsSelectPartitionList.add(mapPartition);
 						isPartition = true;
