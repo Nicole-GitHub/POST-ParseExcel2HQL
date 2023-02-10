@@ -1,4 +1,4 @@
-package gss;
+package gss.tools;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.util.Properties;
 public class Property {
 	private static final String className = Property.class.getName();
 	
-	protected static Map<String, String> getProperties(String path) throws Exception {
+	public static Map<String, String> getProperties(String path) throws Exception {
 		Map<String, String> map = new HashMap<String, String>();
 		Properties prop = new Properties();
 		FileInputStream fis = null;

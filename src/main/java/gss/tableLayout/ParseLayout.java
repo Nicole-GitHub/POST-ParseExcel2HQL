@@ -1,4 +1,4 @@
-package gss;
+package gss.tableLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +9,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+
+import gss.tools.Tools;
 
 public class ParseLayout {
 	private static final String className = ParseLayout.class.getName();
@@ -115,7 +117,7 @@ public class ParseLayout {
 			throw new Exception(className + " Error: \n" + ex);
 		}
 
-System.out.println("ParseLayout Done!");
+		System.out.println(className + " Done!");
 		return mapReturn;
 	}
 }

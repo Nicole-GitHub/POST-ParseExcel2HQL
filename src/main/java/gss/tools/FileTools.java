@@ -1,4 +1,4 @@
-package gss;
+package gss.tools;
 
 import java.io.BufferedReader;
 

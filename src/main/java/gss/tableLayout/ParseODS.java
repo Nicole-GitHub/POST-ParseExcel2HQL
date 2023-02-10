@@ -1,4 +1,4 @@
-package gss;
+package gss.tableLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+
+import gss.tools.Tools;
 
 public class ParseODS {
 	private static final String className = ParseODS.class.getName();
@@ -22,7 +24,7 @@ public class ParseODS {
 	public static Map<String, String> run (Sheet sheetODS, Map<String, String> mapProp, String partition) throws Exception {
 		Row row = null;
 		String rsCREATE = "", rsINSERT = "", rsCreateCols = "", rsSelectCols = "", createScript = "", selectScript = ""
-				,rsCreatePartition = "", rsSelectPartition = "";
+				,rsCreatePartition = "", rsSelectPartition = "", dataStartEnd = "";
 		boolean isPartition = false;
 		List<Map<String, String>> rsCreatePartitionList = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> rsSelectPartitionList = new ArrayList<Map<String, String>>();
@@ -46,7 +48,8 @@ public class ParseODS {
 				int dataStart = Integer.parseInt(Tools.getCellValue(row, c++, "資料起點"));
 				int dataEnd = Integer.parseInt(Tools.getCellValue(row, c++, "資料終點"));
 				int datalen = dataEnd - dataStart + 1;
-
+				
+				dataStartEnd += dataStart + "," + dataEnd + ",";
 				createScript = "\t" + dwColEName + " VARCHAR(" + datalen + ") ,\n";
 				selectScript = "TRIM(SUBSTRING(line," + dataStart + "," + datalen + "))";
 				selectScript = "\tcase when " + selectScript + " = '' then NULL else " + selectScript + " end AS "
@@ -75,6 +78,7 @@ public class ParseODS {
 				}
 			}
 			String tableName = Tools.getCellValue(sheetODS.getRow(0), 4, "TABLE名稱");
+			String txtName = Tools.getCellValue(sheetODS.getRow(0), 8, "來源文字檔檔名");
 
 			// 確認最後輸出的partition順序需與Layout頁籤的partition欄位相同
 			boolean isBreak = false;
@@ -107,18 +111,20 @@ public class ParseODS {
 			rsINSERT = "INSERT OVERWRITE TABLE " + mapProp.get("hadoop.raw.dbname") + "." + tableName + " \n"
 					+ "PARTITION(" + partition + " batchid) \n"
 					+ "SELECT \n" + rsSelectCols + rsSelectPartition + "\tbatchid \n"
-					+ "FROM " + mapProp.get("hadoop.meta.dbname") + "." + tableName + "_files \n"
+					+ "FROM " + mapProp.get("hadoop.meta.dbname") + "." + tableName + "_data_files \n"
 					+ "WHERE batchid = ${BATCHID} ;";
 			
 			mapReturn.put("CreateSql", rsCREATE);
 			mapReturn.put("InsertSql", rsINSERT);
 			mapReturn.put("TableName", tableName);
+			mapReturn.put("TXTName", txtName);
+			mapReturn.put("DataStartEnd", dataStartEnd);
 			
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}
 
-System.out.println("ParseODSLayout Done!");
+		System.out.println(className + " Done!");
 		return mapReturn;
 	}
 

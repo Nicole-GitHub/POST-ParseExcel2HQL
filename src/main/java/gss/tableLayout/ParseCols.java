@@ -1,4 +1,4 @@
-package gss;
+package gss.tableLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +10,8 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+
+import gss.tools.Tools;
 
 public class ParseCols {
 	private static final String className = ParseCols.class.getName();
@@ -117,7 +119,7 @@ public class ParseCols {
 			throw new Exception(className + " Error: \n" + ex);
 		}
 
-System.out.println("ParseCols Done!");
+		System.out.println(className + " Done!");
 		return mapListCols;
 	}
 	

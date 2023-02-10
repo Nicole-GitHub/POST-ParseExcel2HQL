@@ -1,4 +1,4 @@
-package gss;
+package gss.tools;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -110,27 +110,27 @@ public class Tools {
 		}
 	}
 
-	/**
-	 * 判斷是否有刪除線
-	 * 
-	 * @param row
-	 * @param cellNum
-	 * @return
-	 */
-	protected static Boolean isDelLine(Workbook workbook, String excelVersion, Row row, int cellNum) {
-		if(!isntBlank(row.getCell(cellNum))) {
-			return false;
-		}else if ("2003".equals(excelVersion)) {
-			return ((HSSFCellStyle) row.getCell(cellNum).getCellStyle()).getFont(workbook).getStrikeout();
-		} else {
-			return ((XSSFCellStyle) row.getCell(cellNum).getCellStyle()).getFont().getStrikeout();
-		}
-	}
+//	/**
+//	 * 判斷是否有刪除線
+//	 * 
+//	 * @param row
+//	 * @param cellNum
+//	 * @return
+//	 */
+//	protected static Boolean isDelLine(Workbook workbook, String excelVersion, Row row, int cellNum) {
+//		if(!isntBlank(row.getCell(cellNum))) {
+//			return false;
+//		}else if ("2003".equals(excelVersion)) {
+//			return ((HSSFCellStyle) row.getCell(cellNum).getCellStyle()).getFont(workbook).getStrikeout();
+//		} else {
+//			return ((XSSFCellStyle) row.getCell(cellNum).getCellStyle()).getFont().getStrikeout();
+//		}
+//	}
 
 	/**
 	 * 設定寫出檔案時的Style
 	 */
-	protected static CellStyle setStyle(Workbook workbook) {
+	public static CellStyle setStyle(Workbook workbook) {
 		CellStyle style = workbook.createCellStyle();
 		short BorderStyle = CellStyle.BORDER_THIN;
 		style.setBorderBottom(BorderStyle); // 儲存格格線(下)
@@ -157,86 +157,10 @@ public class Tools {
 	/**
      * 不為空
      */
-	protected static boolean isntBlank(Cell cell) {
+	public static boolean isntBlank(Cell cell) {
 		return cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK;
 	}
 	
-	/**
-	 * 中文欄位
-	 *  部份、身份 -> 部分、身分
-	 *  計劃 -> 計畫
-	 * 	迄 -> 訖
-	 *  記錄 -> 紀錄
-	 */
-	protected static String replaceFieldCName(String fieldCName) {
-
-		fieldCName = fieldCName.replace("部份", "部分");
-		fieldCName = fieldCName.replace("身份", "身分");
-		fieldCName = fieldCName.replace("計劃", "計畫");
-		fieldCName = fieldCName.replace("迄", "訖");
-		fieldCName = fieldCName.replace("記錄", "紀錄");
-		return fieldCName;
-	}
-	
-	/**
-	 * 是否為需加密的欄位
-	 * sourceFieldEName.equals("HOSP_ID") || fieldCName.equals("ID")
-	 *	|| fieldCName.contains("身分證字號") || fieldCName.contains("身分證號") 
-	 *	|| fieldCName.contains("醫事機構代碼") || fieldCName.contains("特約藥局代號") 
-	 *	|| fieldCName.contains("保險對象健保ID") || fieldCName.contains("醫師ID") 
-	 *	|| fieldCName.contains("藥師ID")
-	 *	|| fieldCName.contains("投保單位或扣費單位") || fieldCName.contains("統一編號")
-	 */
-	public static boolean isEncrypt(String fieldCName, String sourceFieldEName) {
-		List<String> list = Arrays.asList(
-				new String[] {"身分證字號","醫事機構代碼","保險對象健保ID","藥師ID","投保單位或扣費單位","身分證號","特約藥局代號","醫師ID","統一編號","醫事人員代號"});
-		
-		if(sourceFieldEName.equals("HOSP_ID") || fieldCName.equals("ID"))
-			return true;
-		
-		for(String str : list) {
-			if(fieldCName.contains(str))
-				return true;
-		}
-		
-		return false;
-	}
-	
-
-	/**
-	 * 寫入 REQandTableLayout Cell
-	 */
-	public static void setREQandTLCell(CellStyle style, Cell cell, Row row, String dataLineSeq, String dataStartDate, String fieldEName, String fieldCName, String dataType, 
-			String dataLength, String pk, String nullable, String initValue, String isEncrypt, String type, String dataClass, 
-			String dataDesc, String sourceTableEName, String sourceFieldEName, String procRule, String chgDesc) {
-		
-		setCell(style, cell, row, 0, dataLineSeq);
-		setCell(style, cell, row, 1, fieldEName);
-		setCell(style, cell, row, 2, fieldCName);
-		setCell(style, cell, row, 3, dataType);
-		setCell(style, cell, row, 4, dataLength);
-		setCell(style, cell, row, 5, pk);
-		setCell(style, cell, row, 6, nullable);
-		setCell(style, cell, row, 7, initValue);
-		setCell(style, cell, row, 8, isEncrypt);
-		if ("REQ".equals(type)) {
-			setCell(style, cell, row, 9, dataClass);
-			setCell(style, cell, row, 10, dataDesc);
-			setCell(style, cell, row, 11, sourceTableEName);
-			setCell(style, cell, row, 12, sourceFieldEName);
-			setCell(style, cell, row, 13, procRule);
-			setCell(style, cell, row, 14, chgDesc);
-		} else {
-			setCell(style, cell, row, 9, dataLineSeq);
-			setCell(style, cell, row, 10, "");
-			setCell(style, cell, row, 11, dataStartDate);
-			setCell(style, cell, row, 12, "");
-			setCell(style, cell, row, 13, dataClass);
-			setCell(style, cell, row, 14, dataDesc);
-			setCell(style, cell, row, 15, "");
-			setCell(style, cell, row, 16, "");
-		}
-	}
 	
 	/**
 	 * 寫入 DataMart Cell
@@ -294,12 +218,4 @@ public class Tools {
 		return cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK;
 	}
 	
-	/**
-	 * 取今日日期 YYYY/MM/DD
-	 * 
-	 * @return
-	 */
-	public static String getToDay() {
-		return new SimpleDateFormat("yyyy/MM/dd").format(new Date());
-	}
 }
