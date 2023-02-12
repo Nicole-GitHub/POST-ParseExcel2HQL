@@ -14,7 +14,7 @@ public class Parser {
 	public static void main(String args[]) throws Exception {
 		try {
 			String os = System.getProperty("os.name");
- 
+
 			System.out.println("=== NOW TIME: " + new Date());
 			System.out.println("=== os.name: " + os);
 			System.out.println("=== Parser.class.Path: "
