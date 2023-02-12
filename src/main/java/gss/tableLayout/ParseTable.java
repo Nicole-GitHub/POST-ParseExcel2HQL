@@ -1,4 +1,4 @@
-package gss.tableLayout;
+package gss.TableLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import gss.tools.Tools;
+import gss.Tools.Tools;
 
 public class ParseTable {
 	private static final String className = ParseTable.class.getName();

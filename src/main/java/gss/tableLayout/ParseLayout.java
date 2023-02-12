@@ -1,4 +1,4 @@
-package gss.tableLayout;
+package gss.TableLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import gss.tools.Tools;
+import gss.Tools.Tools;
 
 public class ParseLayout {
 	private static final String className = ParseLayout.class.getName();
@@ -22,13 +22,14 @@ public class ParseLayout {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Map<String, String> run (Sheet sheetLayout, Map<String, String> mapProp) throws Exception {
+	public static List<Map<String,String>> run (Sheet sheetLayout, Map<String, String> mapProp) throws Exception {
 		Row row = null;
 		String rsMSSQL = "", rsHADOOP = "", rsCols = "", rsHPCols = "", rsMSCols = "", pkStr = "", rsCreatePartition = "";
 		boolean isPartition = false;
 		Map<String, String> mapReturn = new HashMap<String, String>();
 		Map<String, String> mapCreatePartition = new HashMap<String, String>();
 		List<Map<String,String>> rsCreatePartitionList = new ArrayList<Map<String,String>>();
+		List<Map<String,String>> listReturn = new ArrayList<Map<String,String>>();
 		// 在Create Table Script 中不需寫長度的 DataType
 		List<String> len0Typelist = Arrays.asList(new String[] {"DATE","TIMESTAMP","INTEGER","SMALLINT","BIGINT"});
 
@@ -45,13 +46,21 @@ public class ParseLayout {
 					break;
 				
 				String colEName = Tools.getCellValue(row, c++, "欄位英文名稱");
-				c++;// 欄位中文名稱
+				String colCName = Tools.getCellValue(row, c++, "欄位中文名稱");
 				String type = Tools.getCellValue(row, c++, "資料型態");
 				String len = Tools.getCellValue(row, c++, "資料長度");
 				String pk = Tools.getCellValue(row, c++, "主鍵註記").toUpperCase();
 				String nullable = Tools.getCellValue(row, c++, "NULL註記").toUpperCase();
 				String init = Tools.getCellValue(row, c++, "初始值");
 
+				mapReturn = new HashMap<String, String>();
+				mapReturn.put("MapType", "Detail");
+				mapReturn.put("ColEName", colEName);
+				mapReturn.put("ColCName", colCName);
+				mapReturn.put("ColLen", len);
+				mapReturn.put("ColType", type);
+				listReturn.add(mapReturn);
+				
 				type = "DATETIME".equalsIgnoreCase(type) ? "TIMESTAMP" : type;
 				len = len0Typelist.contains(type.toUpperCase()) ? "" : "(" + len + ")";
 				init = StringUtils.isBlank(init) || "IDENTITY(1,1)".equals(init) ? init : "DEFAULT " + init;
@@ -108,16 +117,19 @@ public class ParseLayout {
 					+ rsHPCols.substring(0, rsHPCols.lastIndexOf(",")) + "\n)\n"
 					+ "PARTITIONED BY(" + rsCreatePartition + " batchid BIGINT);";
 			
+			mapReturn = new HashMap<String, String>();
+			mapReturn.put("MapType", "Main");
 			mapReturn.put("HPSQL", rsHADOOP);
 			mapReturn.put("MSSQL", rsMSSQL);
 			mapReturn.put("TableName", tableName);
 			mapReturn.put("Partition", partition);
+			listReturn.add(mapReturn);
 			
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}
 
 		System.out.println(className + " Done!");
-		return mapReturn;
+		return listReturn;
 	}
 }

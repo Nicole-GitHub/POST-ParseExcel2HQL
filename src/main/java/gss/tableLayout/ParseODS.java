@@ -1,4 +1,4 @@
-package gss.tableLayout;
+package gss.TableLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import gss.tools.Tools;
+import gss.Tools.Tools;
 
 public class ParseODS {
 	private static final String className = ParseODS.class.getName();
@@ -24,7 +24,7 @@ public class ParseODS {
 	public static Map<String, String> run (Sheet sheetODS, Map<String, String> mapProp, String partition) throws Exception {
 		Row row = null;
 		String rsCREATE = "", rsINSERT = "", rsCreateCols = "", rsSelectCols = "", createScript = "", selectScript = ""
-				,rsCreatePartition = "", rsSelectPartition = "", dataStartEnd = "";
+				,rsCreatePartition = "", rsSelectPartition = "", dataStartEnd = "", dataCols = "";
 		boolean isPartition = false;
 		List<Map<String, String>> rsCreatePartitionList = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> rsSelectPartitionList = new ArrayList<Map<String, String>>();
@@ -49,6 +49,7 @@ public class ParseODS {
 				int dataEnd = Integer.parseInt(Tools.getCellValue(row, c++, "資料終點"));
 				int datalen = dataEnd - dataStart + 1;
 				
+				dataCols += dwColEName + ",";
 				dataStartEnd += dataStart + "," + dataEnd + ",";
 				createScript = "\t" + dwColEName + " VARCHAR(" + datalen + ") ,\n";
 				selectScript = "TRIM(SUBSTRING(line," + dataStart + "," + datalen + "))";
@@ -78,7 +79,7 @@ public class ParseODS {
 				}
 			}
 			String tableName = Tools.getCellValue(sheetODS.getRow(0), 4, "TABLE名稱");
-			String txtName = Tools.getCellValue(sheetODS.getRow(0), 8, "來源文字檔檔名");
+			String sourceFileName = Tools.getCellValue(sheetODS.getRow(0), 8, "來源文字檔檔名");
 
 			// 確認最後輸出的partition順序需與Layout頁籤的partition欄位相同
 			boolean isBreak = false;
@@ -97,9 +98,6 @@ public class ParseODS {
 				}
 			}
 			
-//			System.out.println("rsCreatePartition:"+rsCreatePartition);
-//			System.out.println("rsSelectPartition:"+rsSelectPartition);
-
 			// CREATE TABLE Script
 			rsCREATE = "DROP TABLE IF EXISTS " + mapProp.get("hadoop.raw.dbname") + "." + tableName + ";\n"
 					+ "CREATE TABLE IF NOT EXISTS " + mapProp.get("hadoop.raw.dbname") + "." + tableName + " (\n"
@@ -117,8 +115,9 @@ public class ParseODS {
 			mapReturn.put("CreateSql", rsCREATE);
 			mapReturn.put("InsertSql", rsINSERT);
 			mapReturn.put("TableName", tableName);
-			mapReturn.put("TXTName", txtName);
+			mapReturn.put("SourceFileName", sourceFileName);
 			mapReturn.put("DataStartEnd", dataStartEnd);
+			mapReturn.put("DataCols", dataCols);
 			
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);

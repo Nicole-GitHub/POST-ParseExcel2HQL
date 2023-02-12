@@ -1,4 +1,4 @@
-package gss.tools;
+package gss.Tools;
 
 import java.io.FileInputStream;
 import java.io.IOException;

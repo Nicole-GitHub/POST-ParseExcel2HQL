@@ -1,4 +1,4 @@
-package gss.tools;
+package gss.Tools;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,19 +6,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Tools {
@@ -67,33 +67,20 @@ public class Tools {
 	}
 
 	/**
-	 * 取得 Excel的Sheet
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public static Sheet getSheet(String path,String sheetName) {
-		return getWorkbook(path).getSheet(sheetName);
-	}
-
-	/**
 	 * 寫出整理好的Excel檔案
 	 * 
 	 * @param outputPath
 	 * @param outputFileName
 	 */
-	public static void output(Workbook workbook, String excelVersion, String outputPath, String outputFileName) {
+	public static void output(Workbook workbook, String outputPath, String outputFileName) {
 		OutputStream output = null;
 		File f = null;
 		
 		try {
-			String lastFileName =  outputPath.substring(0,outputPath.length()-1);
-			lastFileName = lastFileName.substring(lastFileName.lastIndexOf("/")+1);
-			
-			f = new File(outputPath + (lastFileName.contains("MD") ? "/CSV" : ""));
+			f = new File(outputPath);
 			if(!f.exists()) f.mkdirs();
 			
-			f = new File(outputPath + outputFileName + ("2003".equals(excelVersion) ? ".xls" : ".xlsx"));
+			f = new File(outputPath + outputFileName + ".xlsx");
 			output = new FileOutputStream(f);
 			workbook.write(output);
 		} catch (Exception ex) {
@@ -110,23 +97,6 @@ public class Tools {
 		}
 	}
 
-//	/**
-//	 * 判斷是否有刪除線
-//	 * 
-//	 * @param row
-//	 * @param cellNum
-//	 * @return
-//	 */
-//	protected static Boolean isDelLine(Workbook workbook, String excelVersion, Row row, int cellNum) {
-//		if(!isntBlank(row.getCell(cellNum))) {
-//			return false;
-//		}else if ("2003".equals(excelVersion)) {
-//			return ((HSSFCellStyle) row.getCell(cellNum).getCellStyle()).getFont(workbook).getStrikeout();
-//		} else {
-//			return ((XSSFCellStyle) row.getCell(cellNum).getCellStyle()).getFont().getStrikeout();
-//		}
-//	}
-
 	/**
 	 * 設定寫出檔案時的Style
 	 */
@@ -139,17 +109,49 @@ public class Tools {
 		style.setBorderTop(BorderStyle); // 儲存格格線(上)
 		return style;
 	}
+	
+	/**
+	 * 設定寫出檔案時的Style(標題)
+	 * @param workbook
+	 * @return
+	 */
+	public static CellStyle setTitleStyle(Workbook workbook) {
+		CellStyle style = workbook.createCellStyle();
+		style.setFillForegroundColor(HSSFColor.LIGHT_GREEN.index);//儲存格底色為:紅色
+		style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+		short BorderStyle = CellStyle.BORDER_THIN;
+		style.setBorderBottom(BorderStyle); // 儲存格格線(下)
+		style.setBorderLeft(BorderStyle); // 儲存格格線(左)
+		style.setBorderRight(BorderStyle); // 儲存格格線(右)
+		style.setBorderTop(BorderStyle); // 儲存格格線(上)
+		return style;
+	}
 
 	/**
-	 * 設定Cell內容(含Style)
-	 * 
+	 * 設定字串Cell內容(含Style)
+	 * @param style
 	 * @param cell
 	 * @param row
 	 * @param cellNum
 	 * @param cellValue
 	 */
-	public static void setCell(CellStyle style, Cell cell, Row row, int cellNum, String cellValue) {
-		cell = row.createCell(cellNum);
+	public static void setStringCell(CellStyle style, Cell cell, Row row, int cellNum, String cellValue) {
+		cell = row.createCell(cellNum,Cell.CELL_TYPE_STRING);
+		cell.setCellValue(cellValue);
+		cell.setCellStyle(style);
+	}
+	
+
+	/**
+	 * 設定數值Cell內容(含Style)
+	 * @param style
+	 * @param cell
+	 * @param row
+	 * @param cellNum
+	 * @param cellValue
+	 */
+	public static void setNumericCell(CellStyle style, Cell cell, Row row, int cellNum, double cellValue) {
+		cell = row.createCell(cellNum,Cell.CELL_TYPE_NUMERIC);
 		cell.setCellValue(cellValue);
 		cell.setCellStyle(style);
 	}
@@ -161,24 +163,6 @@ public class Tools {
 		return cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK;
 	}
 	
-	
-	/**
-	 * 寫入 DataMart Cell
-	 */
-	public static void setDataMartCell(CellStyle style, Cell cell, Row row, String dwTableEName, String fieldEName, String dataSource, String sourceTableEName, 
-			String tableCName, String sourceFieldEName, String fieldCName, String procRule) {
-
-		setCell(style, cell, row, 0, dwTableEName);
-		setCell(style, cell, row, 1, fieldEName);
-		setCell(style, cell, row, 2, dataSource);
-		setCell(style, cell, row, 3, sourceTableEName);
-		setCell(style, cell, row, 4, tableCName);
-		setCell(style, cell, row, 5, sourceFieldEName);
-		setCell(style, cell, row, 6, fieldCName);
-		setCell(style, cell, row, 7, procRule);
-		setCell(style, cell, row, 8, "DW");
-		
-	}
 	
 	/**
 	 * 取Excel欄位值
@@ -218,4 +202,63 @@ public class Tools {
 		return cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK;
 	}
 	
+
+	/**
+	 * 取最後一欄的Excel名稱(例:BH欄)
+	 * @param len
+	 * @return
+	 */
+	public static String getLastExcelColName(int len) {
+		List<String> alphabet = Arrays.asList(new String[] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
+				"M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" });
+		int col1 = len / 26;
+		int col2 = len % 26;
+		
+		String rs = col1 > 0 ? alphabet.get(col1 - 1) : "";
+		rs += col2 > 0 ? alphabet.get(col2 - 1) : "";
+		
+		return rs;
+	}
+	
+	/**
+	 * 設定標題 & 凍結首欄 & 首欄篩選
+	 * @param sheet
+	 * @param lastExcelColNameSheet
+	 * @param style
+	 * @param listColName
+	 * @throws Exception
+	 */
+	public static void setTitle(Sheet sheet, String lastExcelColNameSheet, CellStyle style, List<String> listColName)
+			throws Exception {
+		Cell cell = null;
+		int c = 0;
+        sheet.createFreezePane(0,1,0,1); // 凍結首行
+		sheet.setAutoFilter(CellRangeAddress.valueOf("A1:" + lastExcelColNameSheet + "1")); // 設定篩選欄A1:ZZ1
+		Row rowSheet = sheet.createRow(0);
+		for (String col : listColName) {
+			Tools.setStringCell(style, cell, rowSheet, c++, col);
+		}
+	}
+
+	/**
+	 * 調整最後輸出的partition順序(需與Layout頁籤的partition欄位相同)
+	 * @param partitionList
+	 * @param rsSelectPartitionList
+	 * @param rsTargetSelectCols
+	 */
+	public static String tunePartitionOrder(String[] partitionList, List<Map<String, String>> rsSelectPartitionList) {
+		String rsTargetSelectCols = "";
+		// 確認最後輸出的partition順序需與Layout頁籤的partition欄位相同
+		for (String str : partitionList) {
+			for (Map<String, String> rsSelectPartition : rsSelectPartitionList) {
+				str = str.trim();
+				if (rsSelectPartition.get("Col").toString().equalsIgnoreCase(str)) {
+					rsTargetSelectCols += rsSelectPartition.get("Script").toString();
+					break;
+				}
+			}
+		}
+		rsTargetSelectCols += "\tbatchid as batchid \n";
+		return rsTargetSelectCols;
+	}
 }

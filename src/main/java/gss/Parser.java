@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import gss.tableLayout.RunParseTableLayout;
-import gss.txt.RunParseTXT;
+import gss.TableLayout.RunParseTableLayout;
+import gss.Tools.FileTools;
 
 public class Parser {
 	private static final String className = Parser.class.getName();
@@ -25,12 +25,11 @@ public class Parser {
 			boolean isStartupFromJar = runPath.endsWith(".jar");
 //		boolean isStartupFromJar = new File(Parser.class.getProtectionDomain().getCodeSource().getLocation().getPath()).isFile();
 			System.out.println("=== isStartupFromJar: " + isStartupFromJar);
-//		String fileName = "";
 			String path = System.getProperty("user.dir") + File.separator; // Jar
-//		System.out.println("=== Parser.class.Path2: "+path);
 			if (!isStartupFromJar) {// IDE
 				path = os.contains("Mac") ? "/Users/nicole/Dropbox/POST/POST-ParseExcel2HQL/" // Mac
-						: "C:/Users/nicole_tsou/Dropbox/POST/POST-ParseExcel2HQL/"; // win
+//						: "C:/Users/nicole_tsou/Dropbox/POST/POST-ParseExcel2HQL/"; // win
+						: "C:/Users/Nicole/Dropbox/POST/POST-ParseExcel2HQL/"; // win(MSI)
 			}
 
 			// TableLayout Path
@@ -39,37 +38,20 @@ public class Parser {
 			List<String> tableLayoutFileNameList = new ArrayList<String>();
 			String[] fileName = new File(tableLayoutPath).list();
 			for (String str : fileName) {
-				if (new File(path + str).isHidden()) {
-					System.out.println("isHidden:" + str);
-				} else {
+				File f = new File(tableLayoutPath + str);
+				if (!f.isHidden() && f.isFile()) {
 					tableLayoutFileNameList.add(str);
-					System.out.println("isNotHidden:" + str);
+//					System.out.println("isNotHiddenFile:" + str);
 				}
 			}
 
-//			// 來源文字檔 Path
-//			String txtPath = path + "TXT/";
-//			// 列出TableLayout下的所有檔案(不含隱藏檔)
-//			List<String> txtFileNameList = new ArrayList<String>();
-//			fileName = new File(txtPath).list();
-//			for (String str : fileName) {
-//				if (new File(path + str).isHidden()) {
-//					System.out.println("isHidden:" + str);
-//				} else {
-//					txtFileNameList.add(str);
-//					System.out.println("isNotHidden:" + str);
-//				}
-//			}
-
 			System.out.println("Path: " + path 
 					+ "\n TableLayoutPath:" + tableLayoutPath 
-//					+ "\n TXTPath:" + txtPath
 					+ "\n TableLayoutFileName: " + tableLayoutFileNameList
-//					+ "\n txtFileName: " + txtFileNameList
 					);
 
+			FileTools.deleteFolder(path + "Output/");
 			RunParseTableLayout.run(tableLayoutPath, tableLayoutFileNameList);
-//			RunParseTXT.run(txtPath, txtFileNameList);
 			
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);

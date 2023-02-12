@@ -1,4 +1,4 @@
-package gss.tableLayout;
+package gss.TableLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import gss.tools.Tools;
+import gss.Tools.Tools;
 
 public class ParseCols {
 	private static final String className = ParseCols.class.getName();
@@ -101,18 +101,9 @@ public class ParseCols {
 					}
 				}
 			}
+
+			rsTargetSelectCols += Tools.tunePartitionOrder(partitionList, rsSelectPartitionList);
 			
-			// 確認最後輸出的partition順序需與Layout頁籤的partition欄位相同
-			for (String str : partitionList) {
-				for (Map<String, String> rsSelectPartition : rsSelectPartitionList) {
-					str = str.trim();
-					if (rsSelectPartition.get("Col").toString().equalsIgnoreCase(str)) {
-						rsTargetSelectCols += rsSelectPartition.get("Script").toString();
-						break;
-					}
-				}
-			}
-			rsTargetSelectCols += "\tbatchid as batchid \n";
 			// Target Table 的 Create Script 用 Layout 頁籤產
 			mapListCols.add(saveMapListCols(targetTableOld,  rsTargetSelectCols,  rsGroup, mapOrder, ""));
 		} catch (Exception ex) {
