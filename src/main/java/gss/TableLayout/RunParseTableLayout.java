@@ -43,6 +43,7 @@ public class RunParseTableLayout {
 
 			for (String fileName : fileNameList) {
 				String fileNamePath = tableLayoutPath + fileName;
+				System.out.println("\n\n=============================");
 				System.out.println("fileName:" + fileNamePath);
 				Workbook workbook = Tools.getWorkbook(fileNamePath);
 				
@@ -138,6 +139,7 @@ public class RunParseTableLayout {
 	 * @throws IOException
 	 */
 	private static void writeContent(String outputPath, List<Map<String, String>> mapList) throws IOException {
+		System.out.println("\n\n============ Create HQL =================");
 		for (Map<String, String> map : mapList) {
 			String folderName = map.get("Folder").toString();
 			FileTools.createFile(outputPath + folderName + "/", map.get("HQLName"),
