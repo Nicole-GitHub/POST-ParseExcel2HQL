@@ -53,7 +53,7 @@ public class RunParseSourceFile {
 	        String lastExcelColNameSheet1 = Tools.getLastExcelColName(dataColsList.length);
 	        String lastExcelColNameSheet2 = Tools.getLastExcelColName(listNumTypeColName.size());
 
-	     	int r = 1, cSheet1 = 0, cSheet2 = 0, cSheet3 = 0, line = 0;
+	     	int r = 1, cSheet1 = 0, cSheet3 = 0, line = 0;
 	     	Double[] sumNumCol = new Double[dataColsList.length];
 	     	
 	        // 設定標題 & 凍結首欄 & 首欄篩選
@@ -70,7 +70,6 @@ public class RunParseSourceFile {
 					continue;
 				
 				cSheet1 = 0;
-				cSheet2 = 0;
 				rowSheet1 = sheet1.createRow(r);
 				rowSheet2 = sheet2.createRow(r);
 				r++;
@@ -83,16 +82,16 @@ public class RunParseSourceFile {
 					if (content.length() >= end) {
 						Tools.setStringCell(style, cell, rowSheet1, cSheet1++, content.substring(start, end));
 						// 若此欄為數值型態欄位則也寫入一份至sheet2
-						for (String numTypeColName : listNumTypeColName) {
-							if (odsColsName.equalsIgnoreCase(numTypeColName)) {
+						for(int j = 0 ; j < listNumTypeColName.size() ; j++) {
+							if (odsColsName.equalsIgnoreCase(listNumTypeColName.get(j).toString())) {
 								String numContentStr = content.substring(start, end).trim();
 								numContentStr = StringUtils.isBlank(numContentStr) ? "0" : numContentStr;
 								Double numContentDouble = Double.parseDouble(numContentStr);
-								Tools.setNumericCell(style, cell, rowSheet2, cSheet2++, numContentDouble);
+								Tools.setNumericCell(style, cell, rowSheet2, j, numContentDouble);
 
 								// 將數值欄位的值加總
-								sumNumCol[dataColsListNum] = sumNumCol[dataColsListNum] == null ? 0 : sumNumCol[dataColsListNum];
-								sumNumCol[dataColsListNum] += numContentDouble;
+								sumNumCol[j] = sumNumCol[j] == null ? 0 : sumNumCol[j];
+								sumNumCol[j] += numContentDouble;
 								
 								break;
 							}
