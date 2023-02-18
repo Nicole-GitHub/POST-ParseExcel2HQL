@@ -33,7 +33,7 @@ public class ParseLayout {
 		List<Map<String,String>> rsCreatePartitionList = new ArrayList<Map<String,String>>();
 		List<Map<String,String>> listReturn = new ArrayList<Map<String,String>>();
 		// 在Create Table Script 中不需寫長度的 DataType
-		List<String> len0Typelist = Arrays.asList(new String[] {"DATE","TIMESTAMP","INTEGER","SMALLINT","BIGINT"});
+		List<String> len0Typelist = Arrays.asList(new String[] {"DATE","DATETIME","INTEGER","SMALLINT","BIGINT"});
 
 		try {
 			String tableName = Tools.getCellValue(sheetLayout.getRow(0), 4, "TABLE名稱");
@@ -65,7 +65,6 @@ public class ParseLayout {
 				mapReturn.put("Nullable", nullable);
 				listReturn.add(mapReturn);
 				
-				type = "DATETIME".equalsIgnoreCase(type) ? "TIMESTAMP" : type;
 				len = len0Typelist.contains(type.toUpperCase()) ? "" : "(" + len + ")";
 				init = StringUtils.isBlank(init) || "IDENTITY(1,1)".equals(init) ? init : "DEFAULT " + init;
 
@@ -95,7 +94,10 @@ public class ParseLayout {
 			}
 			
 			// MSSQL CREATE TABLE Script
-			rsMSSQL = "-- MSSQL \nCREATE TABLE " + mapProp.get("mssql.dbname") + ".dbo." + tableName + " (\n";
+			String mssqlTableName = mapProp.get("mssql.dbname") + ".dbo." + tableName;
+			rsMSSQL = "-- MSSQL \n"
+					+ "DROP TABLE IF EXISTS " + mssqlTableName + " ;\r\n"
+					+ "CREATE TABLE " + mssqlTableName + " (\n";
 			if (StringUtils.isBlank(pkStr))
 				rsMSSQL += rsMSCols.substring(0, rsMSCols.lastIndexOf(","));
 			else
@@ -113,11 +115,13 @@ public class ParseLayout {
 					}
 				}
 			}
-
+			
 			// HADOOP CREATE TABLE Script
+			rsHPCols = rsHPCols.replace("DATETIME", "TIMESTAMP");
+			String hadoopTableName = mapProp.get("hadoop.raw.dbname") + "." + tableName;
 			rsHADOOP = "-- HADOOP \n"
-					+ "DROP TABLE IF EXISTS " + mapProp.get("hadoop.raw.dbname") + "." + tableName + " ;\r\n"
-					+ "CREATE TABLE IF NOT EXISTS " + mapProp.get("hadoop.raw.dbname") + "." + tableName + " (\n"
+					+ "DROP TABLE IF EXISTS " + hadoopTableName + " ;\r\n"
+					+ "CREATE TABLE IF NOT EXISTS " + hadoopTableName + " (\n"
 					+ rsHPCols.substring(0, rsHPCols.lastIndexOf(",")) + "\n)\n"
 					+ "PARTITIONED BY(" + rsCreatePartition + " batchid BIGINT);";
 			
