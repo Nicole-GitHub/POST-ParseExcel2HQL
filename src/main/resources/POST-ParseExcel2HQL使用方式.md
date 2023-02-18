@@ -6,6 +6,9 @@
 		3.jar檔
 		4.config.properties檔
 	二、修改config.properties檔裡的參數值
+		若Excel無邏輯相關頁籤則runType需為1，反之需為2
+	三、ODS頁籤的"來源文字檔檔名"可不填，若有填則需將對應的TXT檔放入"POST-ParseExcel2HQL/TableLayout/SourceFile/"目錄下
+
 ```
 
 # 執行方式:
@@ -17,6 +20,10 @@
 # 產出結果:
 ```sh
 	執行完後會將產出的HQL會對應Excel檔名分別放入同檔名的資料夾下
+	1.若Excel無邏輯相關頁籤則程式會自動產出1對1抄的簡易邏輯頁籤與對應HQL
+	2.若Excel有邏輯相關頁籤則程式會依頁籤內容產出對應HQL
+	3.若有放置來源文字檔則程式會自動將來源文字檔轉成Excel並整理出數值型態欄位的加總值,另會再判斷NotNull欄位是否有Null值，若有則報錯
+	4.程式會自動產出驗測時所需SQL(含DW/M與ODS)，但維度分群與資料抽樣的SQL需再自行調整
 ```
 
 

@@ -10,11 +10,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -100,6 +103,22 @@ public class Tools {
 	/**
 	 * 設定寫出檔案時的Style
 	 */
+	public static CellStyle setNumStyle(Workbook workbook, int num) {
+		// 將小數位數改為format格式
+		String formatStr = "0";
+		for(int i = 0 ; i < num ; i++)
+			formatStr += ((i == 0) ? "." : "") + "0";
+		
+		CellStyle style = setStyle(workbook);
+		DataFormat format = workbook.createDataFormat(); 
+		style.setDataFormat(format.getFormat(formatStr));
+		style.setFont(setFont(workbook));
+		return style;
+	}
+	
+	/**
+	 * 設定寫出檔案時的Style
+	 */
 	public static CellStyle setStyle(Workbook workbook) {
 		CellStyle style = workbook.createCellStyle();
 		short BorderStyle = CellStyle.BORDER_THIN;
@@ -107,6 +126,7 @@ public class Tools {
 		style.setBorderLeft(BorderStyle); // 儲存格格線(左)
 		style.setBorderRight(BorderStyle); // 儲存格格線(右)
 		style.setBorderTop(BorderStyle); // 儲存格格線(上)
+		style.setFont(setFont(workbook));
 		return style;
 	}
 	
@@ -117,16 +137,29 @@ public class Tools {
 	 */
 	public static CellStyle setTitleStyle(Workbook workbook) {
 		CellStyle style = workbook.createCellStyle();
-		style.setFillForegroundColor(HSSFColor.LIGHT_GREEN.index);//儲存格底色為:紅色
+		style.setFillForegroundColor(HSSFColor.LIGHT_GREEN.index);// 儲存格底色為:紅色
 		style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 		short BorderStyle = CellStyle.BORDER_THIN;
 		style.setBorderBottom(BorderStyle); // 儲存格格線(下)
 		style.setBorderLeft(BorderStyle); // 儲存格格線(左)
 		style.setBorderRight(BorderStyle); // 儲存格格線(右)
 		style.setBorderTop(BorderStyle); // 儲存格格線(上)
+		style.setFont(setFont(workbook));
 		return style;
 	}
 
+	/**
+	 * 設定字型 14pt 微軟正黑體
+	 * @param workbook
+	 * @return
+	 */
+	private static Font setFont(Workbook workbook) {
+		Font font = workbook.createFont();
+		font.setFontHeightInPoints((short) 14);
+		font.setFontName("微軟正黑體");
+		return font;
+	}
+		
 	/**
 	 * 設定字串Cell內容(含Style)
 	 * @param style
@@ -250,11 +283,13 @@ public class Tools {
 		String rsTargetSelectCols = "";
 		// 確認最後輸出的partition順序需與Layout頁籤的partition欄位相同
 		for (String str : partitionList) {
-			for (Map<String, String> rsSelectPartition : rsSelectPartitionList) {
-				str = str.trim();
-				if (rsSelectPartition.get("Col").toString().equalsIgnoreCase(str)) {
-					rsTargetSelectCols += rsSelectPartition.get("Script").toString();
-					break;
+			if (!StringUtils.isBlank(str)) {
+				for (Map<String, String> rsSelectPartition : rsSelectPartitionList) {
+					str = str.trim();
+					if (rsSelectPartition.get("Col").toString().equalsIgnoreCase(str)) {
+						rsTargetSelectCols += rsSelectPartition.get("Script").toString();
+						break;
+					}
 				}
 			}
 		}

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import gss.SourceFile.ChkNotNullContent;
 import gss.SourceFile.RunParseSourceFile;
 import gss.Tools.FileTools;
 import gss.Tools.Property;
@@ -40,7 +41,8 @@ public class RunParseTableLayout {
 
 			// Property
 			Map<String, String> mapProp = Property.getProperties(tableLayoutPath + "../");
-
+			String outputPath = tableLayoutPath + "../Output/";
+			
 			for (String fileName : fileNameList) {
 				String fileNamePath = tableLayoutPath + fileName;
 				System.out.println("\n\n=============================");
@@ -50,6 +52,10 @@ public class RunParseTableLayout {
 				// 防呆 Excel必需要有Layout頁籤
 				if (workbook.getSheet("Layout") == null)
 					throw new Exception(className + " Error: 缺少頁韱:Layout");
+				if ("1".equals(mapProp.get("runType"))) {
+					if (workbook.getSheet("資料關聯") != null || workbook.getSheet("欄位處理邏輯") != null)
+						throw new Exception(className + " Error: runType為1時不可有\"資料關聯\"與\"欄位處理邏輯\"頁籤");
+				}
 				
 				layoutMapList = ParseLayout.run(workbook.getSheet("Layout"), mapProp);
 				layoutMap = layoutMapList.get(layoutMapList.size()-1);// 取最後一筆Main資料
@@ -60,8 +66,11 @@ public class RunParseTableLayout {
 				Sheet sheetODS = workbook.getSheet("ODS");
 				if (sheetODS != null) {
 					odsMap = ParseODS.run(sheetODS, mapProp, partition);
-					if(!StringUtils.isBlank(odsMap.get("SourceFileName").toString()))
-						RunParseSourceFile.run(tableLayoutPath, fileName, layoutMapList, odsMap);
+					String sourceFileName = odsMap.get("SourceFileName").toString();
+					if(!StringUtils.isBlank(sourceFileName)) {
+						RunParseSourceFile.run(outputPath, tableLayoutPath, fileName, layoutMapList, odsMap);
+						ChkNotNullContent.run(outputPath, fileName, sourceFileName, layoutMapList);
+					}
 				}
 
 				// Layout
@@ -89,26 +98,25 @@ public class RunParseTableLayout {
 					map.put("SQL", odsMap.get("CreateSql"));
 					mapList.add(map);
 				}
-				
-				if("1".equals(mapProp.get("runType"))) {
-					WriteToExcel.run(tableLayoutPath, fileName, workbook, layoutMapList, partition, mapProp);
-				} else {
-					// 若 非儲壽類型、無資料關聯、無欄位處理邏輯頁籤 則不讀取邏輯相關頁籤
-					Sheet sheetTableLogic = workbook.getSheet("資料關聯");
-					Sheet sheetColLogic = workbook.getSheet("欄位處理邏輯");
-					if (sheetTableLogic != null && sheetColLogic != null) {
-						tableMapList = ParseTable.run(sheetTableLogic);
-						colsMapList = ParseCols.run(sheetColLogic, partition);
 
-						// 因欄位處理邏輯的table與cols分了兩個頁籤，故先至對應頁籤抓資訊後再拉回此處組合
-						mapList.addAll(
-								BuildLogic.run(tableMapList, colsMapList, mapProp, layoutMap, partition, fileName));
-					}
-				}
+				// IFRS 17 自動產生邏輯HQL與頁籤與rcpt script
+				WriteToExcel.run(outputPath, fileName, workbook, layoutMapList, partition, mapProp);
 				
+				// 若 非儲壽類型、無資料關聯、無欄位處理邏輯頁籤 則不讀取邏輯相關頁籤
+				Sheet sheetTableLogic = workbook.getSheet("資料關聯");
+				Sheet sheetColLogic = workbook.getSheet("欄位處理邏輯");
+				if (sheetTableLogic != null && sheetColLogic != null) {
+					tableMapList = ParseTable.run(sheetTableLogic);
+					colsMapList = ParseCols.run(sheetColLogic, partition);
+
+					// 因欄位處理邏輯的table與cols分了兩個頁籤，故先至對應頁籤抓資訊後再拉回此處組合
+					mapList.addAll(BuildLogic.run(tableMapList, colsMapList, mapProp, layoutMap, partition, fileName));
+				}
+
 			}
 
-			writeContent(tableLayoutPath + "../Output/", mapList);
+			writeContent(outputPath, mapList);
+			
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}

@@ -17,6 +17,8 @@ public class ParseLayout {
 	
 	/**
 	 * 取得 Layout 內容
+	 * 最後一筆list才是組SQL所需
+	 * 前面的list皆為layout資訊
 	 * @param sheetLayout
 	 * @param dbname
 	 * @return
@@ -59,6 +61,8 @@ public class ParseLayout {
 				mapReturn.put("ColCName", colCName);
 				mapReturn.put("ColLen", len);
 				mapReturn.put("ColType", type);
+				mapReturn.put("PK", pk);
+				mapReturn.put("Nullable", nullable);
 				listReturn.add(mapReturn);
 				
 				type = "DATETIME".equalsIgnoreCase(type) ? "TIMESTAMP" : type;
@@ -82,7 +86,7 @@ public class ParseLayout {
 
 				// 非Partiton欄位的位置正常
 				if (!isPartition) {
-					rsHPCols += rsCols + " " + ("N".equals(nullable) ? "NOT NULL" : "") + " " + init + " ,\n";
+					rsHPCols += rsCols + " " + ("N".equals(nullable) ? "NOT NULL" : "") + " ,\n";
 				}
 				
 				// MSSQL
