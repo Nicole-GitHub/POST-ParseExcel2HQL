@@ -6,15 +6,18 @@
 		3.jar檔
 		4.config.properties檔
 	二、修改config.properties檔裡的參數值
-		若Excel無邏輯相關頁籤則runType需為1，反之需為2
-	三、ODS頁籤的"來源文字檔檔名"可不填，若有填則需將對應的TXT檔放入"POST-ParseExcel2HQL/TableLayout/SourceFile/"目錄下
+		若Excel無邏輯相關頁籤則runType=1
+		若只需將資料提供的文字檔轉成Excel則runType=3
+		反之runType=2
+	三、ODS頁籤的"來源文字檔檔名"可不填，若有填則需將對應的TXT檔放入"POST-ParseExcel2HQL/TableLayout/TXTFile/"目錄下
+	四、當runType=3時，Layout頁籤的"文字檔檔名"為必填，並須將對應的TXT檔放入"POST-ParseExcel2HQL/TableLayout/TXTFile/"目錄下
 
 ```
 
 # 執行方式:
 ```sh
-	點兩下bat檔即會跳出CMD畫面
-	畫面中會請您輸入欲轉成HQL的檔案名稱(含副檔名，若有多個請用 pipe | 隔開)
+	點兩下bat檔即會跳出CMD畫面並自動執行
+
 ```
 
 # 產出結果:
