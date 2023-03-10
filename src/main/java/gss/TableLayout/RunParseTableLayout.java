@@ -10,12 +10,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import gss.SourceFile.ChkNotNullContent;
-import gss.SourceFile.RunParseSourceFile;
 import gss.Tools.FileTools;
-import gss.Tools.Property;
 import gss.Tools.Tools;
-import gss.Write.WriteToExcel;
+import gss.Write.ChkSourceFileContent;
+import gss.Write.RunParseTXTFile;
+import gss.Write.WriteToLogic;
 
 public class RunParseTableLayout {
 	private static final String className = RunParseTableLayout.class.getName();
@@ -27,7 +26,7 @@ public class RunParseTableLayout {
 	 * @param map
 	 * @throws Exception
 	 */
-	public static void run(String tableLayoutPath, List<String> fileNameList) throws Exception {
+	public static void run(Map<String, String> mapProp, String tableLayoutPath, List<String> fileNameList) throws Exception {
 		List<Map<String, String>> tableMapList = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> colsMapList = new ArrayList<Map<String, String>>();
 		Map<String, String> layoutMap = new HashMap<String, String>();
@@ -39,8 +38,6 @@ public class RunParseTableLayout {
 
 		try {
 
-			// Property
-			Map<String, String> mapProp = Property.getProperties(tableLayoutPath + "../");
 			String outputPath = tableLayoutPath + "../Output/";
 			
 			for (String fileName : fileNameList) {
@@ -66,10 +63,10 @@ public class RunParseTableLayout {
 				Sheet sheetODS = workbook.getSheet("ODS");
 				if (sheetODS != null) {
 					odsMap = ParseODS.run(sheetODS, mapProp, partition);
-					String sourceFileName = odsMap.get("SourceFileName").toString();
-					if(!StringUtils.isBlank(sourceFileName)) {
-						RunParseSourceFile.run(outputPath, tableLayoutPath, fileName, layoutMapList, odsMap);
-						ChkNotNullContent.run(outputPath, fileName, sourceFileName, layoutMapList);
+					String txtFileName = odsMap.get("TXTFileName").toString();
+					if(!StringUtils.isBlank(txtFileName)) {
+						RunParseTXTFile.parseSourceFile(tableLayoutPath, fileName, layoutMapList, odsMap);
+						ChkSourceFileContent.run(outputPath, fileName, txtFileName, layoutMapList);
 					}
 				}
 
@@ -100,7 +97,7 @@ public class RunParseTableLayout {
 				}
 
 				// IFRS 17 自動產生邏輯HQL與頁籤與rcpt script
-				WriteToExcel.run(outputPath, fileName, workbook, layoutMapList, partition, mapProp);
+				WriteToLogic.run(outputPath, fileName, workbook, layoutMapList, partition, mapProp);
 				
 				// 若 非儲壽類型、無資料關聯、無欄位處理邏輯頁籤 則不讀取邏輯相關頁籤
 				Sheet sheetTableLogic = workbook.getSheet("資料關聯");

@@ -79,7 +79,7 @@ public class ParseODS {
 				}
 			}
 			String tableName = Tools.getCellValue(sheetODS.getRow(0), 4, "TABLE名稱");
-			String sourceFileName = Tools.getCellValue(sheetODS.getRow(0), 8, "來源文字檔檔名");
+			String txtFileName = Tools.getCellValue(sheetODS.getRow(0), 8, "來源文字檔檔名");
 
 			// 確認最後輸出的partition順序需與Layout頁籤的partition欄位相同
 			boolean isBreak = false;
@@ -115,7 +115,7 @@ public class ParseODS {
 			mapReturn.put("CreateSql", rsCREATE);
 			mapReturn.put("InsertSql", rsINSERT);
 			mapReturn.put("TableName", tableName);
-			mapReturn.put("SourceFileName", sourceFileName);
+			mapReturn.put("TXTFileName", txtFileName);
 			mapReturn.put("DataStartEnd", dataStartEnd);
 			mapReturn.put("DataCols", dataCols);
 			

@@ -1,4 +1,4 @@
-package gss.SourceFile;
+package gss.Write;
 
 import java.util.List;
 import java.util.Map;
@@ -10,13 +10,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import gss.Tools.Tools;
 
-/**
- * 檢查Not Null欄位是否有空值
- * @author nicole_tsou
- *
- */
-public class ChkNotNullContent {
-	private static final String className = ChkNotNullContent.class.getName();
+public class ChkSourceFileContent {
+	private static final String className = ChkSourceFileContent.class.getName();
 
 	public static void run(String fileNamePath, String fileName, String sourceFileName,
 			List<Map<String, String>> layoutMapList) throws Exception {

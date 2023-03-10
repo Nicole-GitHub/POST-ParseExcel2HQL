@@ -37,6 +37,7 @@ public class ParseLayout {
 
 		try {
 			String tableName = Tools.getCellValue(sheetLayout.getRow(0), 4, "TABLE名稱");
+			String txtFileName = Tools.getCellValue(sheetLayout.getRow(1), 10, "文字檔檔名");
 			String partition = Tools.getCellValue(sheetLayout.getRow(0), 10, "Partition");
 			String[] partitionList = partition.split(",");
 			
@@ -131,6 +132,7 @@ public class ParseLayout {
 			mapReturn.put("MSSQL", rsMSSQL);
 			mapReturn.put("TableName", tableName);
 			mapReturn.put("Partition", partition);
+			mapReturn.put("TXTFileName", txtFileName);
 			listReturn.add(mapReturn);
 			
 		} catch (Exception ex) {

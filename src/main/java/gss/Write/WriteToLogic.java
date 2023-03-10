@@ -22,8 +22,8 @@ import gss.Tools.Tools;
  * @author Nicole
  *
  */
-public class WriteToExcel {
-	private static final String className = WriteToExcel.class.getName();
+public class WriteToLogic {
+	private static final String className = WriteToLogic.class.getName();
 
 	public static void run(String outputPath, String fileName, Workbook workbook,
 			List<Map<String, String>> layoutMapList, String partition, Map<String, String> mapProp) throws Exception {
@@ -185,8 +185,5 @@ public class WriteToExcel {
 
 		System.out.println(className + " Done!");
 	}
-	
-	
-	
 
 }

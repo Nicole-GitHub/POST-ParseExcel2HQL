@@ -4,9 +4,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import gss.TableLayout.RunParseTableLayout;
 import gss.Tools.FileTools;
+import gss.Tools.Property;
+import gss.Write.RunParseTXTFile;
 
 public class Parser {
 	private static final String className = Parser.class.getName();
@@ -51,7 +54,13 @@ public class Parser {
 					);
 
 			FileTools.deleteFolder(path + "Output/");
-			RunParseTableLayout.run(tableLayoutPath, tableLayoutFileNameList);
+
+			// Property
+			Map<String, String> mapProp = Property.getProperties(path);
+			if("3".equals(mapProp.get("runType"))) 
+				RunParseTXTFile.parseExportFile(mapProp, tableLayoutPath, tableLayoutFileNameList);
+			else
+				RunParseTableLayout.run(mapProp, tableLayoutPath, tableLayoutFileNameList);
 			
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
