@@ -14,7 +14,9 @@ import gss.Tools.FileTools;
 import gss.Tools.Tools;
 import gss.Write.ChkSourceFileContent;
 import gss.Write.RunParseTXTFile;
+import gss.Write.WriteToDataExport;
 import gss.Write.WriteToLogic;
+import gss.Write.WriteToRCPT;
 
 public class RunParseTableLayout {
 	private static final String className = RunParseTableLayout.class.getName();
@@ -59,6 +61,13 @@ public class RunParseTableLayout {
 				partition = layoutMap.get("Partition");
 				fileName = fileName.substring(0, fileName.lastIndexOf("."));
 
+				if ("1".equals(mapProp.get("runType")))
+					WriteToLogic.run(outputPath, fileName, workbook, layoutMapList, partition, mapProp);
+				else if ("2".equals(mapProp.get("runType")))
+					WriteToDataExport.run(outputPath, fileName, layoutMapList, mapProp);
+				
+				WriteToRCPT.run(outputPath, fileName, layoutMapList, mapProp);
+				
 				// 若無ODS頁籤則不產ODS相關hql
 				Sheet sheetODS = workbook.getSheet("ODS");
 				if (sheetODS != null) {
@@ -96,18 +105,18 @@ public class RunParseTableLayout {
 					mapList.add(map);
 				}
 
-				// IFRS 17 自動產生邏輯HQL與頁籤與rcpt script
-				WriteToLogic.run(outputPath, fileName, workbook, layoutMapList, partition, mapProp);
-				
-				// 若 非儲壽類型、無資料關聯、無欄位處理邏輯頁籤 則不讀取邏輯相關頁籤
-				Sheet sheetTableLogic = workbook.getSheet("資料關聯");
-				Sheet sheetColLogic = workbook.getSheet("欄位處理邏輯");
-				if (sheetTableLogic != null && sheetColLogic != null) {
-					tableMapList = ParseTable.run(sheetTableLogic);
-					colsMapList = ParseCols.run(sheetColLogic, partition);
 
-					// 因欄位處理邏輯的table與cols分了兩個頁籤，故先至對應頁籤抓資訊後再拉回此處組合
-					mapList.addAll(BuildLogic.run(tableMapList, colsMapList, mapProp, layoutMap, partition, fileName));
+				if ("2".equals(mapProp.get("runType"))) {
+					// 若 非儲壽類型、無資料關聯、無欄位處理邏輯頁籤 則不讀取邏輯相關頁籤
+					Sheet sheetTableLogic = workbook.getSheet("資料關聯");
+					Sheet sheetColLogic = workbook.getSheet("欄位處理邏輯");
+					if (sheetTableLogic != null && sheetColLogic != null) {
+						tableMapList = ParseTable.run(sheetTableLogic);
+						colsMapList = ParseCols.run(sheetColLogic, partition);
+	
+						// 因欄位處理邏輯的table與cols分了兩個頁籤，故先至對應頁籤抓資訊後再拉回此處組合
+						mapList.addAll(BuildLogic.run(tableMapList, colsMapList, mapProp, layoutMap, partition, fileName));
+					}
 				}
 
 			}

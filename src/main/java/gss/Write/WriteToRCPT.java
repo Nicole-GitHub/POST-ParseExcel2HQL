@@ -1,5 +1,7 @@
 package gss.Write;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,9 +16,36 @@ import gss.Tools.FileTools;
 public class WriteToRCPT {
 	private static final String className = WriteToRCPT.class.getName();
 	
-	public static void run(String outputPath, Map<String, String> mapProp, String tableName, String odsTableName,
-			String rcptODSColLogic, String rcptColLogic) throws Exception {
+	public static void run(String outputPath, String fileName, List<Map<String, String>> layoutMapList, Map<String, String> mapProp)
+			throws Exception {
 		try {
+			List<String> charTypeList = Arrays.asList(new String[] { "VARCHAR", "CHAR" });
+			List<String> intTypeList = Arrays.asList(new String[] { "SMALLINT", "BIGINT", "INTEGER" });
+	        
+			// list的最後一筆位置
+			int layoutMapListLastNum = layoutMapList.size() - 1;
+			String tableName = layoutMapList.get(layoutMapListLastNum).get("TableName");
+	     	String odsTableName = "ODS" + tableName.substring(1);
+			String rcptODSColLogic = "", colLogic = "", rcptColLogic = "";
+			for (Map<String, String> layoutMap : layoutMapList) {
+				if ("Detail".equals(layoutMap.get("MapType"))) {
+					String colEName = layoutMap.get("ColEName").toString().toUpperCase();
+					String colType = layoutMap.get("ColType").toString().toUpperCase();
+					String colLen = layoutMap.get("ColLen").toString().toUpperCase();
+
+					if (intTypeList.contains(colType) || "DECIMAL".equals(colType)) {
+						colLogic = WriteToLogic.getColLogic(charTypeList, intTypeList, colEName, colType, colLen);
+						if (intTypeList.contains(colType)) {
+							rcptODSColLogic += "\tsum(" + colLogic + ") as " + colEName + " ,\n";
+							rcptColLogic += "\tsum(" + colEName + ") as " + colEName + " ,\n";
+						} else if ("DECIMAL".equals(colType)) {
+							rcptODSColLogic += "\tsum(" + colLogic + ") as " + colEName + " ,\n";
+							rcptColLogic += "\tsum(" + colEName + ") as " + colEName + " ,\n";
+						}
+					}
+				}
+			}
+			
 			String raw = mapProp.get("hadoop.raw.dbname");
 			rcptODSColLogic = StringUtils.isBlank(rcptODSColLogic) ? "" : rcptODSColLogic.substring(0,rcptODSColLogic.length() - 2);
 			rcptColLogic = StringUtils.isBlank(rcptColLogic) ? "" : rcptColLogic.substring(0,rcptColLogic.length() - 2);
@@ -25,18 +54,8 @@ public class WriteToRCPT {
 					+ "select count(1) cnt from " + raw + "." + tableName + " ;\n\n" 
 					+ "-- 數值加總\n"
 					+ "Select \n" + rcptODSColLogic + "\n"
-//					+ "	sum(cast(POLICY_K_SEQ as SMALLINT)) as POLICY_K_SEQ ,\n"
-//					+ "	sum(cast(PAY_FRQ as SMALLINT)) as PAY_FRQ ,\n"
-//					+ "	sum(cast(INS_AMT as INTEGER)) as INS_AMT ,\n"
-//					+ "	sum(cast(EXCHANGE_RATE as DECIMAL(8,4))) as EXCHANGE_RATE ,\n"
-//					+ "	sum(cast(AMT as INTEGER)) as AMT \n" 
 					+ "FROM " + raw + "." + odsTableName + " T1 ;\n\n" 
 					+ "Select \n" + rcptColLogic + "\n"
-//					+ "	sum(POLICY_K_SEQ) as POLICY_K_SEQ,\n"
-//					+ "	sum(PAY_FRQ) as PAY_FRQ,\n" 
-//					+ "	sum(INS_AMT) as INS_AMT,\n"
-//					+ "	sum(EXCHANGE_RATE) as EXCHANGE_RATE,\n"
-//					+ "	sum(AMT) as AMT\n" 
 					+ "FROM " + raw + "." + tableName + " T1 ;\n" + "\n" 
 					+ "-- 維度分群加總\n"
 					+ "select POLICY_KIND,count(1) cnt FROM " + raw + "." + odsTableName + " T1 GROUP BY POLICY_KIND;\n" 
@@ -48,7 +67,7 @@ public class WriteToRCPT {
 					+ "SELECT *\n" + "FROM " + raw + "." + tableName + " T1\n" 
 					+ "WHERE POLICY_NO = '' ;";
 
-			FileTools.createFile(outputPath, "RCPT", "sql", sql);
+			FileTools.createFile(outputPath + fileName + "/", "RCPT", "sql", sql);
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}

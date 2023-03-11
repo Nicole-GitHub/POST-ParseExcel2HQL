@@ -24,7 +24,7 @@ public class RunParseTXTFile {
 	public static void parseSourceFile(String tableLayoutPath, String fileName, List<Map<String, String>> layoutMapList,
 			Map<String, String> odsMap) throws Exception {
 
-		String funcName = "parseExportFile";
+		String funcName = "parseSourceFile";
 		try {
 			String txtFileName = odsMap.get("TXTFileName").toString();
 			String dataStartEnd = odsMap.get("DataStartEnd").toString();
@@ -60,11 +60,13 @@ public class RunParseTXTFile {
 				
 				// 防呆 Excel必需要有Layout頁籤
 				if (wbLayout.getSheet("Layout") == null)
-					throw new Exception(className + " Error: 缺少頁韱:Layout");
+					throw new Exception(className + " " + funcName + " Error: 缺少頁韱:Layout");
 				
 				layoutMapList = ParseLayout.run(wbLayout.getSheet("Layout"), mapProp);
 				layoutMap = layoutMapList.get(layoutMapList.size()-1);// 取最後一筆Main資料
 				String txtFileName = layoutMap.get("TXTFileName");
+				if (StringUtils.isBlank(txtFileName))
+					throw new Exception(className + " " + funcName + " Error: 缺少文字檔檔名");
 	
 				List<String> dataStartEndList = new ArrayList<String>();
 				List<String> dataColsList = new ArrayList<String>();
@@ -103,7 +105,7 @@ public class RunParseTXTFile {
 
 		Row rowSheet1 = null, rowSheet2 = null, rowSheet3 = null;
 		Cell cell = null;
-		String funcName = "parseExportFile";
+		String funcName = "toExcel";
 		
 		try {
 
