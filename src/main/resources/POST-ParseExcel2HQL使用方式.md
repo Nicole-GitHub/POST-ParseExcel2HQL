@@ -1,16 +1,17 @@
 # 使用方式:
 ```sh
 	一、將以下四個檔案放在同一目錄下
-		1.欲轉成HQL的Excel檔(可多個)
+		1.TableLayout
 		2.bat檔
 		3.jar檔
 		4.config.properties檔
 	二、修改config.properties檔裡的參數值
-		若Excel無邏輯相關頁籤則runType=1
-		若只需將資料提供的文字檔轉成Excel則runType=3
-		反之runType=2
+		runType:
+			1: Excel無邏輯相關頁籤
+			3: 只需將資料提供的文字檔轉成Excel
+				(Layout頁籤的"文字檔檔名"為必填，並須將對應的TXT檔放入"POST-ParseExcel2HQL/TableLayout/TXTFile/"目錄下)
+			2: 其它情況皆為2
 	三、ODS頁籤的"來源文字檔檔名"可不填，若有填則需將對應的TXT檔放入"POST-ParseExcel2HQL/TableLayout/TXTFile/"目錄下
-	四、當runType=3時，Layout頁籤的"文字檔檔名"為必填，並須將對應的TXT檔放入"POST-ParseExcel2HQL/TableLayout/TXTFile/"目錄下
 
 ```
 
