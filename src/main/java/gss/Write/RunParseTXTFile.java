@@ -144,8 +144,10 @@ public class RunParseTXTFile {
 	     	
 	        // 設定標題 & 凍結首欄 & 首欄篩選
 			Tools.setTitle(sheet1, lastExcelColNameSheet1, style, dataColsList);
-			Tools.setTitle(sheet2, lastExcelColNameSheet2, style, listNumTypeColName);
-			Tools.setTitle(sheet3, lastExcelColNameSheet2, style, listNumTypeColName);
+			if (listNumTypeColName.size() > 0) {
+				Tools.setTitle(sheet2, lastExcelColNameSheet2, style, listNumTypeColName);
+				Tools.setTitle(sheet3, lastExcelColNameSheet2, style, listNumTypeColName);
+			}
 			
 			// 設定內容
 			style = Tools.setStyle(wbOut);
