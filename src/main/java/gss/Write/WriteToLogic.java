@@ -14,22 +14,35 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+import gss.ETLCode.bin.DW_L07_LoadDW;
 import gss.Tools.FileTools;
 import gss.Tools.Tools;
 
 /**
- * IFRS 17 自動產生邏輯HQL與頁籤與rcpt script
+ * IFRS 17 自動產生邏輯HQL與頁籤
  * @author Nicole
  *
  */
 public class WriteToLogic {
 	private static final String className = WriteToLogic.class.getName();
 
+	/**
+	 * 產生邏輯HQL與"資料關聯"、"欄位處理邏輯"頁籤
+	 * 
+	 * @param outputPath
+	 * @param fileName
+	 * @param workbook
+	 * @param layoutMapList
+	 * @param partition
+	 * @param mapProp
+	 * @throws Exception
+	 */
 	public static void run(String outputPath, String fileName, Workbook workbook,
-			List<Map<String, String>> layoutMapList, String partition, Map<String, String> mapProp) throws Exception {
+			List<Map<String, String>> layoutMapList, Map<String, String> mapProp) throws Exception {
 		Sheet sheet1 = null, sheet2 = null;
 		Row rowSheet1 = null, rowSheet2 = null;
 		Cell cell = null;
+		Map<String, String> layoutMap = new HashMap<String, String>();
 		
 		try {
 
@@ -47,8 +60,6 @@ public class WriteToLogic {
 			sheet1 = workbook.createSheet("資料關聯");
 			sheet2 = workbook.createSheet("欄位處理邏輯");
 			
-			// partition
-			String[] partitionList = partition.split(",");
 
 			// 設定標題 & 凍結首欄 & 首欄篩選
 			Tools.setTitle(sheet1, "K", style,
@@ -57,10 +68,15 @@ public class WriteToLogic {
 	        
 	     	// list的最後一筆位置
 			int layoutMapListLastNum = layoutMapList.size() - 1;
-			String tableName = layoutMapList.get(layoutMapListLastNum).get("TableName");
+			layoutMap = layoutMapList.get(layoutMapListLastNum);
+			String tableName = layoutMap.get("TableName");
 	     	String odsTableName = "ODS" + tableName.substring(1);
 			String tableType = "D" + tableName.substring(5, 6);
-
+			String partition = layoutMap.get("Partition");
+			
+			// partition
+			String[] partitionList = partition.split(",");
+			
 			// 設定內容
 			style = Tools.setStyle(workbook);
 			rowSheet1 = sheet1.createRow(1);
@@ -99,15 +115,28 @@ public class WriteToLogic {
 			Tools.setStringCell(style, cell, rowSheet2, 4, "");
 			Tools.setStringCell(style, cell, rowSheet2, 6, "");
 			Tools.setStringCell(style, cell, rowSheet2, 7, "{raw}.TARGET");
-	        
-			for (Map<String, String> layoutMap : layoutMapList) {
-				if ("Detail".equals(layoutMap.get("MapType"))) {
-					String colEName = layoutMap.get("ColEName").toString().toUpperCase();
-					String colType = layoutMap.get("ColType").toString().toUpperCase();
-					String colLen = layoutMap.get("ColLen").toString().toUpperCase();
+			
+			String sumODSColLogic = "", sumColLogic = "", whereSumCol = "";
+			for (Map<String, String> layoutMapFor : layoutMapList) {
+				if ("Detail".equals(layoutMapFor.get("MapType"))) {
+					String colEName = layoutMapFor.get("ColEName").toString().toUpperCase();
+					String colType = layoutMapFor.get("ColType").toString().toUpperCase();
+					String colLen = layoutMapFor.get("ColLen").toString().toUpperCase();
 					
+					// 欄位型態轉換
 					colLogic = getColLogic( charTypeList, intTypeList, colEName, colType, colLen);
 
+					if (intTypeList.contains(colType) || "DECIMAL".equals(colType)) {
+						if (intTypeList.contains(colType)) {
+							sumColLogic += "\t\t\tsum(" + colEName + ") as " + colEName + " ,\n";
+							sumODSColLogic += "\t\t\tsum(" + colLogic + ") as SRC_" + colEName + " ,\n";
+						} else if ("DECIMAL".equals(colType)) {
+							sumColLogic += "\t\t\tsum(" + colEName + ") as " + colEName + " ,\n";
+							sumODSColLogic += "\t\t\tsum(" + colLogic + ") as SRC_" + colEName + " ,\n";
+							whereSumCol += "\t\tand a." + colEName + " = b.SRC_" + colEName + "\n";
+						}
+					}
+					
 					// 寫入Excel
 					Tools.setStringCell(style, cell, rowSheet2, 2, colLogic);
 					Tools.setStringCell(style, cell, rowSheet2, 5, colEName);
@@ -136,16 +165,24 @@ public class WriteToLogic {
 
 			outputPath += fileName + "/";
 			// 調整最後輸出的partition順序(需與Layout頁籤的partition欄位相同)
-			rsTargetSelectCols += Tools.tunePartitionOrder(partitionList, rsSelectPartitionList);
+			rsTargetSelectCols += partitionList[0].length() > 0 ? Tools.tunePartitionOrder(partitionList, rsSelectPartitionList) : "";
+			rsTargetSelectCols = rsTargetSelectCols.substring(0,rsTargetSelectCols.lastIndexOf(","));
+			
+			sumColLogic = StringUtils.isBlank(sumColLogic) ? "" : sumColLogic.substring(0,sumColLogic.length() - 2);
+			sumODSColLogic = StringUtils.isBlank(sumODSColLogic) ? "" : sumODSColLogic.substring(0,sumODSColLogic.length() - 2);
+			whereSumCol = StringUtils.isBlank(whereSumCol) ? "" : whereSumCol.substring(6);
 
-			// 組出完整hql
-			String rawDBName = mapProp.get("hadoop.raw.dbname");
-			String sql = "INSERT OVERWRITE TABLE " + rawDBName + "." + tableName + " \n" + "PARTITION("
-					+ (StringUtils.isBlank(partition) ? "" : partition + ",") + " batchid) \n" + "Select \n"
-					+ rsTargetSelectCols + "FROM " + rawDBName + "." + odsTableName + " T1 ;";
+			// 組出完整hql (DW_L07_LoadDW)
+			String rsHQL = DW_L07_LoadDW.getHQL(partition, mapProp, rsTargetSelectCols, sumColLogic, sumODSColLogic,
+					whereSumCol, tableName, odsTableName);
+			String rsVAR = DW_L07_LoadDW.getVAR(mapProp, tableName, odsTableName);
+			
 			// 將整理好的比對結果另寫出Excel檔
 			Tools.output(workbook, outputPath, fileName);
-			FileTools.createFile(outputPath, tableType + "_L01", "hql", sql);
+			
+			outputPath += "bin/";
+			FileTools.createFile(outputPath, tableType + "_L07_LoadDW", "hql", rsHQL);
+			FileTools.createFile(outputPath, tableType + "_L07_LoadDW", "var", rsVAR);
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}
@@ -154,7 +191,7 @@ public class WriteToLogic {
 	}
 
 	/**
-	 * 整理欄位邏輯
+	 * 欄位型態轉換
 	 * @param charTypeList
 	 * @param intTypeList
 	 * @param colEName

@@ -11,8 +11,17 @@ import gss.Tools.FileTools;
 public class WriteToDataExport {
 	private static final String className = WriteToDataExport.class.getName();
 
-	public static void run(String outputPath, String fileName, List<Map<String, String>> layoutMapList, Map<String, String> mapProp)
-			throws Exception {
+	/**
+	 * 資料提供HQL
+	 * 
+	 * @param outputPath
+	 * @param fileName
+	 * @param layoutMapList
+	 * @param mapProp
+	 * @throws Exception
+	 */
+	public static void run(String outputPath, String fileName, List<Map<String, String>> layoutMapList,
+			Map<String, String> mapProp) throws Exception {
 
 		try {
 
@@ -140,7 +149,7 @@ public class WriteToDataExport {
 					+ "ORDER BY KEY_STR, BATCHID, BLOCK_TYPE, RN\n"
 					+ ";";
 
-			FileTools.createFile(outputPath + fileName + "/", "DM_F01_" + tableNameLast, "hql", sql);
+			FileTools.createFile(outputPath + fileName + "/bin/", "EXPORTFILE", "hql", sql);
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}

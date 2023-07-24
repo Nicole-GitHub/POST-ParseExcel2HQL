@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import gss.ETLCode.CreateTable_ODS;
+import gss.ETLCode.bin.ODS_L06_LoadODS;
+import gss.Tools.FileTools;
 import gss.Tools.Tools;
 
 public class ParseODS {
@@ -21,18 +23,18 @@ public class ParseODS {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Map<String, String> run (Sheet sheetODS, Map<String, String> mapProp, String partition) throws Exception {
+	public static Map<String, String> run(String outputPath, String fileName, Sheet sheetODS,
+			Map<String, String> mapProp, String partition) throws Exception {
 		Row row = null;
-		String rsCREATE = "", rsINSERT = "", rsCreateCols = "", rsSelectCols = "", createScript = "", selectScript = ""
+		String rsCREATE = "", rsHQL = "", rsVAR = "", rsCreateCols = "", rsSelectCols = "", createScript = "", selectScript = ""
 				,rsCreatePartition = "", rsSelectPartition = "", dataStartEnd = "", dataCols = "";
-		boolean isPartition = false;
+		boolean isPartition = false, hasChineseForTable = false;
 		List<Map<String, String>> rsCreatePartitionList = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> rsSelectPartitionList = new ArrayList<Map<String, String>>();
 		Map<String, String> mapReturn = new HashMap<String, String>();
 		Map<String, String> mapPartition = new HashMap<String, String>();
 		
 		try {
-			
 			// partition
 			String[] partitionList = partition.split(",");
 			
@@ -47,14 +49,26 @@ public class ParseODS {
 				c++;// 來源欄位英文名稱
 				int dataStart = Integer.parseInt(Tools.getCellValue(row, c++, "資料起點"));
 				int dataEnd = Integer.parseInt(Tools.getCellValue(row, c++, "資料終點"));
+				c++;// 備註
 				int datalen = dataEnd - dataStart + 1;
+				boolean hasChinese = "Y".equalsIgnoreCase(Tools.getCellValue(row, c++, "是否含有中文"));
+				// 若有其中一個欄位含有中文，則整份Table都算含有中文(傳給外面用的)
+				hasChineseForTable = hasChineseForTable ? true : hasChinese;
 				
 				dataCols += dwColEName + ",";
 				dataStartEnd += dataStart + "," + dataEnd + ",";
 				createScript = "\t" + dwColEName + " VARCHAR(" + datalen + ") ,\n";
-				selectScript = "TRIM(SUBSTRING(line," + dataStart + "," + datalen + "))";
-				selectScript = "\tcase when " + selectScript + " = '' then NULL else " + selectScript + " end AS "
-						+ dwColEName + " ,\n";
+				
+				// 含有中文則需轉碼否則長度截取會出錯
+				if (hasChinese) {
+					selectScript = "TRIM(ENCODE(DECODE(SUBSTRING(ENCODE(SUBSTRING(line," + dataStart + "),'BIG5'),1," + datalen + "),'BIG5'),'UTF8'))";
+					selectScript = "\tcase when " + selectScript + " = '' then NULL \n\t\telse " + selectScript + " end AS "
+							+ dwColEName + " ,\n";
+				} else {
+					selectScript = "TRIM(SUBSTRING(line," + dataStart + "," + datalen + "))";
+					selectScript = "\tcase when " + selectScript + " = '' then NULL else " + selectScript + " end AS "
+							+ dwColEName + " ,\n";
+				}
 				
 				// Partiton欄位的位置要另外放
 				isPartition = false;
@@ -99,25 +113,30 @@ public class ParseODS {
 			}
 			
 			// CREATE TABLE Script
-			rsCREATE = "DROP TABLE IF EXISTS " + mapProp.get("hadoop.raw.dbname") + "." + tableName + ";\n"
-					+ "CREATE TABLE IF NOT EXISTS " + mapProp.get("hadoop.raw.dbname") + "." + tableName + " (\n"
-					+ rsCreateCols.substring(0, rsCreateCols.lastIndexOf(",")) + "\n)\n"
-					+ "PARTITIONED BY(" + rsCreatePartition + " batchid BIGINT);";
+			rsCREATE = CreateTable_ODS.getHQL(partitionList, mapProp, tableName, rsCreateCols, rsCreatePartition);
 			
 			// INSERT INTO Script
-			partition += StringUtils.isBlank(partition) ? "" : ",";
-			rsINSERT = "INSERT OVERWRITE TABLE " + mapProp.get("hadoop.raw.dbname") + "." + tableName + " \n"
-					+ "PARTITION(" + partition + " batchid) \n"
-					+ "SELECT \n" + rsSelectCols + rsSelectPartition + "\tbatchid \n"
-					+ "FROM " + mapProp.get("hadoop.meta.dbname") + "." + tableName + "_data_files \n"
-					+ "WHERE batchid = ${BATCHID} ;";
+			rsHQL = ODS_L06_LoadODS.getHQL(partition, mapProp, rsSelectCols + rsSelectPartition, tableName);
+			rsVAR = ODS_L06_LoadODS.getVAR(mapProp, tableName);
 			
-			mapReturn.put("CreateSql", rsCREATE);
-			mapReturn.put("InsertSql", rsINSERT);
+//			mapReturn.put("CreateSql", rsCREATE);
+//			mapReturn.put("HQLSTR", rsHQL);
+//			mapReturn.put("VARSTR", rsVAR);
 			mapReturn.put("TableName", tableName);
 			mapReturn.put("TXTFileName", txtFileName);
 			mapReturn.put("DataStartEnd", dataStartEnd);
 			mapReturn.put("DataCols", dataCols);
+			mapReturn.put("HasChineseForTable", hasChineseForTable ? "Y" : "N");
+			
+
+			outputPath += fileName + "/";
+			// ODS_CMMW_VSAPC_TEMP.hql
+			FileTools.createFile(outputPath , tableName, "hql", rsCREATE);
+			outputPath += "bin/";
+//			// ODS_L06_LoadODS.hql
+			FileTools.createFile(outputPath , "ODS_L06_LoadODS", "hql", rsHQL);
+//			// ODS_L06_LoadODS.var
+			FileTools.createFile(outputPath , "ODS_L06_LoadODS", "var", rsVAR);
 			
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);

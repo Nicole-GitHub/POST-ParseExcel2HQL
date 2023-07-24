@@ -1,7 +1,6 @@
 package gss.Tools;
 
 import java.io.BufferedReader;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -9,7 +8,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+import org.apache.commons.io.FileUtils;
+
 public class FileTools {
+	private static final String className = FileTools.class.getName();
+
 
 	// 檔案路徑 名稱
 	private static String filenameTemp;
@@ -23,7 +26,8 @@ public class FileTools {
 	 * @param fileContent	檔案內容
 	 * @return 是否建立成功，成功則返回true
 	 */
-	public static boolean createFile(String path, String fileName, String extension, String fileContent) {
+	public static boolean createFile(String path, String fileName, String extension, String fileContent) throws Exception {
+		String funcName = "createFile";
 		Boolean bool = false;
 		File file ;
 		
@@ -41,8 +45,8 @@ public class FileTools {
 			}
 			// 建立檔案成功後，寫入內容到檔案裡
 			writeFileContent(filenameTemp, fileContent);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			throw new Exception(className + " " + funcName + " Error: \n" + ex);
 		}
 		return bool;
 	}
@@ -55,7 +59,8 @@ public class FileTools {
 	 * @return
 	 * @throws IOException
 	 */
-	public static boolean writeFileContent(String filePathName, String newstr) throws IOException {
+	public static boolean writeFileContent(String filePathName, String newstr) throws Exception {
+		String funcName = "writeFileContent";
 		Boolean bool = false;
 //		String filein = "\r\n" + newstr + "\r\n";// 新寫入的行，換行
 //		String temp = "";
@@ -83,8 +88,8 @@ public class FileTools {
 			pw.write(buffer.toString().toCharArray());
 			pw.flush();
 			bool = true;
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			throw new Exception(className + " " + funcName + " Error: \n" + ex);
 		} finally {
 			if (pw != null)	pw.close();
 			if (fos != null) fos.close();
@@ -98,7 +103,8 @@ public class FileTools {
 	/**
 	 * 讀取檔案內容
 	 */
-	public static String readFileContent(String filePathName) throws IOException {
+	public static String readFileContent(String filePathName) throws Exception {
+		String funcName = "readFileContent";
 		String temp = "";
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
@@ -120,14 +126,14 @@ public class FileTools {
 			
 //			System.out.println(buffer);
 			return buffer.toString();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			throw new Exception(className + " " + funcName + " Error: \n" + ex);
 		} finally {
 			if (br != null) br.close();
 			if (isr != null) isr.close();
 			if (fis != null) fis.close();
 		}
-		return "";
+//		return "";
 	}
 	
 	/**
@@ -155,6 +161,19 @@ public class FileTools {
 			}
 		}
 		file.delete();
+	}
+
+	/**
+	 * 複製檔案
+	 * @param file
+	 * @throws Exception 
+	 */
+	public static void copyFile(String srcDirPath, String destDirPath) throws Exception {
+		try {
+			FileUtils.copyDirectory(new File(srcDirPath), new File(destDirPath));
+		} catch (IOException ex) {
+			throw new Exception(className + " copyFile Error: \n" + ex);
+		}
 	}
 
 }

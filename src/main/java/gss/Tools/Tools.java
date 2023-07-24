@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -283,17 +282,14 @@ public class Tools {
 		String rsTargetSelectCols = "";
 		// 確認最後輸出的partition順序需與Layout頁籤的partition欄位相同
 		for (String str : partitionList) {
-			if (!StringUtils.isBlank(str)) {
-				for (Map<String, String> rsSelectPartition : rsSelectPartitionList) {
-					str = str.trim();
-					if (rsSelectPartition.get("Col").toString().equalsIgnoreCase(str)) {
-						rsTargetSelectCols += rsSelectPartition.get("Script").toString();
-						break;
-					}
+			for (Map<String, String> rsSelectPartition : rsSelectPartitionList) {
+				str = str.trim();
+				if (rsSelectPartition.get("Col").toString().equalsIgnoreCase(str)) {
+					rsTargetSelectCols += rsSelectPartition.get("Script").toString();
+					break;
 				}
 			}
 		}
-		rsTargetSelectCols += "\tbatchid as batchid \n";
 		return rsTargetSelectCols;
 	}
 }

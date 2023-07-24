@@ -1,6 +1,5 @@
 package gss.TableLayout;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,7 @@ import gss.Write.ChkSourceFileContent;
 import gss.Write.RunParseTXTFile;
 import gss.Write.WriteToDataExport;
 import gss.Write.WriteToLogic;
-import gss.Write.WriteToRCPT;
+import gss.Write.WriteToOther;
 
 public class RunParseTableLayout {
 	private static final String className = RunParseTableLayout.class.getName();
@@ -35,7 +34,7 @@ public class RunParseTableLayout {
 		Map<String, String> odsMap = new HashMap<String, String>();
 		List<Map<String, String>> layoutMapList = new ArrayList<Map<String, String>>();
 		List<Map<String, String>> mapList = new ArrayList<Map<String, String>>();
-		Map<String, String> map;
+//		Map<String, String> map;
 		String partition = "";
 
 		try {
@@ -56,56 +55,41 @@ public class RunParseTableLayout {
 						throw new Exception(className + " Error: runType為1時不可有\"資料關聯\"與\"欄位處理邏輯\"頁籤");
 				}
 				
-				layoutMapList = ParseLayout.run(workbook.getSheet("Layout"), mapProp);
+				// 取得 Layout 內容，最後一筆list才是組SQL所需，前面的list皆為layout資訊
+				fileName = fileName.substring(0, fileName.lastIndexOf("."));
+				layoutMapList = ParseLayout.run(outputPath, fileName, workbook.getSheet("Layout"), mapProp);
 				layoutMap = layoutMapList.get(layoutMapList.size()-1);// 取最後一筆Main資料
 				partition = layoutMap.get("Partition");
-				fileName = fileName.substring(0, fileName.lastIndexOf("."));
 
 				if ("1".equals(mapProp.get("runType")))
-					WriteToLogic.run(outputPath, fileName, workbook, layoutMapList, partition, mapProp);
+					WriteToLogic.run(outputPath, fileName, workbook, layoutMapList, mapProp);
 				else if ("2".equals(mapProp.get("runType")))
 					WriteToDataExport.run(outputPath, fileName, layoutMapList, mapProp);
 				
-				WriteToRCPT.run(outputPath, fileName, layoutMapList, mapProp);
 				
 				// 若無ODS頁籤則不產ODS相關hql
 				Sheet sheetODS = workbook.getSheet("ODS");
+				String finalLen = "0", txtFileName = "", hasChineseForTable = "";
 				if (sheetODS != null) {
-					odsMap = ParseODS.run(sheetODS, mapProp, partition);
-					String txtFileName = odsMap.get("TXTFileName").toString();
+					odsMap = ParseODS.run(outputPath, fileName, sheetODS, mapProp, partition);
+					String[] dataStartEnd = odsMap.get("DataStartEnd").split(",");
+					finalLen = dataStartEnd[dataStartEnd.length -1];
+					hasChineseForTable = odsMap.get("HasChineseForTable");
+					
+					// 將來源文字檔轉成Excel格式
+					txtFileName = odsMap.get("TXTFileName").toString();
 					if(!StringUtils.isBlank(txtFileName)) {
-						RunParseTXTFile.parseSourceFile(tableLayoutPath, fileName, layoutMapList, odsMap);
-						ChkSourceFileContent.run(outputPath, fileName, txtFileName, layoutMapList);
+						try {
+							RunParseTXTFile.parseSourceFile(tableLayoutPath, fileName, layoutMapList, odsMap);
+							ChkSourceFileContent.run(outputPath, fileName, txtFileName, layoutMapList);
+						} catch(Exception ex) {
+							System.out.println(className + " Warn: \n" + ex.getMessage());
+						}
 					}
 				}
 
-				// Layout
-				map = new HashMap<String, String>();
-				map.put("Folder", fileName);
-				map.put("HQLName", "create_HP_" + layoutMap.get("TableName"));
-				map.put("SQL", layoutMap.get("HPSQL"));
-				mapList.add(map);
-				map = new HashMap<String, String>();
-				map.put("Folder", fileName);
-				map.put("HQLName", "create_MS_" + layoutMap.get("TableName"));
-				map.put("SQL", layoutMap.get("MSSQL"));
-				mapList.add(map);
-
-				// ODS
-				if (odsMap.size() > 0) {
-					map = new HashMap<String, String>();
-					map.put("Folder", fileName);
-					map.put("HQLName", "ODS_L01_" + odsMap.get("TableName"));
-					map.put("SQL", odsMap.get("InsertSql"));
-					mapList.add(map);
-					map = new HashMap<String, String>();
-					map.put("Folder", fileName);
-					map.put("HQLName", "create_" + odsMap.get("TableName"));
-					map.put("SQL", odsMap.get("CreateSql"));
-					mapList.add(map);
-				}
-
-
+				WriteToOther.run(outputPath, fileName, layoutMapList, finalLen, hasChineseForTable, txtFileName, mapProp);
+				
 				if ("2".equals(mapProp.get("runType"))) {
 					// 若 非儲壽類型、無資料關聯、無欄位處理邏輯頁籤 則不讀取邏輯相關頁籤
 					Sheet sheetTableLogic = workbook.getSheet("資料關聯");
@@ -115,10 +99,9 @@ public class RunParseTableLayout {
 						colsMapList = ParseCols.run(sheetColLogic, partition);
 	
 						// 因欄位處理邏輯的table與cols分了兩個頁籤，故先至對應頁籤抓資訊後再拉回此處組合
-						mapList.addAll(BuildLogic.run(tableMapList, colsMapList, mapProp, layoutMap, partition, fileName));
+						mapList.addAll(BuildLogic.run(tableMapList, colsMapList, mapProp, layoutMap, fileName));
 					}
 				}
-
 			}
 
 			writeContent(outputPath, mapList);
@@ -150,14 +133,23 @@ public class RunParseTableLayout {
 	 * 
 	 * @param outputPath
 	 * @param mapList
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	private static void writeContent(String outputPath, List<Map<String, String>> mapList) throws IOException {
-		System.out.println("\n\n============ Create HQL =================");
+	private static void writeContent(String outputPath, List<Map<String, String>> mapList) throws Exception {
+//		System.out.println("\n\n============ Create HQL =================");
+		String aux = ""; 
+		
 		for (Map<String, String> map : mapList) {
+			if(map.get("HQLName").startsWith("MS_"))
+				aux = "sql";
+			else if(map.get("HQLName").endsWith(".var"))
+				aux = "var";
+			else
+				aux = "hql";
+			
+			String fileName = map.get("HQLName").endsWith(".var") ? map.get("HQLName").substring(0,map.get("HQLName").lastIndexOf(".")) : map.get("HQLName");
 			String folderName = map.get("Folder").toString();
-			FileTools.createFile(outputPath + folderName + "/", map.get("HQLName"),
-					map.get("HQLName").startsWith("create_MS_") ? "sql" : "hql", map.get("SQL"));
+			FileTools.createFile(outputPath + folderName + "/", fileName, aux, map.get("SQL"));
 		}
 	}
 }

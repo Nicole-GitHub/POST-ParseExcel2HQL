@@ -102,7 +102,8 @@ public class ParseCols {
 				}
 			}
 
-			rsTargetSelectCols += Tools.tunePartitionOrder(partitionList, rsSelectPartitionList);
+			rsTargetSelectCols += partitionList[0].length() > 0 ? Tools.tunePartitionOrder(partitionList, rsSelectPartitionList) : "";
+			rsTargetSelectCols = rsTargetSelectCols.substring(0,rsTargetSelectCols.lastIndexOf(","));
 			
 			// Target Table 的 Create Script 用 Layout 頁籤產
 			mapListCols.add(saveMapListCols(targetTableOld,  rsTargetSelectCols,  rsGroup, mapOrder, ""));

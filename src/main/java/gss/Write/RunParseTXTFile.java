@@ -21,6 +21,15 @@ import gss.Tools.Tools;
 public class RunParseTXTFile {
 	private static final String className = RunParseTXTFile.class.getName();
 	
+	/**
+	 * 將來源文字檔轉成Excel格式
+	 * 
+	 * @param tableLayoutPath
+	 * @param fileName
+	 * @param layoutMapList
+	 * @param odsMap
+	 * @throws Exception
+	 */
 	public static void parseSourceFile(String tableLayoutPath, String fileName, List<Map<String, String>> layoutMapList,
 			Map<String, String> odsMap) throws Exception {
 
@@ -42,14 +51,24 @@ public class RunParseTXTFile {
 		System.out.println(className + " " + funcName + " Done!");
 	}
 	
-	public static void parseExportFile(Map<String, String> mapProp, String tableLayoutPath, List<String> fileNameList)
+	/**
+	 * 將資料提供的文字檔轉成Excel格式(不可使用)
+	 * 
+	 * @param mapProp
+	 * @param tableLayoutPath
+	 * @param fileNameList
+	 * @throws Exception
+	 */
+	public static void XXparseExportFile(Map<String, String> mapProp, String tableLayoutPath, List<String> fileNameList)
 			throws Exception {
 
 		List<Map<String, String>> layoutMapList = new ArrayList<Map<String, String>>();
 		Map<String, String> layoutMap = new HashMap<String, String>();
 		String funcName = "parseExportFile";
 		
-		try {
+		try {			
+			String outputPath = tableLayoutPath + "../Output/";
+
 			for (String fileName : fileNameList) {
 				
 				String fileNamePath = tableLayoutPath + fileName;
@@ -62,7 +81,7 @@ public class RunParseTXTFile {
 				if (wbLayout.getSheet("Layout") == null)
 					throw new Exception(className + " " + funcName + " Error: 缺少頁韱:Layout");
 				
-				layoutMapList = ParseLayout.run(wbLayout.getSheet("Layout"), mapProp);
+				layoutMapList = ParseLayout.run(outputPath, fileName, wbLayout.getSheet("Layout"), mapProp);
 				layoutMap = layoutMapList.get(layoutMapList.size()-1);// 取最後一筆Main資料
 				String txtFileName = layoutMap.get("TXTFileName");
 				if (StringUtils.isBlank(txtFileName))
@@ -99,6 +118,17 @@ public class RunParseTXTFile {
 		System.out.println(className + " " + funcName + " Done!");
 	}
 
+	/**
+	 * 將來源文字檔轉成Excel格式
+	 * 
+	 * @param fileName
+	 * @param tableLayoutPath
+	 * @param txtFileName
+	 * @param layoutMapList
+	 * @param dataColsList
+	 * @param dataStartEndList
+	 * @throws Exception
+	 */
 	private static void toExcel(String fileName, String tableLayoutPath, String txtFileName,
 			List<Map<String, String>> layoutMapList, List<String> dataColsList,
 			List<String> dataStartEndList) throws Exception {
@@ -111,7 +141,7 @@ public class RunParseTXTFile {
 
 			String outputPath = tableLayoutPath + "../Output/";
 			String txtFilePath = tableLayoutPath + "TXTFile/";
-			String txtFileContent = FileTools.readFileContent(txtFilePath + txtFileName + ".txt");
+			String txtFileContent = FileTools.readFileContent(txtFilePath + txtFileName);
 			String[] txtFileContentList = txtFileContent.split("\n");
 			
 			// 整理出Layout頁籤數值型態的欄位
@@ -195,7 +225,7 @@ public class RunParseTXTFile {
 							}
 						}
 					} else
-						break;
+						throw new Exception("資料長度小於ODS頁籤的最大值");
 				}
 			}
 	

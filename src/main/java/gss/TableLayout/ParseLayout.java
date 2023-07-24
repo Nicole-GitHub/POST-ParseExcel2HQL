@@ -10,6 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import gss.ETLCode.CreateTable_MSSQL;
+import gss.ETLCode.CreateTable_T;
+import gss.Tools.FileTools;
 import gss.Tools.Tools;
 
 public class ParseLayout {
@@ -24,7 +27,8 @@ public class ParseLayout {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Map<String,String>> run (Sheet sheetLayout, Map<String, String> mapProp) throws Exception {
+	public static List<Map<String, String>> run(String outputPath, String fileName, Sheet sheetLayout,
+			Map<String, String> mapProp) throws Exception {
 		Row row = null;
 		String rsMSSQL = "", rsHADOOP = "", rsCols = "", rsHPCols = "", rsMSCols = "", pkStr = "", rsCreatePartition = "";
 		boolean isPartition = false;
@@ -37,8 +41,8 @@ public class ParseLayout {
 
 		try {
 			String tableName = Tools.getCellValue(sheetLayout.getRow(0), 4, "TABLE名稱");
-			String txtFileName = Tools.getCellValue(sheetLayout.getRow(1), 10, "文字檔檔名");
-			String partition = Tools.getCellValue(sheetLayout.getRow(0), 10, "Partition");
+			String txtFileName = Tools.getCellValue(sheetLayout.getRow(1), 8, "文字檔檔名");
+			String partition = Tools.getCellValue(sheetLayout.getRow(0), 8, "Partition");
 			String[] partitionList = partition.split(",");
 			
 			// 解析資料內容(從第五ROW開頭爬)
@@ -74,7 +78,7 @@ public class ParseLayout {
 				// HADOOP
 				// Partiton欄位的位置要另外放
 				isPartition = false;
-				for(String str :partitionList) {
+				for(String str : partitionList) {
 					if(colEName.equals(str)) {
 						mapCreatePartition = new HashMap<String, String>();
 						mapCreatePartition.put("Col", colEName);
@@ -95,15 +99,8 @@ public class ParseLayout {
 			}
 			
 			// MSSQL CREATE TABLE Script
-			String mssqlTableName = mapProp.get("mssql.dbname") + ".dbo." + tableName;
-			rsMSSQL = "-- MSSQL \n"
-					+ "DROP TABLE IF EXISTS " + mssqlTableName + " ;\r\n"
-					+ "CREATE TABLE " + mssqlTableName + " (\n";
-			if (StringUtils.isBlank(pkStr))
-				rsMSSQL += rsMSCols.substring(0, rsMSCols.lastIndexOf(","));
-			else
-				rsMSSQL += rsMSCols + "\tPRIMARY KEY (" + pkStr.substring(0, pkStr.length() - 1) + ")";
-			rsMSSQL += "\n);";
+			rsMSCols = rsMSCols.replace(" CHAR(", " NCHAR(");
+			rsMSSQL = CreateTable_MSSQL.getSQL(pkStr, rsMSCols, mapProp.get("mssql.dbname") + ".dbo." + tableName);
 			
 			// 確認最後輸出的partition順序需與Layout頁籤的partition欄位相同
 			for (String str : partitionList) {
@@ -111,7 +108,7 @@ public class ParseLayout {
 					String createPartitonCol = map.get("Col").toString();
 					str = str.trim();
 					if (createPartitonCol.equalsIgnoreCase(str)) {
-						rsCreatePartition += map.get("Script").toString().substring(1);;
+						rsCreatePartition += map.get("Script").toString().substring(1);
 						break;
 					}
 				}
@@ -119,21 +116,22 @@ public class ParseLayout {
 			
 			// HADOOP CREATE TABLE Script
 			rsHPCols = rsHPCols.replace("DATETIME", "TIMESTAMP");
-			String hadoopTableName = mapProp.get("hadoop.raw.dbname") + "." + tableName;
-			rsHADOOP = "-- HADOOP \n"
-					+ "DROP TABLE IF EXISTS " + hadoopTableName + " ;\r\n"
-					+ "CREATE TABLE IF NOT EXISTS " + hadoopTableName + " (\n"
-					+ rsHPCols.substring(0, rsHPCols.lastIndexOf(",")) + "\n)\n"
-					+ "PARTITIONED BY(" + rsCreatePartition + " batchid BIGINT);";
+			rsHADOOP = CreateTable_T.getHQL(partitionList, rsCreatePartition, rsHPCols, mapProp.get("hadoop.raw.dbname") + "." + tableName);
 			
 			mapReturn = new HashMap<String, String>();
 			mapReturn.put("MapType", "Main");
-			mapReturn.put("HPSQL", rsHADOOP);
-			mapReturn.put("MSSQL", rsMSSQL);
+//			mapReturn.put("HPSQL", rsHADOOP);
+//			mapReturn.put("MSSQL", rsMSSQL);
 			mapReturn.put("TableName", tableName);
 			mapReturn.put("Partition", partition);
 			mapReturn.put("TXTFileName", txtFileName);
 			listReturn.add(mapReturn);
+
+			outputPath += fileName + "/";
+//			// T_CMMW_VSAPC_TEMP.hql
+			FileTools.createFile(outputPath , tableName, "hql", rsHADOOP);
+//			// MS_T_CMMW_VSAPC_TEMP.sql
+			FileTools.createFile(outputPath , "MS_" + tableName, "sql", rsMSSQL);
 			
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);

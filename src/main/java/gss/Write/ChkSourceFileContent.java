@@ -13,6 +13,16 @@ import gss.Tools.Tools;
 public class ChkSourceFileContent {
 	private static final String className = ChkSourceFileContent.class.getName();
 
+	/**
+	 * 驗證來源文字檔內容格式是否有誤
+	 * 例:not null欄位有null
+	 * 
+	 * @param fileNamePath
+	 * @param fileName
+	 * @param sourceFileName
+	 * @param layoutMapList
+	 * @throws Exception
+	 */
 	public static void run(String fileNamePath, String fileName, String sourceFileName,
 			List<Map<String, String>> layoutMapList) throws Exception {
 		

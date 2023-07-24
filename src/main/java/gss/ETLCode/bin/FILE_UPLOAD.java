@@ -1,0 +1,120 @@
+package gss.ETLCode.bin;
+
+import java.util.Map;
+
+public class FILE_UPLOAD {
+
+	public static String getShell(Map<String, String> mapProp, String tableName, String txtFileName) {
+		
+		String rs = "## FUNCTION: Upload files from local store to hdfs.\n"
+				+ "\n"
+				+ "source ${ENV_STR}\n"
+				+ "\n"
+				+ "########################\n"
+				+ "## Parameter liating: ##\n"
+				+ "########################\n"
+				+ "##    BATCHID: batchid, job id. the framework will handle this.\n"
+				+ "declare BATCHID=20230329000000;\n"
+				+ "\n"
+				+ "## SRC_PATH: source uri. local directory.\n"
+				+ "declare SRC_PATH=/home/post1/DW_WORK/download/"+tableName+"/WORK/*.*\n"
+				+ "declare SRC1=\n"
+				+ "declare SRC1_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_C01_UploadFile.hql\n"
+				+ "declare SRC2_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_C02_GetDataFileName.hql\n"
+				+ "declare SRC3_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_C03_GetErrorData.hql\n"
+				+ "declare SRC4_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_C04_GetData.hql\n"
+				+ "declare SRC5_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_C05_GetDoneFile.hql\n"
+				+ "declare SRC6_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/TRUNCATE_ODS.hql\n"
+				+ "declare SRC7_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_L06_LoadODS.hql\n"
+				+ "declare SRC8_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/BACKUP_DW.hql\n"
+				+ "\n"
+				+ "## DES_PATH: destination uri.\n"
+				+ "declare DES_PATH=/user/post1/Upload/tmp/"+tableName+"/\n"
+				+ "\n"
+				+ "## LOGIC_NAME: logic name.\n"
+				+ "declare LOGIC_NAME="+tableName+"\n"
+				+ "\n"
+				+ "#  FUNC_NAME: main function name.\n"
+				+ "declare FUNC_NAME=dfs_upload\n"
+				+ "\n"
+				+ "## KEY_NAME: key_name of msg in the result table.\n"
+				+ "declare KEY_NAME=return_code\n"
+				+ "\n"
+				+ "## TMP1: a table holds verification stats.\n"
+				+ "declare TMP1=tmp_tab01_verivication_stat\n"
+				+ "\n"
+				+ "\n"
+				+ "\n"
+				+ "# MAIN LOGIC START\n"
+				+ "\n"
+				+ "# gssShell: ETL-FRAMEWORK TOOL\n"
+				+ "# CREATE REMOTE STORE SPACE\n"
+				+ "# gssShell fs -mkdir ${DES_PATH}\n"
+				+ "\n"
+				+ "#GET FILE FROM $/home/DW_WORK/download/\n"
+				+ "sh ${GET_SHELL} -T "+tableName+" -F *"+txtFileName.substring(0,txtFileName.lastIndexOf("."))+"*.* -u\n"
+				+ "\n"
+				+ "# UPLOAD FILES TO THE REMOTE STORE\n"
+				+ "gssShell fs -put ${SRC_PATH} ${DES_PATH}\n"
+				+ "\n"
+				+ "# BACK UP ETL FILE\n"
+				+ "sh ${DONE_SHELL} -T "+tableName+"\n"
+				+ "\n"
+				+ "gssSQLConn --user hdfs --logic-file ${SRC1_PATH} --var BATCHID=${BATCHID}\n"
+				+ "gssSQLConn --user hdfs --logic-file ${SRC2_PATH} --var BATCHID=${BATCHID}\n"
+				+ "gssSQLConn --user hdfs --logic-file ${SRC3_PATH} --var BATCHID=${BATCHID}\n"
+				+ "gssSQLConn --user hdfs --logic-file ${SRC4_PATH} --var BATCHID=${BATCHID}\n"
+				+ "gssSQLConn --user hdfs --logic-file ${SRC5_PATH} --var BATCHID=${BATCHID}\n"
+				+ "gssSQLConn --user hdfs --logic-file ${SRC6_PATH} --var BATCHID=${BATCHID}\n"
+				+ "gssSQLConn --user hdfs --logic-file ${SRC7_PATH} --var BATCHID=${BATCHID}\n"
+				+ "gssSQLConn --user hdfs --logic-file ${SRC8_PATH} --var BATCHID=${BATCHID}\n"
+				+ "\n"
+				+ "";
+		
+		return rs;
+	}
+
+
+	public static String getShellVAR(String tableName) {
+		
+		String rs = "## FUNCTION: Upload files from local store to hdfs.\n"
+				+ "\n"
+				+ "########################\n"
+				+ "## Parameter liating: ##\n"
+				+ "########################\n"
+				+ "##    BATCHID: batchid, job id. the framework will handle this.\n"
+				+ "declare BATCHID=20230329000000;\n"
+				+ "\n"
+				+ "## SRC_PATH: source uri. local directory.\n"
+				+ "declare SRC_PATH=/home/post1/DW_WORK/download/"+tableName+"/WORK/*.*\n"
+				+ "declare SRC1=\n"
+				+ "declare SRC1_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_C01_UploadFile.hql\n"
+				+ "declare SRC2_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_C02_GetDataFileName.hql\n"
+				+ "declare SRC3_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_C03_GetErrorData.hql\n"
+				+ "declare SRC4_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_C04_GetData.hql\n"
+				+ "declare SRC5_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_C05_GetDoneFile.hql\n"
+				+ "declare SRC6_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/TRUNCATE_ODS.hql\n"
+				+ "declare SRC7_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/ODS_L06_LoadODS.hql\n"
+				+ "declare SRC8_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/BACKUP_DW.hql\n"
+				+ "\n"
+				+ "## DES_PATH: destination uri.\n"
+				+ "declare DES_PATH=/user/post1/Upload/tmp/"+tableName+"/\n"
+				+ "\n"
+				+ "## LOGIC_NAME: logic name.\n"
+				+ "declare LOGIC_NAME="+tableName+"\n"
+				+ "\n"
+				+ "#  FUNC_NAME: main function name.\n"
+				+ "declare FUNC_NAME=dfs_upload\n"
+				+ "\n"
+				+ "## KEY_NAME: key_name of msg in the result table.\n"
+				+ "declare KEY_NAME=return_code\n"
+				+ "\n"
+				+ "## TMP1: a table holds verification stats.\n"
+				+ "declare TMP1=tmp_tab01_verivication_stat\n"
+				+ "\n";
+		
+		return rs;
+	}
+
+
+}

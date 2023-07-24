@@ -14,14 +14,15 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class BuildLogic {
 	private static final String className = BuildLogic.class.getName();
-	
-	public static List<Map<String, String>> run (List<Map<String, String>> tableMapList, List<Map<String, String>> colsMapList , Map<String, String> mapProp
-			, Map<String, String> layoutMap, String partition, String fileName) throws Exception {
+
+	public static List<Map<String, String>> run(List<Map<String, String>> tableMapList,
+			List<Map<String, String>> colsMapList, Map<String, String> mapProp, Map<String, String> layoutMap,
+			String fileName) throws Exception {
 
 		List<Map<String, String>> mapList = new ArrayList<Map<String, String>>();
 		Map<String, String> map = new HashMap<String, String>();
 		String tableType = "D" + layoutMap.get("TableName").substring(5, 6);
-
+		String partition = layoutMap.get("Partition");
 		String rawDBName = mapProp.get("hadoop.raw.dbname");
 		String tmpDBName = mapProp.get("hadoop.tmp.dbname");
 		try {

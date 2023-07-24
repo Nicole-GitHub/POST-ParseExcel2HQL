@@ -57,9 +57,9 @@ public class Parser {
 
 			// Property
 			Map<String, String> mapProp = Property.getProperties(path);
-			if("3".equals(mapProp.get("runType"))) 
-				RunParseTXTFile.parseExportFile(mapProp, tableLayoutPath, tableLayoutFileNameList);
-			else
+			if("3".equals(mapProp.get("runType"))) {
+//				RunParseTXTFile.parseExportFile(mapProp, tableLayoutPath, tableLayoutFileNameList);
+			}else
 				RunParseTableLayout.run(mapProp, tableLayoutPath, tableLayoutFileNameList);
 			
 		} catch (Exception ex) {
