@@ -54,6 +54,7 @@ public class WriteToOther {
 					selectStr += "\t" + layoutMapfor.get("ColEName") + ",\n";
 				}
 			}
+			
 	     	String desc = description.get();
 	     	String flowAll = flow.get_def_all();
 	     	String flowNoExport = flow.get_def_noExport();

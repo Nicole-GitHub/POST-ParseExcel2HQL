@@ -2,16 +2,16 @@
 ```sh
 	一、將以下四個檔案放在同一目錄下
 		1.TableLayout
-		2.bat檔
-		3.jar檔
-		4.config.properties檔
+		2.CopyFile
+		3.bat檔
+		4.jar檔
+		5.config.properties檔
 	二、修改config.properties檔裡的參數值
 		runType:
-			1: Excel無邏輯相關頁籤
-			3: 只需將資料提供的文字檔轉成Excel
+			1: Excel無邏輯相關頁籤時使用 (單純1對1抄，程式會整理出對應的邏輯相關頁籤)
+			3: 只需將資料提供的文字檔轉成Excel時使用
 				(Layout頁籤的"文字檔檔名"為必填，並須將對應的TXT檔放入"POST-ParseExcel2HQL/TableLayout/TXTFile/"目錄下)
 			2: 其它情況皆為2
-	三、ODS頁籤的"來源文字檔檔名"可不填，若有填則需將對應的TXT檔放入"POST-ParseExcel2HQL/TableLayout/TXTFile/"目錄下
 
 ```
 
@@ -26,7 +26,7 @@
 	執行完後會將產出的HQL會對應Excel檔名分別放入同檔名的資料夾下
 	1.若Excel無邏輯相關頁籤則程式會自動產出1對1抄的簡易邏輯頁籤與對應HQL
 	2.若Excel有邏輯相關頁籤則程式會依頁籤內容產出對應HQL
-	3.若有放置來源文字檔則程式會自動將來源文字檔轉成Excel並整理出數值型態欄位的加總值,另會再判斷NotNull欄位是否有Null值，若有則報錯
+	3.若有放置來源文字檔則程式會自動將來源文字檔轉成Excel並整理出數值型態欄位的加總值,另會再判斷NotNull欄位是否有Null值，若有則報錯但程式不會中斷
 	4.程式會自動產出驗測時所需SQL(含DW/M與ODS)，但維度分群與資料抽樣的SQL需再自行調整
 ```
 
