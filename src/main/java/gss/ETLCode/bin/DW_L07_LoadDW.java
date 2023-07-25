@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 public class DW_L07_LoadDW {
 
 	public static String getHQL(String partition, Map<String, String> mapProp, String selectStr, String sumColLogic,
-			String sumODSColLogic, String whereSumCol, String tableName, String odsTableName) {
+			String sumODSColLogic, String whereSumCol, String tableName, String odsTableName, String type) {
 		
 		String rs = "-----------------------------------------------------------------\n"
 				+ "-- parameter list\n"
@@ -20,9 +20,9 @@ public class DW_L07_LoadDW {
 				+ "set hivevar:SRC2_L07="+mapProp.get("hadoop.meta.dbname")+"."+odsTableName+"_done_files;\n"
 				+ "set hivevar:DES1="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
 				+ "set hivevar:SRC3_L07="+mapProp.get("hadoop.tmp.dbname")+".BKD_"+tableName+";\n"
-				+ "set hivevar:FUNC_NAME1="+tableName+"_BackDW_TotalDataCount;\n"
-				+ "set hivevar:FUNC_NAME2="+tableName+"_BackDW_SumNumData;\n"
-				+ "set hivevar:FUNC_NAME3="+tableName+"_BackDW_GroupSum;\n"
+				+ "set hivevar:FUNC_NAME1="+tableName+"_Back"+type+"_TotalDataCount;\n"
+				+ "set hivevar:FUNC_NAME2="+tableName+"_Back"+type+"_SumNumData;\n"
+				+ "set hivevar:FUNC_NAME3="+tableName+"_Back"+type+"_GroupSum;\n"
 				+ "set hivevar:KEY_NAME=return_code;\n"
 				+ "set hivevar:LOGIC_NAME="+tableName+";\n"
 				+ "set hivevar:TMP1=tmp_"+tableName+"_071;\n"
@@ -138,24 +138,24 @@ public class DW_L07_LoadDW {
 			rs += "select count(1) as err_row_count\n"
 				+ "from (\n"
 				+ "	select " + (!StringUtils.isBlank(partition) ? "a." + partition + "," : "") 
-				+ "a.POLICY_KIND,a.des_cnt,b.src_row\n"
+				+ "a.[維度欄位],a.des_cnt,b.src_row\n"
 				+ "	from (\n"
 				+ "		select " + (!StringUtils.isBlank(partition) ? partition + "," : "") 
-				+ " POLICY_KIND, count(1) des_cnt\n"
+				+ " [維度欄位], count(1) des_cnt\n"
 				+ "		from ${hivevar:DES1} a1 ";
 			rs += !StringUtils.isBlank(partition) ? "join run on a1." + partition + " = run.ymds\n" : "\n";
-			rs += "		group by " + (!StringUtils.isBlank(partition) ? partition+ "," : "") + "POLICY_KIND\n";
+			rs += "		group by " + (!StringUtils.isBlank(partition) ? partition+ "," : "") + "[維度欄位]\n";
 			rs += "	) a\n"
 				+ "	full outer join (\n"
 				+ "		select " + (!StringUtils.isBlank(partition) ? partition + "," : "") 
-				+ " POLICY_KIND, count(1) src_row\n"
+				+ " [維度欄位], count(1) src_row\n"
 				+ "		from ${hivevar:SRC1_L07} a1 ";
 			rs += !StringUtils.isBlank(partition) ? "join run on a1." + partition + " = run.ymds\n" : "\n";
-			rs += "		group by " + (!StringUtils.isBlank(partition) ? partition+ "," : "") + "POLICY_KIND\n";
+			rs += "		group by " + (!StringUtils.isBlank(partition) ? partition+ "," : "") + "[維度欄位]\n";
 			rs += "	) b\n";
 			rs += !StringUtils.isBlank(partition) ? "\ton a."+partition+" = b."+partition+"\n\tAND " : "\ton ";
-			rs += "a.POLICY_KIND = b.POLICY_KIND) H\n"
-				+ "where des_cnt <> src_row or POLICY_KIND is null\n"
+			rs += "a.[維度欄位] = b.[維度欄位]) H\n"
+				+ "where des_cnt <> src_row or [維度欄位] is null\n"
 				+ ";\n"
 				+ "\n"
 				+ "-- 0 => success\n"
@@ -179,7 +179,7 @@ public class DW_L07_LoadDW {
 	}
 	
 
-	public static String getVAR(Map<String, String> mapProp, String tableName, String odsTableName) {
+	public static String getVAR(Map<String, String> mapProp, String tableName, String odsTableName, String type) {
 		
 		String rs = "-----------------------------------------------------------------\n"
 				+ "-- parameter list\n"
@@ -192,9 +192,9 @@ public class DW_L07_LoadDW {
 				+ "set hivevar:SRC2_L07="+mapProp.get("hadoop.meta.dbname")+"."+odsTableName+"_done_files;\n"
 				+ "set hivevar:DES1="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
 				+ "set hivevar:SRC3_L07="+mapProp.get("hadoop.tmp.dbname")+".BKD_"+tableName+";\n"
-				+ "set hivevar:FUNC_NAME1="+tableName+"_BackDW_TotalDataCount;\n"
-				+ "set hivevar:FUNC_NAME2="+tableName+"_BackDW_SumNumData;\n"
-				+ "set hivevar:FUNC_NAME3="+tableName+"_BackDW_GroupSum;\n"
+				+ "set hivevar:FUNC_NAME1="+tableName+"_Back"+type+"_TotalDataCount;\n"
+				+ "set hivevar:FUNC_NAME2="+tableName+"_Back"+type+"_SumNumData;\n"
+				+ "set hivevar:FUNC_NAME3="+tableName+"_Back"+type+"_GroupSum;\n"
 				+ "set hivevar:KEY_NAME=return_code;\n"
 				+ "set hivevar:LOGIC_NAME="+tableName+";\n"
 				+ "set hivevar:TMP1=tmp_"+tableName+"_071;\n"

@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class DW_L08_LoadDW_TMP {
 
-	public static String getHQL(String partition, Map<String, String> mapProp, String tableName, String selectStr) {
+	public static String getHQL(String partition, Map<String, String> mapProp, String tableName, String selectStr, String type) {
 		
 		String rs = "-----------------------------------------------------------------\n"
 				+ "-- parameter list\n"
@@ -17,7 +17,7 @@ public class DW_L08_LoadDW_TMP {
 				+ "set hivevar:RSLT="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+"_result;\n"
 				+ "set hivevar:SRC1_L08="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
 				+ "set hivevar:DES1_L08="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+";\n"
-				+ "set hivevar:FUNC_NAME="+tableName+"_LoadDW_TMP;\n"
+				+ "set hivevar:FUNC_NAME="+tableName+"_Load"+type+"_TMP;\n"
 				+ "set hivevar:KEY_NAME=return_code;\n"
 				+ "set hivevar:LOGIC_NAME="+tableName+";\n"
 				+ "set hivevar:TMP1=tmp_"+tableName+"_081;\n"
@@ -65,7 +65,7 @@ public class DW_L08_LoadDW_TMP {
 		
 	}
 
-	public static String getVAR(Map<String, String> mapProp, String tableName) {
+	public static String getVAR(Map<String, String> mapProp, String tableName, String type) {
 		
 		String rs = "-----------------------------------------------------------------\n"
 				+ "-- parameter list\n"
@@ -76,7 +76,7 @@ public class DW_L08_LoadDW_TMP {
 				+ "set hivevar:RSLT="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+"_result;\n"
 				+ "set hivevar:SRC1_L08="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
 				+ "set hivevar:DES1_L08="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+";\n"
-				+ "set hivevar:FUNC_NAME="+tableName+"_LoadDW_TMP;\n"
+				+ "set hivevar:FUNC_NAME="+tableName+"_Load"+type+"_TMP;\n"
 				+ "set hivevar:KEY_NAME=return_code;\n"
 				+ "set hivevar:LOGIC_NAME="+tableName+";\n"
 				+ "set hivevar:TMP1=tmp_"+tableName+"_081;\n"

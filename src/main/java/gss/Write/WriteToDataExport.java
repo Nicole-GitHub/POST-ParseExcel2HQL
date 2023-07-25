@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import gss.ETLCode.bin.EXPORTFILE;
 import gss.Tools.FileTools;
 
 public class WriteToDataExport {
@@ -24,14 +25,13 @@ public class WriteToDataExport {
 			Map<String, String> mapProp) throws Exception {
 
 		try {
-
 	     	List<String> charTypeList = Arrays.asList(new String[] { "VARCHAR", "CHAR" });
 			List<String> intTypeList = Arrays.asList(new String[] { "SMALLINT", "BIGINT", "INTEGER" });
 	        
 	     	// list的最後一筆位置
-			int layoutMapListLastNum = layoutMapList.size() - 1;
-			String tableNameLast = layoutMapList.get(layoutMapListLastNum).get("TableName").substring(7);
-			String colENameStr = "", colLogic = "", colLogicStr = "", dateFormat = "yyyyMMdd", dtFormat = "yyyyMMddHHmmss";
+			String tableName = layoutMapList.get(layoutMapList.size() - 1).get("TableName");
+			String colENameStr = "", colLogic = "", colLogicStr = "", dateFormat = "yyyyMMdd",
+					dtFormat = "yyyyMMddHHmmss";
 			for (Map<String, String> layoutMap : layoutMapList) {
 				if ("Detail".equals(layoutMap.get("MapType"))) {
 					String colEName = layoutMap.get("ColEName").toString().toUpperCase();
@@ -59,97 +59,15 @@ public class WriteToDataExport {
 				}
 			}
 
-			String raw = mapProp.get("hadoop.raw.dbname");
 			colLogicStr = StringUtils.isBlank(colLogicStr) ? "" : colLogicStr.substring(0,colLogicStr.length() - 2);
 			colENameStr = StringUtils.isBlank(colENameStr) ? "" : colENameStr.substring(0,colENameStr.length() - 2);
-			String sql = "set hivevar:RAW_DB=" + raw + ";\n"
-					+ "set hivevar:SRC1=T_IFTM_" + tableNameLast + ";\n"
-					+ "set hivevar:ACT_YM=?;\n"
-					+ "\n"
-					+ "set hivevar:KEY_STR=POST_DATA_EXPORT;\n"
-					+ "set hivevar:BATCHID=?;\n"
-					+ "set hivevar:TMP1=TMP_DATA_SET_" + tableNameLast + ";\n"
-					+ "set hivevar:TMP2=TMP_DATA_BLOCK_" + tableNameLast + ";\n"
-					+ "set hivevar:TMP3=TMP_HEADDER_FOOTER_INFO_" + tableNameLast + ";\n"
-					+ "set hivevar:TMP4=TMP_HEADDER_FOOTER_MAXLEN_" + tableNameLast + ";\n"
-					+ "set hivevar:DES1=TMP_OUTPUT_" + tableNameLast + ";\n"
-					+ "\n"
-					+ "DROP TABLE IF EXISTS ${hivevar:TMP1};\n"
-					+ "\n"
-					+ "CREATE TABLE IF NOT EXISTS ${hivevar:TMP1} as \n"
-					+ "select \n" + colLogicStr + "\n"
-					+ "FROM ${hivevar:RAW_DB}.${hivevar:SRC1} a\n"
-					+ "where a.ACT_YM = ${hivevar:ACT_YM}\n"
-					+ ";\n"
-					+ "\n"
-					+ "DROP TABLE IF EXISTS ${hivevar:TMP2};\n"
-					+ "\n"
-					+ "CREATE TABLE IF NOT EXISTS ${hivevar:TMP2} as \n"
-					+ "SELECT \n"
-					+ "  '${hivevar:KEY_STR}' AS KEY_STR,\n"
-					+ "  '${hivevar:BATCHID}' AS BATCHID,\n"
-					+ "  2 AS BLOCK_TYPE,\n"
-					+ "  row_number() over() AS RN,\n"
-					+ "  concat(" + colENameStr + "\n"
-					+ "    ) AS LINE\n"
-					+ "FROM ${hivevar:TMP1}\n"
-					+ ";\n"
-					+ "\n"
-					+ "\n"
-					+ "DROP TABLE IF EXISTS ${hivevar:TMP3};\n"
-					+ "\n"
-					+ "CREATE TABLE IF NOT EXISTS ${hivevar:TMP3} as \n"
-					+ "SELECT \n"
-					+ "   KEY_STR,\n"
-					+ "   BATCHID,\n"
-					+ "   999 AS BLOCK_TYPE,\n"
-					+ "   row_number() over() AS RN,\n"
-					+ "   CONCAT(\n"
-					+ "     '${hivevar:BATCHID}',\n"
-					+ "     lpad(cast( COUNT(1) AS STRING),9,0)\n"
-					+ "     ) AS LINE\n"
-					+ "FROM ${hivevar:TMP2}\n"
-					+ "GROUP BY KEY_STR, BATCHID\n"
-					+ ";\n"
-					+ "\n"
-					+ "INSERT INTO TABLE ${hivevar:TMP3}\n"
-					+ "SELECT \n"
-					+ "   KEY_STR,\n"
-					+ "   BATCHID,\n"
-					+ "   row_number() over() AS RN,\n"
-					+ "   1 AS BLOCK_TYPE,\n"
-					+ "   '${hivevar:BATCHID}' AS LINE\n"
-					+ "FROM ${hivevar:TMP2}\n"
-					+ "GROUP BY KEY_STR, BATCHID\n"
-					+ ";\n"
-					+ "\n"
-					+ "\n"
-					+ "DROP TABLE IF EXISTS ${hivevar:TMP4};\n"
-					+ "\n"
-					+ "CREATE TABLE IF NOT EXISTS ${hivevar:TMP4} as \n"
-					+ "select a.KEY_STR, a.BATCHID, a.BLOCK_TYPE, a.RN,\n"
-					+ "   rpad(a.LINE, b.maxlen, ' ') as line\n"
-					+ "from ${hivevar:TMP3} a, (SELECT max(LENGTH(LINE)) as maxlen FROM ${hivevar:TMP2}) as b\n"
-					+ ";\n"
-					+ "\n"
-					+ "\n"
-					+ "DROP TABLE IF EXISTS ${hivevar:DES1};\n"
-					+ "\n"
-					+ "CREATE TABLE IF NOT EXISTS ${hivevar:DES1} as \n"
-					+ "   SELECT * FROM ${hivevar:TMP2}\n"
-					+ "   UNION ALL\n"
-					+ "   SELECT * FROM ${hivevar:TMP4}\n"
-					+ ";\n"
-					+ "\n"
-					+ "\n"
-					+ "SELECT line\n"
-					+ "FROM ${hivevar:DES1}\n"
-					+ "WHERE KEY_STR='${hivevar:KEY_STR}' \n"
-					+ "	AND BATCHID='${hivevar:BATCHID}'\n"
-					+ "ORDER BY KEY_STR, BATCHID, BLOCK_TYPE, RN\n"
-					+ ";";
+			String hql = EXPORTFILE.getHQL(mapProp, colLogicStr, colENameStr, tableName);
+			String sh = EXPORTFILE.getShell(tableName);
+			String var = EXPORTFILE.getShellVAR(tableName);
 
-			FileTools.createFile(outputPath + fileName + "/bin/", "EXPORTFILE", "hql", sql);
+			FileTools.createFile(outputPath + fileName + "/bin/", "EXPORTFILE", "hql", hql);
+			FileTools.createFile(outputPath + fileName + "/bin/", "EXPORTFILE", "sh", sh);
+			FileTools.createFile(outputPath + fileName + "/bin/", "EXPORTFILE", "var", var);
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}

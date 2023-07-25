@@ -6,28 +6,28 @@ import org.apache.commons.lang3.StringUtils;
 
 public class BACKUP_DW {
 
-	public static String getHQL(String partition, Map<String, String> mapProp, String tableName) {
+	public static String getHQL(String partition, Map<String, String> mapProp, String tableName, String type) {
 
 		String rs = "-----------------------------------------------------------------\n"
 				+ "-- parameter list\n"
 				+ "-----------------------------------------------------------------\n"
 				+ "set hivevar:BATCHID=20230329000000;\n"
-				+ "set hivevar:DES1_BACKUP_DW="+mapProp.get("hadoop.tmp.dbname")+".BKD_"+tableName+";\n"
+				+ "set hivevar:DES1_BACKUP_"+type+"="+mapProp.get("hadoop.tmp.dbname")+".BKD_"+tableName+";\n"
 				+ "set hivevar:Run_TableName="+tableName+";\n"
 				+ "set hivevar:RUN_NOW="+mapProp.get("hadoop.std.dbname")+".SYS_RUN_NOW;\n"
 				+ "set hivevar:RSLT="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+"_result;\n"
-				+ "set hivevar:SRC1_BACKUP_DW="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
-				+ "set hivevar:FUNC_NAME="+tableName+"_BackupDW;\n"
+				+ "set hivevar:SRC1_BACKUP_"+type+"="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
+				+ "set hivevar:FUNC_NAME="+tableName+"_Backup"+type+";\n"
 				+ "set hivevar:KEY_NAME=return_code;\n"
 				+ "set hivevar:LOGIC_NAME="+tableName+";\n"
-				+ "set hivevar:TMP1=tmp_"+tableName+"_BackupDW;\n"
+				+ "set hivevar:TMP1=tmp_"+tableName+"_Backup"+type+";\n"
 				+ "-----------------------------------------------------------------\n"
 				+ "\n"
-				+ "-- 備份DW Table\n";
+				+ "-- 備份"+type+" Table\n";
 		rs += !StringUtils.isBlank(partition) ? "-- 有" : "-- 無" ;
 		rs += "Partiton\n"
-				+ "Create table ${hivevar:DES1_BACKUP_DW}_${hivevar:BATCHID} AS \n"
-				+ "SELECT * FROM ${hivevar:SRC1_BACKUP_DW} a \n";
+				+ "Create table ${hivevar:DES1_BACKUP_"+type+"}_${hivevar:BATCHID} AS \n"
+				+ "SELECT * FROM ${hivevar:SRC1_BACKUP_"+type+"} a \n";
 		rs += !StringUtils.isBlank(partition) ? 
 				"join (select SUBSTRING(ymds,1,6) ymds from ${hivevar:RUN_NOW} where trim(tablenm) = '${hivevar:Run_TableName}') b\n"
 				+ "on a."+partition+" = b.ymds" : "";
@@ -42,10 +42,10 @@ public class BACKUP_DW {
 				+ "	select row_count,count(1) cnt\n"
 				+ "	from (\n"
 				+ "		select count(1) as row_count\n"
-				+ "		from ${hivevar:DES1_BACKUP_DW}_${hivevar:BATCHID}\n"
+				+ "		from ${hivevar:DES1_BACKUP_"+type+"}_${hivevar:BATCHID}\n"
 				+ "		union all \n"
 				+ "		select count(1) as row_count\n"
-				+ "		from ${hivevar:SRC1_BACKUP_DW} a \n";
+				+ "		from ${hivevar:SRC1_BACKUP_"+type+"} a \n";
 			rs += !StringUtils.isBlank(partition) ?
 				 "			join (select SUBSTRING(ymds,1,6) ymds from ${hivevar:RUN_NOW} where trim(tablenm) = '${hivevar:Run_TableName}') b\n"
 				+ "			on a." + partition + " = b.ymds\n" : "";
@@ -76,21 +76,21 @@ public class BACKUP_DW {
 		return rs;
 	}
 
-	public static String getVAR(Map<String, String> mapProp, String tableName) {
+	public static String getVAR(Map<String, String> mapProp, String tableName, String type) {
 
 		String rs = "-----------------------------------------------------------------\n"
 				+ "-- parameter list\n"
 				+ "-----------------------------------------------------------------\n"
 				+ "set hivevar:BATCHID=20230329000000;\n"
-				+ "set hivevar:DES1_BACKUP_DW="+mapProp.get("hadoop.tmp.dbname")+".BKD_"+tableName+";\n"
+				+ "set hivevar:DES1_BACKUP_"+type+"="+mapProp.get("hadoop.tmp.dbname")+".BKD_"+tableName+";\n"
 				+ "set hivevar:Run_TableName="+tableName+";\n"
 				+ "set hivevar:RUN_NOW="+mapProp.get("hadoop.std.dbname")+".SYS_RUN_NOW;\n"
 				+ "set hivevar:RSLT="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+"_result;\n"
-				+ "set hivevar:SRC1_BACKUP_DW="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
-				+ "set hivevar:FUNC_NAME="+tableName+"_BackupDW;\n"
+				+ "set hivevar:SRC1_BACKUP_"+type+"="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
+				+ "set hivevar:FUNC_NAME="+tableName+"_Backup"+type+";\n"
 				+ "set hivevar:KEY_NAME=return_code;\n"
 				+ "set hivevar:LOGIC_NAME="+tableName+";\n"
-				+ "set hivevar:TMP1=tmp_"+tableName+"_BackupDW;\n"
+				+ "set hivevar:TMP1=tmp_"+tableName+"_Backup"+type+";\n"
 				+ "-----------------------------------------------------------------\n"
 				+ "\n";
 		

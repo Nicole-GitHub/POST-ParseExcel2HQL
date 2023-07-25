@@ -39,12 +39,17 @@ public class WriteToOther {
 	public static void run(String outputPath, String fileName, List<Map<String, String>> layoutMapList, String finalLen,
 			String hasChineseForTable, String txtFileName, Map<String, String> mapProp) throws Exception {
 		try {
+
+			outputPath += fileName + "/";
+			String outputPathBin = outputPath + "bin/";
+			
 			// list的最後一筆位置
 			Map<String, String> layoutMap = layoutMapList.get(layoutMapList.size() - 1);
 			String tableName = layoutMap.get("TableName");
 	     	String odsTableName = "ODS" + tableName.substring(1);
 	     	String partition = layoutMap.get("Partition");
-			String type = mapProp.get("mssql.dbname").substring(mapProp.get("mssql.dbname").lastIndexOf("_")+1).toUpperCase();
+			String type = mapProp.get("tableType");
+			String runType = mapProp.get("runType");
 			boolean hasChinese = "Y".equals(hasChineseForTable);
 			
 			// 將所有欄位名稱合在一起
@@ -56,9 +61,10 @@ public class WriteToOther {
 			}
 			
 	     	String desc = description.get();
-	     	String flowAll = flow.get_def_all();
-	     	String flowNoExport = flow.get_def_noExport();
+	     	String flowAll = flow.get_def_all(runType);
+	     	String flowNoExport = flow.get_def_noExport(runType);
 	     	String rcpt = getRCPT(tableName, odsTableName, layoutMapList, mapProp);
+	     	
 	     	// bin/
 	     	String global_variables_def = global_variables.getDef();
 	     	String b01_hql = BEFORE_C01_Run.getHQL(partition, mapProp, tableName);
@@ -71,34 +77,55 @@ public class WriteToOther {
 	     	String b04_var = BEFORE_C04_FinishData.getShellVAR(tableName);
 	     	String b03_sh = BEFORE_C03_ExportDate2File.getShell(tableName);
 	     	String b04_sh = BEFORE_C04_FinishData.getShell(tableName);
-	     	String backup_dw_hql = BACKUP_DW.getHQL(partition, mapProp, tableName);
-	     	String backup_dw_var = BACKUP_DW.getVAR(mapProp, tableName);
+	     	String backup_dw_hql = BACKUP_DW.getHQL(partition, mapProp, tableName, type);
+	     	String backup_dw_var = BACKUP_DW.getVAR(mapProp, tableName, type);
 	     	String dw_export_2sql_dbc = DW_EXPORT_2SQL.getDBC(type, mapProp, tableName);
 	     	String dw_export_2sql_sh = DW_EXPORT_2SQL.getShell(type, mapProp, tableName);
 	     	String dw_export_2sql_var = DW_EXPORT_2SQL.getShellVAR(type, mapProp, tableName);
-	     	String dw_l08_loaddw_tmp_hql = DW_L08_LoadDW_TMP.getHQL(partition, mapProp, tableName, selectStr);
-	     	String dw_l08_loaddw_tmp_var = DW_L08_LoadDW_TMP.getVAR(mapProp, tableName);
-	     	String file_upload_sh = FILE_UPLOAD.getShell(mapProp, tableName, txtFileName);
-	     	String file_upload_var = FILE_UPLOAD.getShellVAR(tableName);
+	     	String dw_l08_loaddw_tmp_hql = DW_L08_LoadDW_TMP.getHQL(partition, mapProp, tableName, selectStr, type);
+	     	String dw_l08_loaddw_tmp_var = DW_L08_LoadDW_TMP.getVAR(mapProp, tableName, type);
+	     	
+	     	if("1".equals(runType)) {
+		     	String file_upload_sh = FILE_UPLOAD.getShell(mapProp, tableName, txtFileName);
+		     	String file_upload_var = FILE_UPLOAD.getShellVAR(tableName);
+		     	String o01_hql = ODS_C01_UploadFile.getHQL(mapProp, tableName, odsTableName);
+		     	String o01_var = ODS_C01_UploadFile.getVAR(mapProp, tableName, odsTableName);
+		     	String o02_hql = ODS_C02_GetDataFileName.getHQL(mapProp, tableName, odsTableName);
+		     	String o02_var = ODS_C02_GetDataFileName.getVAR(mapProp, tableName, odsTableName);
+		     	String o03_hql = ODS_C03_GetErrorData.getHQL(mapProp, tableName, odsTableName, finalLen, hasChinese);
+		     	String o03_var = ODS_C03_GetErrorData.getVAR(mapProp, tableName, odsTableName, finalLen);
+		     	String o04_hql = ODS_C04_GetData.getHQL(mapProp, tableName, odsTableName, finalLen, hasChinese);
+		     	String o04_var = ODS_C04_GetData.getVAR(mapProp, tableName, odsTableName, finalLen);
+		     	String o05_hql = ODS_C05_GetDoneFile.getHQL(mapProp, tableName, odsTableName, finalLen, hasChinese);
+		     	String o05_var = ODS_C05_GetDoneFile.getVAR(mapProp, tableName, odsTableName, finalLen);
+		     	String truncate_ods_hql = TRUNCATE_ODS.getHQL(mapProp, tableName, odsTableName);
+		     	String truncate_ods_var = TRUNCATE_ODS.getVAR(mapProp, tableName, odsTableName);
+		     	
+
+				FileTools.createFile(outputPathBin, "ODS_C01_UploadFile", "hql", o01_hql);
+				FileTools.createFile(outputPathBin, "ODS_C02_GetDataFileName", "hql", o02_hql);
+				FileTools.createFile(outputPathBin, "ODS_C03_GetErrorData", "hql", o03_hql);
+				FileTools.createFile(outputPathBin, "ODS_C04_GetData", "hql", o04_hql);
+				FileTools.createFile(outputPathBin, "ODS_C05_GetDoneFile", "hql", o05_hql);
+				FileTools.createFile(outputPathBin, "TRUNCATE_ODS", "hql", truncate_ods_hql);
+	
+				FileTools.createFile(outputPathBin, "ODS_C01_UploadFile", "var", o01_var);
+				FileTools.createFile(outputPathBin, "ODS_C02_GetDataFileName", "var", o02_var);
+				FileTools.createFile(outputPathBin, "ODS_C03_GetErrorData", "var", o03_var);
+				FileTools.createFile(outputPathBin, "ODS_C04_GetData", "var", o04_var);
+				FileTools.createFile(outputPathBin, "ODS_C05_GetDoneFile", "var", o05_var);
+				FileTools.createFile(outputPathBin, "FILE_UPLOAD", "var", file_upload_var);
+				FileTools.createFile(outputPathBin, "TRUNCATE_ODS", "var", truncate_ods_var);
+	
+				FileTools.createFile(outputPathBin, "FILE_UPLOAD", "sh", file_upload_sh);
+	     	}
+	     	
 	     	String finish_hql = FINISH.getHQL(mapProp, tableName);
 	     	String finish_var = FINISH.getVAR(mapProp, tableName);
-	     	String o01_hql = ODS_C01_UploadFile.getHQL(mapProp, tableName, odsTableName);
-	     	String o01_var = ODS_C01_UploadFile.getVAR(mapProp, tableName, odsTableName);
-	     	String o02_hql = ODS_C02_GetDataFileName.getHQL(mapProp, tableName, odsTableName);
-	     	String o02_var = ODS_C02_GetDataFileName.getVAR(mapProp, tableName, odsTableName);
-	     	String o03_hql = ODS_C03_GetErrorData.getHQL(mapProp, tableName, odsTableName, finalLen, hasChinese);
-	     	String o03_var = ODS_C03_GetErrorData.getVAR(mapProp, tableName, odsTableName, finalLen);
-	     	String o04_hql = ODS_C04_GetData.getHQL(mapProp, tableName, odsTableName, finalLen, hasChinese);
-	     	String o04_var = ODS_C04_GetData.getVAR(mapProp, tableName, odsTableName, finalLen);
-	     	String o05_hql = ODS_C05_GetDoneFile.getHQL(mapProp, tableName, odsTableName, finalLen, hasChinese);
-	     	String o05_var = ODS_C05_GetDoneFile.getVAR(mapProp, tableName, odsTableName, finalLen);
-	     	String truncate_dw_hql = TRUNCATE_DW.getHQL(partition, mapProp, tableName);
-	     	String truncate_dw_sh = TRUNCATE_DW.getShell(tableName);
-	     	String truncate_dw_var = TRUNCATE_DW.getShellVAR(tableName);
-	     	String truncate_ods_hql = TRUNCATE_ODS.getHQL(mapProp, tableName, odsTableName);
-	     	String truncate_ods_var = TRUNCATE_ODS.getVAR(mapProp, tableName, odsTableName);
+	     	String truncate_dw_hql = TRUNCATE_DW.getHQL(partition, mapProp, tableName, type);
+	     	String truncate_dw_sh = TRUNCATE_DW.getShell(tableName, type);
+	     	String truncate_dw_var = TRUNCATE_DW.getShellVAR(tableName, type);
 	     	
-			outputPath += fileName + "/";
 			FileTools.copyFile(outputPath+"../../CopyFile",outputPath); // 將main檔案copy進來
 			FileTools.createFile(outputPath, "RCPT", "hql", rcpt);
 			FileTools.createFile(outputPath, "description", "txt", desc);
@@ -107,50 +134,36 @@ public class WriteToOther {
 			
 			// bin/ 
 			// HQL
-			outputPath += "bin/";
-			FileTools.createFile(outputPath, "BEFORE_C01_Run", "hql", b01_hql);
-			FileTools.createFile(outputPath, "BEFORE_C02_Check", "hql", b02_hql);
-			FileTools.createFile(outputPath, "BEFORE_C03_ExportDate2File", "hql", b03_hql);
-			FileTools.createFile(outputPath, "BEFORE_C04_FinishData", "hql", b04_hql);
-			FileTools.createFile(outputPath, "ODS_C01_UploadFile", "hql", o01_hql);
-			FileTools.createFile(outputPath, "ODS_C02_GetDataFileName", "hql", o02_hql);
-			FileTools.createFile(outputPath, "ODS_C03_GetErrorData", "hql", o03_hql);
-			FileTools.createFile(outputPath, "ODS_C04_GetData", "hql", o04_hql);
-			FileTools.createFile(outputPath, "ODS_C05_GetDoneFile", "hql", o05_hql);
-			FileTools.createFile(outputPath, "BACKUP_DW", "hql", backup_dw_hql);
-			FileTools.createFile(outputPath, "DW_L08_LoadDW_TMP", "hql", dw_l08_loaddw_tmp_hql);
-			FileTools.createFile(outputPath, "FINISH", "hql", finish_hql);
-			FileTools.createFile(outputPath, "TRUNCATE_DW", "hql", truncate_dw_hql);
-			FileTools.createFile(outputPath, "TRUNCATE_ODS", "hql", truncate_ods_hql);
+			FileTools.createFile(outputPathBin, "BEFORE_C01_Run", "hql", b01_hql);
+			FileTools.createFile(outputPathBin, "BEFORE_C02_Check", "hql", b02_hql);
+			FileTools.createFile(outputPathBin, "BEFORE_C03_ExportDate2File", "hql", b03_hql);
+			FileTools.createFile(outputPathBin, "BEFORE_C04_FinishData", "hql", b04_hql);
+			FileTools.createFile(outputPathBin, "BACKUP_"+type, "hql", backup_dw_hql);
+			String codeFileName = type+"_L0"+("DW".equals(type) ? "8" : "3")+"_Load"+type+"_TMP";
+			FileTools.createFile(outputPathBin, codeFileName, "hql", dw_l08_loaddw_tmp_hql);
+			FileTools.createFile(outputPathBin, "FINISH", "hql", finish_hql);
+			FileTools.createFile(outputPathBin, "TRUNCATE_"+type, "hql", truncate_dw_hql);
 
 			// VAR
-			FileTools.createFile(outputPath, "BEFORE_C01_Run", "var", b01_var);
-			FileTools.createFile(outputPath, "BEFORE_C02_Check", "var", b02_var);
-			FileTools.createFile(outputPath, "BEFORE_C03_ExportDate2File", "var", b03_var);
-			FileTools.createFile(outputPath, "BEFORE_C04_FinishData", "var", b04_var);
-			FileTools.createFile(outputPath, "ODS_C01_UploadFile", "var", o01_var);
-			FileTools.createFile(outputPath, "ODS_C02_GetDataFileName", "var", o02_var);
-			FileTools.createFile(outputPath, "ODS_C03_GetErrorData", "var", o03_var);
-			FileTools.createFile(outputPath, "ODS_C04_GetData", "var", o04_var);
-			FileTools.createFile(outputPath, "ODS_C05_GetDoneFile", "var", o05_var);
-			FileTools.createFile(outputPath, "BACKUP_DW", "var", backup_dw_var);
-			FileTools.createFile(outputPath, "DW_EXPORT_2SQL", "var", dw_export_2sql_var);
-			FileTools.createFile(outputPath, "DW_L08_LoadDW_TMP", "var", dw_l08_loaddw_tmp_var);
-			FileTools.createFile(outputPath, "FILE_UPLOAD", "var", file_upload_var);
-			FileTools.createFile(outputPath, "FINISH", "var", finish_var);
-			FileTools.createFile(outputPath, "TRUNCATE_DW", "var", truncate_dw_var);
-			FileTools.createFile(outputPath, "TRUNCATE_ODS", "var", truncate_ods_var);
+			FileTools.createFile(outputPathBin, "BEFORE_C01_Run", "var", b01_var);
+			FileTools.createFile(outputPathBin, "BEFORE_C02_Check", "var", b02_var);
+			FileTools.createFile(outputPathBin, "BEFORE_C03_ExportDate2File", "var", b03_var);
+			FileTools.createFile(outputPathBin, "BEFORE_C04_FinishData", "var", b04_var);
+			FileTools.createFile(outputPathBin, "BACKUP_"+type, "var", backup_dw_var);
+			FileTools.createFile(outputPathBin, type+"_EXPORT_2SQL", "var", dw_export_2sql_var);
+			FileTools.createFile(outputPathBin, type+"_L08_Load"+type+"_TMP", "var", dw_l08_loaddw_tmp_var);
+			FileTools.createFile(outputPathBin, "FINISH", "var", finish_var);
+			FileTools.createFile(outputPathBin, "TRUNCATE_"+type, "var", truncate_dw_var);
 			
 			// SH
-			FileTools.createFile(outputPath, "BEFORE_C03_ExportDate2File", "sh", b03_sh);
-			FileTools.createFile(outputPath, "BEFORE_C04_FinishData", "sh", b04_sh);
-			FileTools.createFile(outputPath, "DW_EXPORT_2SQL", "sh", dw_export_2sql_sh);
-			FileTools.createFile(outputPath, "FILE_UPLOAD", "sh", file_upload_sh);
-			FileTools.createFile(outputPath, "TRUNCATE_DW", "sh", truncate_dw_sh);
+			FileTools.createFile(outputPathBin, "BEFORE_C03_ExportDate2File", "sh", b03_sh);
+			FileTools.createFile(outputPathBin, "BEFORE_C04_FinishData", "sh", b04_sh);
+			FileTools.createFile(outputPathBin, type+"_EXPORT_2SQL", "sh", dw_export_2sql_sh);
+			FileTools.createFile(outputPathBin, "TRUNCATE_"+type, "sh", truncate_dw_sh);
 			
 			// Other
-			FileTools.createFile(outputPath, "DW_EXPORT_2SQL", "dbc", dw_export_2sql_dbc);
-			FileTools.createFile(outputPath, "global_variables", "def", global_variables_def);
+			FileTools.createFile(outputPathBin, type+"_EXPORT_2SQL", "dbc", dw_export_2sql_dbc);
+			FileTools.createFile(outputPathBin, "global_variables", "def", global_variables_def);
 
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
@@ -191,8 +204,7 @@ public class WriteToOther {
 			
 			rcptODSColLogic = StringUtils.isBlank(rcptODSColLogic) ? "" : rcptODSColLogic.substring(0,rcptODSColLogic.length() - 2);
 			rcptColLogic = StringUtils.isBlank(rcptColLogic) ? "" : rcptColLogic.substring(0,rcptColLogic.length() - 2);
-			String sql = RCPT.getHQL(mapProp.get("hadoop.raw.dbname"), rcptODSColLogic, rcptColLogic, odsTableName,
-					tableName);
+			String sql = RCPT.getHQL(mapProp, rcptODSColLogic, rcptColLogic, odsTableName, tableName);
 			
 			return sql;
 		} catch (Exception ex) {

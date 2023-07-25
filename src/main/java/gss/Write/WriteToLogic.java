@@ -19,7 +19,7 @@ import gss.Tools.FileTools;
 import gss.Tools.Tools;
 
 /**
- * IFRS 17 自動產生邏輯HQL與頁籤
+ * 
  * @author Nicole
  *
  */
@@ -71,7 +71,8 @@ public class WriteToLogic {
 			layoutMap = layoutMapList.get(layoutMapListLastNum);
 			String tableName = layoutMap.get("TableName");
 	     	String odsTableName = "ODS" + tableName.substring(1);
-			String tableType = "D" + tableName.substring(5, 6);
+//			String tableType = "D" + tableName.substring(5, 6);
+			String type = mapProp.get("tableType");
 			String partition = layoutMap.get("Partition");
 			
 			// partition
@@ -174,15 +175,21 @@ public class WriteToLogic {
 
 			// 組出完整hql (DW_L07_LoadDW)
 			String rsHQL = DW_L07_LoadDW.getHQL(partition, mapProp, rsTargetSelectCols, sumColLogic, sumODSColLogic,
-					whereSumCol, tableName, odsTableName);
-			String rsVAR = DW_L07_LoadDW.getVAR(mapProp, tableName, odsTableName);
+					whereSumCol, tableName, odsTableName, type);
+			String rsVAR = DW_L07_LoadDW.getVAR(mapProp, tableName, odsTableName, type);
 			
 			// 將整理好的比對結果另寫出Excel檔
-			Tools.output(workbook, outputPath, fileName);
+			// 收載才需產出Excel的邏輯頁籤，梳理則不需
+			if("DW".equals(type)) {
+				Tools.output(workbook, outputPath, fileName);
+			} else {
+				workbook.close();
+			}
 			
 			outputPath += "bin/";
-			FileTools.createFile(outputPath, tableType + "_L07_LoadDW", "hql", rsHQL);
-			FileTools.createFile(outputPath, tableType + "_L07_LoadDW", "var", rsVAR);
+			String codeFileName = type + "_L0"+("DW".equals(type) ? "7" : "2")+"_Load" + type;
+			FileTools.createFile(outputPath, codeFileName, "hql", rsHQL);
+			FileTools.createFile(outputPath, codeFileName, "var", rsVAR);
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}
