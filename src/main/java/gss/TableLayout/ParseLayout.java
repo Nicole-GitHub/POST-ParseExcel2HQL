@@ -44,7 +44,8 @@ public class ParseLayout {
 			String txtFileName = Tools.getCellValue(sheetLayout.getRow(1), 8, "文字檔檔名");
 			String partition = Tools.getCellValue(sheetLayout.getRow(0), 8, "Partition");
 			String[] partitionList = partition.split(",");
-			
+
+			boolean delLine = false;
 			// 解析資料內容(從第五ROW開頭爬)
 			for (int r = 4; r <= sheetLayout.getLastRowNum(); r++) {
 				int c = 1; // 從第二CELL開頭爬
@@ -52,13 +53,23 @@ public class ParseLayout {
 				if (row == null || !Tools.isntBlank(row.getCell(1)))
 					break;
 				
-				String colEName = Tools.getCellValue(row, c++, "欄位英文名稱");
-				String colCName = Tools.getCellValue(row, c++, "欄位中文名稱");
-				String type = Tools.getCellValue(row, c++, "資料型態");
-				String len = Tools.getCellValue(row, c++, "資料長度");
-				String pk = Tools.getCellValue(row, c++, "主鍵註記").toUpperCase();
-				String nullable = Tools.getCellValue(row, c++, "NULL註記").toUpperCase();
-				String init = Tools.getCellValue(row, c++, "初始值");
+				String colEName = Tools.getCellValue(row, c, "欄位英文名稱");
+				if (!delLine) delLine = Tools.isDelLine(row, c++);
+				String colCName = Tools.getCellValue(row, c, "欄位中文名稱");
+				if (!delLine) delLine = Tools.isDelLine(row, c++);
+				String type = Tools.getCellValue(row, c, "資料型態");
+				if (!delLine) delLine = Tools.isDelLine(row, c++);
+				String len = Tools.getCellValue(row, c, "資料長度");
+				if (!delLine) delLine = Tools.isDelLine(row, c++);
+				String pk = Tools.getCellValue(row, c, "主鍵註記").toUpperCase();
+				if (!delLine) delLine = Tools.isDelLine(row, c++);
+				String nullable = Tools.getCellValue(row, c, "NULL註記").toUpperCase();
+				if (!delLine) delLine = Tools.isDelLine(row, c++);
+				String init = Tools.getCellValue(row, c, "初始值");
+				if (!delLine) delLine = Tools.isDelLine(row, c++);
+				
+				// 若此行有刪除線，則整行不讀取
+				if (delLine) continue;
 
 				mapReturn = new HashMap<String, String>();
 				mapReturn.put("MapType", "Detail");

@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Tools {
@@ -291,5 +292,22 @@ public class Tools {
 			}
 		}
 		return rsTargetSelectCols;
+	}
+	
+	/**
+	 * 判斷是否有刪除線 (僅限xlsx使用)
+	 * 
+	 * @param row
+	 * @param cellNum
+	 * @return
+	 */
+	public static Boolean isDelLine(Row row, int cellNum) {
+		if(!isntBlank(row.getCell(cellNum))) {
+			return false;
+//		}else if ("2003".equals(excelVersion)) {
+//			return ((HSSFCellStyle) row.getCell(cellNum).getCellStyle()).getFont(workbook).getStrikeout();
+		} else {
+			return ((XSSFCellStyle) row.getCell(cellNum).getCellStyle()).getFont().getStrikeout();
+		}
 	}
 }
