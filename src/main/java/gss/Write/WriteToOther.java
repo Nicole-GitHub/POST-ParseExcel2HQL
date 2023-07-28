@@ -163,7 +163,7 @@ public class WriteToOther {
 			
 			// Other
 			FileTools.createFile(outputPathBin, type+"_EXPORT_2SQL", "dbc", dw_export_2sql_dbc);
-			FileTools.createFile(outputPathBin, "global_variables", "def", global_variables_def);
+			FileTools.createFile(outputPathBin, "global-variables", "def", global_variables_def);
 
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);

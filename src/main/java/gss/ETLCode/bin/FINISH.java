@@ -31,7 +31,7 @@ public class FINISH {
 				+ "-- 將轉檔完成的資訊寫入Run_Finish\n"
 				+ "INSERT OVERWRITE TABLE ${hivevar:Run_Finish}\n"
 				+ "PARTITION(TABLENM,YMDS,YMDE) \n"
-				+ "select current_timestamp() as CREATEDDATE, TABLENM, YMDS, YMDE\n"
+				+ "select current_timestamp() as CREATEDDATE, TRIM(TABLENM), YMDS, YMDE\n"
 				+ "from ${hivevar:TMP1} \n"
 				+ ";\n"
 				+ "\n"

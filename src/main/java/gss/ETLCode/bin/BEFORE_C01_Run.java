@@ -57,7 +57,7 @@ public class BEFORE_C01_Run {
 				+ "-- 再將整理好的放入RUN_NOW裡\n"
 				+ "INSERT OVERWRITE TABLE ${hivevar:DES1_RUN}\n"
 				+ "PARTITION(TABLENM) \n"
-				+ "Select YMDS,YMDE,CREATEDDATE,TABLENM from ${hivevar:TMP1};\n"
+				+ "Select YMDS,YMDE,CREATEDDATE,TRIM(TABLENM) from ${hivevar:TMP1};\n"
 				+ "\n"
 				+ "-- 清空驗証結果檔並重建\n"
 				+ "drop table if exists ${hivevar:RSLT};\n"

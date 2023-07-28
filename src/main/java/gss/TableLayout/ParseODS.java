@@ -41,22 +41,22 @@ public class ParseODS {
 			boolean delLine = false;
 			// 解析資料內容(從第四ROW開頭爬)
 			for (int r = 3; r <= sheetODS.getLastRowNum(); r++) {
-				int c = 1; // 從第二CELL開頭爬
+				int c = 0; // 從第二CELL開頭爬(++c)
 				row = sheetODS.getRow(r);
 				if (row == null || !Tools.isntBlank(row.getCell(1)))
 					break;
-				
-				String dwColEName = Tools.getCellValue(row, c, "DW欄位英文名稱");
-				if (!delLine) delLine = Tools.isDelLine(row, c++);
+
+				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
+				String dwColEName = !delLine ? Tools.getCellValue(row, c, "DW欄位英文名稱") : "";
 				c++;// 來源欄位英文名稱
-				int dataStart = Integer.parseInt(Tools.getCellValue(row, c, "資料起點"));
-				if (!delLine) delLine = Tools.isDelLine(row, c++);
-				int dataEnd = Integer.parseInt(Tools.getCellValue(row, c, "資料終點"));
-				if (!delLine) delLine = Tools.isDelLine(row, c++);
+				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
+				int dataStart = !delLine ? Integer.parseInt(Tools.getCellValue(row, c, "資料起點")) : 0;
+				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
+				int dataEnd = !delLine ? Integer.parseInt(Tools.getCellValue(row, c, "資料終點")) : 0;
 				c++;// 備註
 				int datalen = dataEnd - dataStart + 1;
-				boolean hasChinese = "Y".equalsIgnoreCase(Tools.getCellValue(row, c, "是否含有中文"));
-				if (!delLine) delLine = Tools.isDelLine(row, c++);
+				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
+				boolean hasChinese = !delLine ? "Y".equalsIgnoreCase(Tools.getCellValue(row, c, "是否含有中文")) : false;
 				// 若有其中一個欄位含有中文，則整份Table都算含有中文(傳給外面用的)
 				hasChineseForTable = hasChineseForTable ? true : hasChinese;
 				

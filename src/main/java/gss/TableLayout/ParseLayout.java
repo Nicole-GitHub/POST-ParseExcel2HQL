@@ -48,25 +48,25 @@ public class ParseLayout {
 			boolean delLine = false;
 			// 解析資料內容(從第五ROW開頭爬)
 			for (int r = 4; r <= sheetLayout.getLastRowNum(); r++) {
-				int c = 1; // 從第二CELL開頭爬
+				int c = 0; // 從第二CELL開頭爬(++c)
 				row = sheetLayout.getRow(r);
 				if (row == null || !Tools.isntBlank(row.getCell(1)))
 					break;
-				
-				String colEName = Tools.getCellValue(row, c, "欄位英文名稱");
-				if (!delLine) delLine = Tools.isDelLine(row, c++);
-				String colCName = Tools.getCellValue(row, c, "欄位中文名稱");
-				if (!delLine) delLine = Tools.isDelLine(row, c++);
-				String type = Tools.getCellValue(row, c, "資料型態");
-				if (!delLine) delLine = Tools.isDelLine(row, c++);
-				String len = Tools.getCellValue(row, c, "資料長度");
-				if (!delLine) delLine = Tools.isDelLine(row, c++);
-				String pk = Tools.getCellValue(row, c, "主鍵註記").toUpperCase();
-				if (!delLine) delLine = Tools.isDelLine(row, c++);
-				String nullable = Tools.getCellValue(row, c, "NULL註記").toUpperCase();
-				if (!delLine) delLine = Tools.isDelLine(row, c++);
-				String init = Tools.getCellValue(row, c, "初始值");
-				if (!delLine) delLine = Tools.isDelLine(row, c++);
+
+				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
+				String colEName = !delLine ? Tools.getCellValue(row, c, "欄位英文名稱") : "";
+				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
+				String colCName = !delLine ? Tools.getCellValue(row, c, "欄位中文名稱") : "";
+				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
+				String type = !delLine ? Tools.getCellValue(row, c, "資料型態") : "";
+				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
+				String len = !delLine ? Tools.getCellValue(row, c, "資料長度") : "";
+				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
+				String pk = !delLine ? Tools.getCellValue(row, c, "主鍵註記").toUpperCase() : "";
+				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
+				String nullable = !delLine ? Tools.getCellValue(row, c, "NULL註記").toUpperCase() : "";
+				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
+				String init = !delLine ? Tools.getCellValue(row, c, "初始值") : "";
 				
 				// 若此行有刪除線，則整行不讀取
 				if (delLine) continue;

@@ -9,7 +9,6 @@ import java.util.Map;
 import gss.TableLayout.RunParseTableLayout;
 import gss.Tools.FileTools;
 import gss.Tools.Property;
-import gss.Write.RunParseTXTFile;
 
 public class Parser {
 	private static final String className = Parser.class.getName();
