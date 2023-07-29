@@ -38,7 +38,6 @@ public class ParseODS {
 			// partition
 			String[] partitionList = partition.split(",");
 
-			boolean delLine = false;
 			// 解析資料內容(從第四ROW開頭爬)
 			for (int r = 3; r <= sheetODS.getLastRowNum(); r++) {
 				int c = 0; // 從第二CELL開頭爬(++c)
@@ -46,6 +45,7 @@ public class ParseODS {
 				if (row == null || !Tools.isntBlank(row.getCell(1)))
 					break;
 
+				boolean delLine = false;
 				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
 				String dwColEName = !delLine ? Tools.getCellValue(row, c, "DW欄位英文名稱") : "";
 				c++;// 來源欄位英文名稱

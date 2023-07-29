@@ -41,7 +41,7 @@ public class FileTools {
 			if (!file.exists()) {
 				file.createNewFile();
 				bool = true;
-				System.out.println("success create file: " + filenameTemp);
+//				System.out.println("success create file: " + filenameTemp);
 			}
 			// 建立檔案成功後，寫入內容到檔案裡
 			writeFileContent(filenameTemp, fileContent);

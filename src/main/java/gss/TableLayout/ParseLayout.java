@@ -45,7 +45,6 @@ public class ParseLayout {
 			String partition = Tools.getCellValue(sheetLayout.getRow(0), 8, "Partition");
 			String[] partitionList = partition.split(",");
 
-			boolean delLine = false;
 			// 解析資料內容(從第五ROW開頭爬)
 			for (int r = 4; r <= sheetLayout.getLastRowNum(); r++) {
 				int c = 0; // 從第二CELL開頭爬(++c)
@@ -53,6 +52,7 @@ public class ParseLayout {
 				if (row == null || !Tools.isntBlank(row.getCell(1)))
 					break;
 
+				boolean delLine = false;
 				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
 				String colEName = !delLine ? Tools.getCellValue(row, c, "欄位英文名稱") : "";
 				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
