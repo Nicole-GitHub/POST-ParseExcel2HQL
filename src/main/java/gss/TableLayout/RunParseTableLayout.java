@@ -59,7 +59,7 @@ public class RunParseTableLayout {
 				// 產生邏輯HQL與"資料關聯"、"欄位處理邏輯"頁籤
 				WriteToLogic.run(outputPath, fileName, workbook, layoutMapList, mapProp);
 				// 若為梳理才需產出ExportFile檔
-				if ("2".equals(mapProp.get("runType")))
+				if ("Y".equalsIgnoreCase(mapProp.get("exportfile")))
 					WriteToDataExport.run(outputPath, fileName, layoutMapList, mapProp);
 				
 				
@@ -84,6 +84,8 @@ public class RunParseTableLayout {
 							}
 						}
 					}
+					else
+						throw new Exception(className + " Error: 缺少頁韱:ODS");
 				}
 
 				WriteToOther.run(outputPath, fileName, layoutMapList, finalLen, hasChineseForTable, txtFileName, mapProp);

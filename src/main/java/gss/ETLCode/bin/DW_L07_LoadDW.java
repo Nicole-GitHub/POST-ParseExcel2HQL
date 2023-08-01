@@ -32,7 +32,6 @@ public class DW_L07_LoadDW {
 				+ "\n"
 				+ "\n"
 				+ "-- main\n"
-				+ "-- 有Partiton\n"
 				+ "INSERT OVERWRITE TABLE ${hivevar:DES1}\n";
 			rs += !StringUtils.isBlank(partition) ? "PARTITION(" + partition + ") \n" : "";
 			rs += "Select \n" + selectStr + "\n"

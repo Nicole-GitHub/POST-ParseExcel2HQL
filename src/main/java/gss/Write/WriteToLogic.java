@@ -54,7 +54,7 @@ public class WriteToLogic {
 	     	List<Map<String, String>> rsSelectPartitionList = new ArrayList<Map<String, String>>();
 
 	     	List<String> charTypeList = Arrays.asList(new String[] { "VARCHAR", "CHAR" });
-			List<String> intTypeList = Arrays.asList(new String[] { "SMALLINT", "BIGINT", "INTEGER" });
+			List<String> intTypeList = Arrays.asList(new String[] { "SMALLINT", "BIGINT", "INTEGER", "INT" });
 	        CellStyle style = Tools.setTitleStyle(workbook);
 	        
 			sheet1 = workbook.createSheet("資料關聯");
@@ -123,19 +123,28 @@ public class WriteToLogic {
 					String colEName = layoutMapFor.get("ColEName").toString().toUpperCase();
 					String colType = layoutMapFor.get("ColType").toString().toUpperCase();
 					String colLen = layoutMapFor.get("ColLen").toString().toUpperCase();
-					
-					// 欄位型態轉換
-					colLogic = getColLogic( charTypeList, intTypeList, colEName, colType, colLen);
+					String formular = layoutMapFor.get("Formular").toString();
 
+					colLogic = colEName;
+					// 欄位型態轉換(收載時才需做轉換)
+					if ("1".equals(mapProp.get("runType")))
+						colLogic = getColLogic( charTypeList, intTypeList, colEName, colType, colLen);
+
+					if ("DATETIME".equalsIgnoreCase(colType) 
+							&& ("CREATEDDATE".equalsIgnoreCase(colEName)
+									|| "MODIFIEDDATE".equalsIgnoreCase(colEName)))
+						colLogic = "current_timestamp";
+					
 					if (intTypeList.contains(colType) || "DECIMAL".equals(colType)) {
-						if (intTypeList.contains(colType)) {
-							sumColLogic += "\t\t\tsum(" + colEName + ") as " + colEName + " ,\n";
-							sumODSColLogic += "\t\t\tsum(" + colLogic + ") as SRC_" + colEName + " ,\n";
-						} else if ("DECIMAL".equals(colType)) {
+//						if (intTypeList.contains(colType)) {
 							sumColLogic += "\t\t\tsum(" + colEName + ") as " + colEName + " ,\n";
 							sumODSColLogic += "\t\t\tsum(" + colLogic + ") as SRC_" + colEName + " ,\n";
 							whereSumCol += "\t\tand a." + colEName + " = b.SRC_" + colEName + "\n";
-						}
+//						} else if ("DECIMAL".equals(colType)) {
+//							sumColLogic += "\t\t\tsum(" + colEName + ") as " + colEName + " ,\n";
+//							sumODSColLogic += "\t\t\tsum(" + colLogic + ") as SRC_" + colEName + " ,\n";
+//							whereSumCol += "\t\tand a." + colEName + " = b.SRC_" + colEName + "\n";
+//						}
 					}
 					
 					// 寫入Excel
@@ -143,10 +152,14 @@ public class WriteToLogic {
 					Tools.setStringCell(style, cell, rowSheet2, 5, colEName);
 					// 因第二行已在Merge時create過了故此行寫在最後
 					rowSheet2 = sheet2.createRow(r++);
-					
+
 					// 寫入HQL
+					if (!StringUtils.isBlank(formular))
+						colLogic = "\t" + formular + " as " + colEName + " ,\n";
+					else 
+						colLogic = "\t" + colLogic + " as " + colEName + " ,\n";
+					
 					// Partiton欄位的位置要另外放
-					colLogic = "\t" + colLogic + " as " + colEName + " ,\n";
 					isPartition = false;
 					for (String str : partitionList) {
 						if (colEName.equals(str)) {
@@ -180,7 +193,7 @@ public class WriteToLogic {
 			
 			// 將整理好的比對結果另寫出Excel檔
 			// 收載才需產出Excel的邏輯頁籤，梳理則不需
-			if("DW".equals(type)) {
+			if("1".equals(mapProp.get("runType"))) {
 				Tools.output(workbook, outputPath, fileName);
 			} else {
 				workbook.close();
@@ -222,8 +235,8 @@ public class WriteToLogic {
 					+ ", 'yyyyMMdd'))) end";
 		else if ("DECIMAL".equals(colType)) 
 			colLogic = "cast(" + colEName + " as " + colType + "(" + colLen + "))";
-		else if ("DATETIME".equals(colType))
-			colLogic = "current_timestamp";
+//		else if ("DATETIME".equalsIgnoreCase(colType) && "CREATEDDATE".equalsIgnoreCase(colEName))
+//			colLogic = "current_timestamp";
 		
 		return colLogic;
 	}

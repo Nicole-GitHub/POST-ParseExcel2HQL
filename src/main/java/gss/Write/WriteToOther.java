@@ -191,13 +191,13 @@ public class WriteToOther {
 					if (intTypeList.contains(colType) || "DECIMAL".equals(colType)) {
 						// 欄位型態轉換
 						colLogic = WriteToLogic.getColLogic(charTypeList, intTypeList, colEName, colType, colLen);
-						if (intTypeList.contains(colType)) {
+//						if (intTypeList.contains(colType)) {
 							rcptODSColLogic += "\tsum(" + colLogic + ") as " + colEName + " ,\n";
 							rcptColLogic += "\tsum(" + colEName + ") as " + colEName + " ,\n";
-						} else if ("DECIMAL".equals(colType)) {
-							rcptODSColLogic += "\tsum(" + colLogic + ") as " + colEName + " ,\n";
-							rcptColLogic += "\tsum(" + colEName + ") as " + colEName + " ,\n";
-						}
+//						} else if ("DECIMAL".equals(colType)) {
+//							rcptODSColLogic += "\tsum(" + colLogic + ") as " + colEName + " ,\n";
+//							rcptColLogic += "\tsum(" + colEName + ") as " + colEName + " ,\n";
+//						}
 					}
 				}
 			}

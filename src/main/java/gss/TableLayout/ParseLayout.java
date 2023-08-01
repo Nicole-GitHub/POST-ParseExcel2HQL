@@ -52,24 +52,28 @@ public class ParseLayout {
 				if (row == null || !Tools.isntBlank(row.getCell(1)))
 					break;
 
-				boolean delLine = false;
-				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
-				String colEName = !delLine ? Tools.getCellValue(row, c, "欄位英文名稱") : "";
-				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
-				String colCName = !delLine ? Tools.getCellValue(row, c, "欄位中文名稱") : "";
-				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
-				String type = !delLine ? Tools.getCellValue(row, c, "資料型態") : "";
-				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
-				String len = !delLine ? Tools.getCellValue(row, c, "資料長度") : "";
-				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
-				String pk = !delLine ? Tools.getCellValue(row, c, "主鍵註記").toUpperCase() : "";
-				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
-				String nullable = !delLine ? Tools.getCellValue(row, c, "NULL註記").toUpperCase() : "";
-				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
-				String init = !delLine ? Tools.getCellValue(row, c, "初始值") : "";
+//				boolean delLine = false;
+				if (Tools.isDelLine(row, ++c)) continue;
+				String colEName = Tools.getCellValue(row, c, "欄位英文名稱");
+				if (Tools.isDelLine(row, ++c)) continue;
+				String colCName =Tools.getCellValue(row, c, "欄位中文名稱");
+				if (Tools.isDelLine(row, ++c)) continue;
+				String type =Tools.getCellValue(row, c, "資料型態");
+				if (Tools.isDelLine(row, ++c)) continue;
+				String len =Tools.getCellValue(row, c, "資料長度");
+				if (Tools.isDelLine(row, ++c)) continue;
+				String pk =Tools.getCellValue(row, c, "主鍵註記").toUpperCase();
+				if (Tools.isDelLine(row, ++c)) continue;
+				String nullable =Tools.getCellValue(row, c, "NULL註記").toUpperCase();
+				if (Tools.isDelLine(row, ++c)) continue;
+				String init =Tools.getCellValue(row, c, "初始值");
+				for(int i = 0 ; i < 9 ; i++) ++c; // 中間跳過9欄
+				if (Tools.isDelLine(row, ++c)) continue;
+				String formular = Tools.getCellValue(row, c, "公式");
 				
-				// 若此行有刪除線，則整行不讀取
-				if (delLine) continue;
+				
+//				// 若此行有刪除線，則整行不讀取
+//				if (delLine) continue;
 
 				mapReturn = new HashMap<String, String>();
 				mapReturn.put("MapType", "Detail");
@@ -79,6 +83,7 @@ public class ParseLayout {
 				mapReturn.put("ColType", type);
 				mapReturn.put("PK", pk);
 				mapReturn.put("Nullable", nullable);
+				mapReturn.put("Formular", formular);
 				listReturn.add(mapReturn);
 				
 				len = len0Typelist.contains(type.toUpperCase()) ? "" : "(" + len + ")";

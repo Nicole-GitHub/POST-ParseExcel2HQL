@@ -33,6 +33,9 @@ public class ParseODS {
 		List<Map<String, String>> rsSelectPartitionList = new ArrayList<Map<String, String>>();
 		Map<String, String> mapReturn = new HashMap<String, String>();
 		Map<String, String> mapPartition = new HashMap<String, String>();
+
+		// ODS一律不切partition (調整於20230801)
+		partition = "";
 		
 		try {
 			// partition
@@ -45,23 +48,23 @@ public class ParseODS {
 				if (row == null || !Tools.isntBlank(row.getCell(1)))
 					break;
 
-				boolean delLine = false;
-				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
-				String dwColEName = !delLine ? Tools.getCellValue(row, c, "DW欄位英文名稱") : "";
+//				boolean delLine = false;
+				if (Tools.isDelLine(row, ++c)) continue;
+				String dwColEName =Tools.getCellValue(row, c, "DW欄位英文名稱");
 				c++;// 來源欄位英文名稱
-				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
-				int dataStart = !delLine ? Integer.parseInt(Tools.getCellValue(row, c, "資料起點")) : 0;
-				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
-				int dataEnd = !delLine ? Integer.parseInt(Tools.getCellValue(row, c, "資料終點")) : 0;
+				if (Tools.isDelLine(row, ++c)) continue;
+				int dataStart =Integer.parseInt(Tools.getCellValue(row, c, "資料起點"));
+				if (Tools.isDelLine(row, ++c)) continue;
+				int dataEnd =Integer.parseInt(Tools.getCellValue(row, c, "資料終點"));
 				c++;// 備註
 				int datalen = dataEnd - dataStart + 1;
-				if (!delLine) delLine = Tools.isDelLine(row, ++c); else continue;
-				boolean hasChinese = !delLine ? "Y".equalsIgnoreCase(Tools.getCellValue(row, c, "是否含有中文")) : false;
+				if (Tools.isDelLine(row, ++c)) continue;
+				boolean hasChinese ="Y".equalsIgnoreCase(Tools.getCellValue(row, c, "是否含有中文"));
 				// 若有其中一個欄位含有中文，則整份Table都算含有中文(傳給外面用的)
 				hasChineseForTable = hasChineseForTable ? true : hasChinese;
 				
-				// 若此行有刪除線，則整行不讀取
-				if (delLine) continue;
+//				// 若此行有刪除線，則整行不讀取
+//				if (delLine) continue;
 				
 				dataCols += dwColEName + ",";
 				dataStartEnd += dataStart + "," + dataEnd + ",";
