@@ -136,15 +136,9 @@ public class WriteToLogic {
 						colLogic = "current_timestamp";
 					
 					if (intTypeList.contains(colType) || "DECIMAL".equals(colType)) {
-//						if (intTypeList.contains(colType)) {
-							sumColLogic += "\t\t\tsum(" + colEName + ") as " + colEName + " ,\n";
-							sumODSColLogic += "\t\t\tsum(" + colLogic + ") as SRC_" + colEName + " ,\n";
-							whereSumCol += "\t\tand a." + colEName + " = b.SRC_" + colEName + "\n";
-//						} else if ("DECIMAL".equals(colType)) {
-//							sumColLogic += "\t\t\tsum(" + colEName + ") as " + colEName + " ,\n";
-//							sumODSColLogic += "\t\t\tsum(" + colLogic + ") as SRC_" + colEName + " ,\n";
-//							whereSumCol += "\t\tand a." + colEName + " = b.SRC_" + colEName + "\n";
-//						}
+						sumColLogic += "\t\t\tnvl(sum(" + colEName + "),0) as " + colEName + " ,\n";
+						sumODSColLogic += "\t\t\tnvl(sum(" + colLogic + "),0) as SRC_" + colEName + " ,\n";
+						whereSumCol += "\t\tand a." + colEName + " = b.SRC_" + colEName + "\n";
 					}
 					
 					// 寫入Excel

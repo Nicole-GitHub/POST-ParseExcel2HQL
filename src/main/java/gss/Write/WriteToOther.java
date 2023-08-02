@@ -139,8 +139,8 @@ public class WriteToOther {
 			FileTools.createFile(outputPathBin, "BEFORE_C03_ExportDate2File", "hql", b03_hql);
 			FileTools.createFile(outputPathBin, "BEFORE_C04_FinishData", "hql", b04_hql);
 			FileTools.createFile(outputPathBin, "BACKUP_"+type, "hql", backup_dw_hql);
-			String codeFileName = type+"_L0"+("DW".equals(type) ? "8" : "3")+"_Load"+type+"_TMP";
-			FileTools.createFile(outputPathBin, codeFileName, "hql", dw_l08_loaddw_tmp_hql);
+			String load_tmp_codeFileName = type+"_L0"+("DW".equals(type) ? "8" : "3")+"_Load"+type+"_TMP";
+			FileTools.createFile(outputPathBin, load_tmp_codeFileName, "hql", dw_l08_loaddw_tmp_hql);
 			FileTools.createFile(outputPathBin, "FINISH", "hql", finish_hql);
 			FileTools.createFile(outputPathBin, "TRUNCATE_"+type, "hql", truncate_dw_hql);
 
@@ -151,7 +151,7 @@ public class WriteToOther {
 			FileTools.createFile(outputPathBin, "BEFORE_C04_FinishData", "var", b04_var);
 			FileTools.createFile(outputPathBin, "BACKUP_"+type, "var", backup_dw_var);
 			FileTools.createFile(outputPathBin, type+"_EXPORT_2SQL", "var", dw_export_2sql_var);
-			FileTools.createFile(outputPathBin, type+"_L08_Load"+type+"_TMP", "var", dw_l08_loaddw_tmp_var);
+			FileTools.createFile(outputPathBin, load_tmp_codeFileName, "var", dw_l08_loaddw_tmp_var);
 			FileTools.createFile(outputPathBin, "FINISH", "var", finish_var);
 			FileTools.createFile(outputPathBin, "TRUNCATE_"+type, "var", truncate_dw_var);
 			
@@ -191,13 +191,8 @@ public class WriteToOther {
 					if (intTypeList.contains(colType) || "DECIMAL".equals(colType)) {
 						// 欄位型態轉換
 						colLogic = WriteToLogic.getColLogic(charTypeList, intTypeList, colEName, colType, colLen);
-//						if (intTypeList.contains(colType)) {
-							rcptODSColLogic += "\tsum(" + colLogic + ") as " + colEName + " ,\n";
-							rcptColLogic += "\tsum(" + colEName + ") as " + colEName + " ,\n";
-//						} else if ("DECIMAL".equals(colType)) {
-//							rcptODSColLogic += "\tsum(" + colLogic + ") as " + colEName + " ,\n";
-//							rcptColLogic += "\tsum(" + colEName + ") as " + colEName + " ,\n";
-//						}
+						rcptODSColLogic += "\tnvl(sum(" + colLogic + "),0) as " + colEName + " ,\n";
+						rcptColLogic += "\tnvl(sum(" + colEName + "),0) as " + colEName + " ,\n";
 					}
 				}
 			}
