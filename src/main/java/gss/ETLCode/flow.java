@@ -24,8 +24,8 @@ public class flow {
 				+ "7:TRUNCATE_DM.sh\n"
 				+ "8:DM_L02_LoadDM.hql\n"
 				+ "9:DM_L03_LoadDM_TMP.hql\n"
-				+ "10:FINISH.hql\n"
-				+ "11:EXPORTFILE.sh\n";
+				+ "10:EXPORTFILE.sh\n"
+				+ "11:FINISH.hql\n";
 		}
 		
 		return rs;
@@ -56,8 +56,8 @@ public class flow {
 				+ "9:DM_L03_LoadDM_TMP.hql\n"
 				+ "10:TRUNCATE_MSSQL.sh\n"
 				+ "11:DM_EXPORT_2SQL.sh\n"
-				+ "12:FINISH.hql\n"
-				+ "13:EXPORTFILE.sh\n";
+				+ "12:EXPORTFILE.sh\n"
+				+ "13:FINISH.hql\n";
 		}
 		
 		return rs;
