@@ -72,9 +72,10 @@ public class ParseODS {
 				
 				// 含有中文則需轉碼否則長度截取會出錯
 				if (hasChinese) {
-					selectScript = "TRIM(ENCODE(DECODE(SUBSTRING(ENCODE(SUBSTRING(line," + dataStart + "),'BIG5'),1," + datalen + "),'BIG5'),'UTF8'))";
-					selectScript = "\tcase when " + selectScript + " = '' then NULL \n\t\telse " + selectScript + " end AS "
-							+ dwColEName + " ,\n";
+					selectScript = "CAST(ENCODE(TRIM(DECODE(SUBSTRING(ENCODE(SUBSTRING(line," + dataStart
+							+ "),'BIG5'),1," + datalen + "),'BIG5')),'UTF8') AS STRING )";
+					selectScript = "\tcase when " + selectScript + " = '' then NULL \n\t\telse " + selectScript
+							+ " end AS " + dwColEName + " ,\n";
 				} else {
 					selectScript = "TRIM(SUBSTRING(line," + dataStart + "," + datalen + "))";
 					selectScript = "\tcase when " + selectScript + " = '' then NULL else " + selectScript + " end AS "
