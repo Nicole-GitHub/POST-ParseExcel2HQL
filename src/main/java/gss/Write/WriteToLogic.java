@@ -71,8 +71,7 @@ public class WriteToLogic {
 			layoutMap = layoutMapList.get(layoutMapListLastNum);
 			String tableName = layoutMap.get("TableName");
 	     	String odsTableName = "ODS" + tableName.substring(1);
-//			String tableType = "D" + tableName.substring(5, 6);
-			String type = mapProp.get("tableType");
+			String type = "1".equals(mapProp.get("runType")) ? "DW" : "DM";
 			String partition = layoutMap.get("Partition");
 			
 			// partition

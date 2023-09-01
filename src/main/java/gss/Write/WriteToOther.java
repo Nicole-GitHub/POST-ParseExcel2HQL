@@ -48,8 +48,8 @@ public class WriteToOther {
 			String tableName = layoutMap.get("TableName");
 	     	String odsTableName = "ODS" + tableName.substring(1);
 	     	String partition = layoutMap.get("Partition");
-			String type = mapProp.get("tableType");
 			String runType = mapProp.get("runType");
+			String type = "1".equals(runType) ? "DW" : "DM";
 			boolean hasChinese = "Y".equals(hasChineseForTable);
 			
 			// 將所有欄位名稱合在一起
@@ -61,8 +61,8 @@ public class WriteToOther {
 			}
 			
 	     	String desc = description.get();
-	     	String flowAll = flow.get_def_all(runType);
-	     	String flowNoExport = flow.get_def_noExport(runType);
+	     	String flowAll = flow.get_def_all(mapProp);
+	     	String flowNoExport = flow.get_def_noExport(mapProp);
 	     	String rcpt = getRCPT(tableName, odsTableName, layoutMapList, mapProp);
 	     	
 	     	// bin/

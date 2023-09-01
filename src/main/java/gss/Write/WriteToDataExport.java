@@ -52,7 +52,12 @@ public class WriteToDataExport {
 					else if ("DECIMAL".equals(colType)) {
 						String[] colLenArr = colLen.split(",");
 						int colLenInt = Integer.parseInt(colLenArr[0]) + 1;
-						colLogic = "\tlpad(nvl(format_number(" + colEName + ", " + colLenArr[1] + "),''), " + colLenInt
+						
+						String format = "0.";
+						for(int i = 0 ; i < Integer.parseInt(colLenArr[1]) ; i++)
+							format += "0";
+						
+						colLogic = "\tlpad(nvl(format_number(" + colEName + ", \"" + format + "\"),''), " + colLenInt
 								+ ", ' ') as " + colEName + ",\n";
 					}
 					colLogicStr += colLogic;

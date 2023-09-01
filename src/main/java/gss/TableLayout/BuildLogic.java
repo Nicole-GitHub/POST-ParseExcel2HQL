@@ -21,7 +21,7 @@ public class BuildLogic {
 
 		List<Map<String, String>> mapList = new ArrayList<Map<String, String>>();
 		Map<String, String> map = new HashMap<String, String>();
-		String tableType = "D" + layoutMap.get("TableName").substring(5, 6);
+		String tableType = "1".equals(layoutMap.get("runType")) ? "DW" : "DM" ;
 		String partition = layoutMap.get("Partition");
 		String rawDBName = mapProp.get("hadoop.raw.dbname");
 		String tmpDBName = mapProp.get("hadoop.tmp.dbname");
