@@ -2,14 +2,14 @@ package gss.ETLCode.bin;
 
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class ODS_L06_LoadODS {
 
-	public static String getHQL(String partition, Map<String, String> mapProp, String selectStr, String tableName) {
+	public static String getHQL(Map<String, String> mapProp, String selectStr, String tableName,
+			boolean hasChineseForTable) {
 		
 		String ods_tableName = tableName;
 		String t_tableName = tableName.replace("ODS_", "T_");
+		
 		String rs = "-----------------------------------------------------------------\n"
 				+ "-- parameter list\n"
 				+ "-----------------------------------------------------------------\n"
@@ -21,16 +21,27 @@ public class ODS_L06_LoadODS {
 				+ "set hivevar:FUNC_NAME="+ods_tableName+"_GetODS;\n"
 				+ "set hivevar:KEY_NAME=return_code;\n"
 				+ "set hivevar:LOGIC_NAME="+t_tableName+";\n"
-				+ "set hivevar:TMP1=tmp_"+ods_tableName+"_061;\n"
-				+ "-----------------------------------------------------------------\n"
+				+ "set hivevar:TMP1=tmp_"+ods_tableName+"_061;\n";
+			rs += hasChineseForTable ? "set hivevar:TMP2=tmp_"+ods_tableName+"_062; \n" : "";
+			rs += "-----------------------------------------------------------------\n"
 				+ "\n"
-				+ "\n"
-				+ "\n"
+				+ "\n";
+			
+			rs += hasChineseForTable ? 
+					"-- 因有中文欄位，將line先encode成big5\n"
+					+ "drop table if exists ${hivevar:TMP2};\n"
+					+ "create table ${hivevar:TMP2}\n"
+					+ "as\n"
+					+ "SELECT ENCODE(line,'BIG5') AS line\n"
+					+ "FROM ${hivevar:SRC1_L06}\n"
+					+ ";\n" 
+					: "";
+			
+			rs += "\n"
 				+ "-- Main logic\n"
 				+ "INSERT OVERWRITE TABLE ${hivevar:DES1_L06}\n";
-			rs += !StringUtils.isBlank(partition) ? "PARTITION(" + partition + ") \n" : "";
 			rs += "SELECT \n" + selectStr.substring(0,selectStr.lastIndexOf(",")) + "\n"
-				+ "FROM ${hivevar:SRC1_L06}\n"
+				+ "FROM ${hivevar:" + (hasChineseForTable ? "TMP2" : "SRC1_L06") + "}\n"
 				+ ";\n"
 				+ "\n"
 				+ "-- verification\n"
@@ -60,7 +71,7 @@ public class ODS_L06_LoadODS {
 				+ "-- 1 => failure\n"
 				+ "insert into table ${hivevar:RSLT}\n"
 				+ "select\n"
-				+ "   '${hivevar:LOGIC_NAME}' as alias,\n"
+				+ "   '${hivevar:LOGIC_NAME}',\n"
 				+ "   ${hivevar:BATCHID},\n"
 				+ "   '${hivevar:FUNC_NAME}',\n"
 				+ "   '${hivevar:KEY_NAME}',\n"
@@ -76,7 +87,7 @@ public class ODS_L06_LoadODS {
 		return rs;
 	}
 	
-	public static String getVAR(Map<String, String> mapProp, String tableName) {
+	public static String getVAR(Map<String, String> mapProp, String tableName, boolean hasChineseForTable) {
 		
 		String ods_tableName = tableName;
 		String t_tableName = tableName.replace("ODS_", "T_");
@@ -91,8 +102,9 @@ public class ODS_L06_LoadODS {
 				+ "set hivevar:FUNC_NAME="+ods_tableName+"_GetODS;\n"
 				+ "set hivevar:KEY_NAME=return_code;\n"
 				+ "set hivevar:LOGIC_NAME="+t_tableName+";\n"
-				+ "set hivevar:TMP1=tmp_"+ods_tableName+"_061;\n"
-				+ "-----------------------------------------------------------------\n\n";
+				+ "set hivevar:TMP1=tmp_"+ods_tableName+"_061;\n";
+			rs += hasChineseForTable ? "set hivevar:TMP2=tmp_"+ods_tableName+"_062; \n" : "";
+			rs += "-----------------------------------------------------------------\n\n";
 		
 		return rs;
 	}

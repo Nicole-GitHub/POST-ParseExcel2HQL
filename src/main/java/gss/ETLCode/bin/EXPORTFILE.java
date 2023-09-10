@@ -10,7 +10,7 @@ public class EXPORTFILE {
 		String rs = "-----------------------------------------------------------------\n"
 				+ "-- parameter list\n"
 				+ "-----------------------------------------------------------------\n"
-				+ "set hivevar:SRC1_EXPORTFILE="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+";\n"
+				+ "set hivevar:SRC1_EXPORTFILE="+mapProp.get("exportfile.dbname")+"."+tableName+";\n"
 				+ "set hivevar:TMP1=TMP_DATA_SET_"+tableName+";\n"
 				+ "set hivevar:DES1_EXPORTFILE="+mapProp.get("hadoop.raw.dbname")+".OUTPUT_"+tableName+";\n"
 				+ "-----------------------------------------------------------------\n"
@@ -43,8 +43,11 @@ public class EXPORTFILE {
 		return rs;
 	}
 
-	public static String getShell(String tableName) {
+	public static String getShell(Map<String, String> mapProp, String tableName) {
 		String tableNameLast = tableName.substring(2);
+		String addSRC1Str = "post1_post_poc_raw".equalsIgnoreCase(mapProp.get("exportfile.dbname"))
+				? "declare SRC1= \ndeclare DES1= \n" : "";
+		
 		String rs = "########################\n"
 				+ "## Parameter liating: ##\n"
 				+ "########################\n"
@@ -57,10 +60,12 @@ public class EXPORTFILE {
 				+ "## SRC_PATH: source uri. local directory.\n"
 				+ "declare SRC1_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/EXPORTFILE.hql\n"
 				+ "\n"
+				+ "## ACT_YM\n"
+				+ "declare ACT_YM=`cat /opt/gss/pipe-logic-deploy/post/"+tableName+"/RUN_NOW/YMS.txt`\n"
 				+ "\n"
 				+ "## DES_PATH: destination uri.\n"
-				+ "declare DES1_PATH=/home/post1/DW_WORK/upload/"+tableName+"/tmp/"+tableNameLast+"_$(date +\"%Y%m%d\").txt\n"
-				+ "declare DES2_PATH=/home/post1/DW_WORK/upload/"+tableName+"/temp/"+tableNameLast+"_$(date +\"%Y%m%d\").txt\n"
+				+ "declare DES1_PATH=/home/post1/DW_WORK/upload/"+tableName+"/tmp/"+tableNameLast+"_${ACT_YM}_$(date +\"%Y%m%d\").txt\n"
+				+ "declare DES2_PATH=/home/post1/DW_WORK/upload/"+tableName+"/temp/"+tableNameLast+"_${ACT_YM}_$(date +\"%Y%m%d\").txt\n"
 				+ "\n"
 				+ "## LOGIC_NAME: logic name.\n"
 				+ "declare LOGIC_NAME="+tableName+"\n"
@@ -73,6 +78,8 @@ public class EXPORTFILE {
 				+ "\n"
 				+ "## TMP1: a table holds verification stats.\n"
 				+ "declare TMP1=tmp_tab01_verification_stat\n"
+				+ "\n"
+				+ addSRC1Str
 				+ "\n"
 				+ "mkdir -p ${HOME}${U_PATH}"+tableName+"/\n"
 				+ "mkdir -p ${HOME}${U_PATH}"+tableName+"/tmp/\n"
@@ -93,7 +100,7 @@ public class EXPORTFILE {
 		return rs;
 	}
 
-	public static String getShellVAR(String tableName) {
+	public static String getShellVAR(Map<String, String> mapProp, String tableName) {
 		String tableNameLast = tableName.substring(2);
 		String rs = "########################\n"
 				+ "## Parameter liating: ##\n"
@@ -107,10 +114,12 @@ public class EXPORTFILE {
 				+ "## SRC_PATH: source uri. local directory.\n"
 				+ "declare SRC1_PATH=/opt/gss/pipe-logic-deploy/post/"+tableName+"/bin/EXPORTFILE.hql\n"
 				+ "\n"
+				+ "## ACT_YM\n"
+				+ "declare ACT_YM=`cat /opt/gss/pipe-logic-deploy/post/"+tableName+"/RUN_NOW/YMS.txt`\n"
 				+ "\n"
 				+ "## DES_PATH: destination uri.\n"
-				+ "declare DES1_PATH=/home/post1/DW_WORK/upload/"+tableName+"/tmp/"+tableNameLast+"_$(date +\"%Y%m%d\").txt\n"
-				+ "declare DES2_PATH=/home/post1/DW_WORK/upload/"+tableName+"/temp/"+tableNameLast+"_$(date +\"%Y%m%d\").txt\n"
+				+ "declare DES1_PATH=/home/post1/DW_WORK/upload/"+tableName+"/tmp/"+tableNameLast+"_${ACT_YM}_$(date +\"%Y%m%d\").txt\n"
+				+ "declare DES2_PATH=/home/post1/DW_WORK/upload/"+tableName+"/temp/"+tableNameLast+"_${ACT_YM}_$(date +\"%Y%m%d\").txt\n"
 				+ "\n"
 				+ "## LOGIC_NAME: logic name.\n"
 				+ "declare LOGIC_NAME="+tableName+"\n"

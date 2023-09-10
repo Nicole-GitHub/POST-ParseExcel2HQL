@@ -97,7 +97,7 @@ public class ODS_C04_GetData {
 				+ "-- 1 => failure\n"
 				+ "insert into table ${hivevar:RSLT}\n"
 				+ "select\n"
-				+ "   '${hivevar:LOGIC_NAME}' as alias,\n"
+				+ "   '${hivevar:LOGIC_NAME}',\n"
 				+ "   ${hivevar:BATCHID},\n"
 				+ "   '${hivevar:FUNC_NAME}',\n"
 				+ "   '${hivevar:KEY_NAME}',\n"

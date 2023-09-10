@@ -67,8 +67,8 @@ public class WriteToDataExport {
 			colLogicStr = StringUtils.isBlank(colLogicStr) ? "" : colLogicStr.substring(0,colLogicStr.length() - 2);
 			colENameStr = StringUtils.isBlank(colENameStr) ? "" : colENameStr.substring(0,colENameStr.length() - 2);
 			String hql = EXPORTFILE.getHQL(mapProp, colLogicStr, colENameStr, tableName);
-			String sh = EXPORTFILE.getShell(tableName);
-			String var = EXPORTFILE.getShellVAR(tableName);
+			String sh = EXPORTFILE.getShell(mapProp, tableName);
+			String var = EXPORTFILE.getShellVAR(mapProp, tableName);
 
 			FileTools.createFile(outputPath + fileName + "/bin/", "EXPORTFILE", "hql", hql);
 			FileTools.createFile(outputPath + fileName + "/bin/", "EXPORTFILE", "sh", sh);
