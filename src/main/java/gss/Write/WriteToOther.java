@@ -14,6 +14,7 @@ import gss.ETLCode.bin.BEFORE_C01_Run;
 import gss.ETLCode.bin.BEFORE_C02_Check;
 import gss.ETLCode.bin.BEFORE_C03_ExportDate2File;
 import gss.ETLCode.bin.BEFORE_C04_FinishData;
+import gss.ETLCode.bin.DM_L02_LoadDM;
 import gss.ETLCode.bin.DW_EXPORT_2SQL;
 import gss.ETLCode.bin.DW_L08_LoadDW_TMP;
 import gss.ETLCode.bin.FILE_UPLOAD;
@@ -118,6 +119,12 @@ public class WriteToOther {
 				FileTools.createFile(outputPathBin, "TRUNCATE_ODS", "var", truncate_ods_var);
 	
 				FileTools.createFile(outputPathBin, "FILE_UPLOAD", "sh", file_upload_sh);
+	     	} else {
+	     		String dm_l02_loaddm_tmp_hql = DM_L02_LoadDM.getHQL(partition, mapProp, tableName);
+		     	String dm_l02_loaddm_tmp_var = DM_L02_LoadDM.getVAR(mapProp, tableName);
+		     	
+		     	FileTools.createFile(outputPathBin, "DM_L02_LoadDM", "hql", dm_l02_loaddm_tmp_hql);
+				FileTools.createFile(outputPathBin, "DM_L02_LoadDM", "var", dm_l02_loaddm_tmp_var);
 	     	}
 	     	
 	     	String finish_hql = FINISH.getHQL(mapProp, tableName);

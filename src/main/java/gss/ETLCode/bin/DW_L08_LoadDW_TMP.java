@@ -26,7 +26,7 @@ public class DW_L08_LoadDW_TMP {
 				+ "-- main\n"
 				+ "drop table if exists ${hivevar:DES1_L08};\n"
 				+ "\n"
-				+ "create table if not exists ${hivevar:DES1_L08}\n"
+				+ "create table ${hivevar:DES1_L08}\n"
 				+ "as\n"
 				+ "select \n" + selectStr.substring(0,selectStr.lastIndexOf(",")) + "\n"
 				+ "from ${hivevar:SRC1_L08} a\n";
