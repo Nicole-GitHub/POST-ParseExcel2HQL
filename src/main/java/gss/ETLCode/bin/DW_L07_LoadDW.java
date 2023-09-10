@@ -7,7 +7,13 @@ import org.apache.commons.lang3.StringUtils;
 public class DW_L07_LoadDW {
 
 	public static String getHQL(String partition, Map<String, String> mapProp, String selectStr, String sumColLogic,
-			String sumODSColLogic, String whereSumCol, String tableName, String odsTableName, String type) {
+			String sumODSColLogic, String whereSumCol, String tableName, String odsTableName) {
+
+		String raw = mapProp.get("hadoop.raw.dbname");
+		String tmp = mapProp.get("hadoop.tmp.dbname");
+		String meta = mapProp.get("hadoop.meta.dbname");
+		boolean runType = "1".equals(mapProp.get("runType"));
+		String func_name = runType ? "_BackDW" : "_merge2DMTMP";
 		
 		String rs = "-----------------------------------------------------------------\n"
 				+ "-- parameter list\n"
@@ -15,27 +21,39 @@ public class DW_L07_LoadDW {
 				+ "set hivevar:BATCHID=20230609000000;\n"
 				+ "set hivevar:Run_TableName="+tableName+";\n"
 				+ "set hivevar:RUN_NOW=post1_post_poc_std.SYS_RUN_NOW;\n"
-				+ "set hivevar:RSLT="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+"_result;\n"
-				+ "set hivevar:SRC1_L07="+mapProp.get("hadoop.raw.dbname")+"."+odsTableName+";\n"
-				+ "set hivevar:SRC2_L07="+mapProp.get("hadoop.meta.dbname")+"."+odsTableName+"_done_files;\n"
-				+ "set hivevar:DES1="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
-				+ "set hivevar:SRC3_L07="+mapProp.get("hadoop.tmp.dbname")+".BKD_"+tableName+";\n"
-				+ "set hivevar:FUNC_NAME1="+tableName+"_Back"+type+"_TotalDataCount;\n"
-				+ "set hivevar:FUNC_NAME2="+tableName+"_Back"+type+"_SumNumData;\n"
-				+ "set hivevar:FUNC_NAME3="+tableName+"_Back"+type+"_GroupSum;\n"
+				+ "set hivevar:RSLT="+ tmp +"."+tableName+"_result;\n"
+				+ (runType ? "set hivevar:SRC1_L07="+ raw +"."+odsTableName+";\n"
+						: "set hivevar:SRC1="+ raw +".[***SourceTableName***];\n")
+				+ (runType ? "set hivevar:SRC2_L07="+ meta +"."+odsTableName+"_done_files;\n"
+						: "set hivevar:SRC2_T="+ meta +".[***ODSTableName***]_done_files;\n")
+				+ (runType ? "set hivevar:DES1="+ raw +"."+tableName+";\n"
+						:"set hivevar:DES1_TMP="+ tmp +".tmp_"+tableName+";\n")
+				+ (runType ? "set hivevar:SRC3_L07="+ tmp +".BKD_"+tableName+";\n"
+						:"set hivevar:SRC3_T="+ raw +"."+tableName+";\n")
+				+ "\n"
+				+ "set hivevar:FUNC_NAME1="+tableName+func_name+"_TotalDataCount;\n"
+				+ "set hivevar:FUNC_NAME2="+tableName+func_name+"_SumNumData;\n"
+				+ "set hivevar:FUNC_NAME3="+tableName+func_name+"_GroupSum;\n"
 				+ "set hivevar:KEY_NAME=return_code;\n"
 				+ "set hivevar:LOGIC_NAME="+tableName+";\n"
-				+ "set hivevar:TMP1=tmp_"+tableName+"_071;\n"
-				+ "set hivevar:TMP2=tmp_"+tableName+"_072;\n"
-				+ "set hivevar:TMP3=tmp_"+tableName+"_073;\n"
+				+ "set hivevar:TMP1=tmp_"+tableName+"_0"+(runType ? "7" : "1")+"1;\n"
+				+ "set hivevar:TMP2=tmp_"+tableName+"_0"+(runType ? "7" : "1")+"2;\n"
+				+ "set hivevar:TMP3=tmp_"+tableName+"_0"+(runType ? "7" : "1")+"3;\n"
 				+ "-----------------------------------------------------------------\n"
 				+ "\n"
 				+ "\n"
-				+ "-- main\n"
-				+ "INSERT OVERWRITE TABLE ${hivevar:DES1}\n";
-			rs += !StringUtils.isBlank(partition) ? "PARTITION(" + partition + ") \n" : "";
+				+ "-- main\n";
+		
+			rs += runType ? 
+				"INSERT OVERWRITE TABLE ${hivevar:DES1}\n"
+				+ (!StringUtils.isBlank(partition) ? "PARTITION(" + partition + ") \n" : "")
+				: "-- 先用target table schema建立後再用insert into方式塞資料，以免發生schema不合的情況\n"
+				+ "drop table if exists ${hivevar:DES1_TMP};\n"
+				+ "create table ${hivevar:DES1_TMP} like ${hivevar:SRC3_T};\n"
+				+ "INSERT into ${hivevar:DES1_TMP}\n";
+			
 			rs += "Select \n" + selectStr + "\n"
-				+ "FROM ${hivevar:SRC1_L07} T1 \n";
+				+ "FROM ${hivevar:"+ (runType ? "SRC1_L07" : "SRC1") +"} T1 \n";
 			rs += !StringUtils.isBlank(partition) ? 
 				"	join (select SUBSTRING(ymds,1,6) ymds from ${hivevar:RUN_NOW} where trim(tablenm) = '${hivevar:Run_TableName}') b\n"
 				+ "	on T1." + partition + " = b.ymds\n" : "";
@@ -51,14 +69,14 @@ public class DW_L07_LoadDW {
 				+ "	select des_cnt,src_row\n"
 				+ "	from (\n"
 				+ "		select count(1) as des_cnt\n"
-				+ "		from ${hivevar:DES1} a1 \n";
+				+ "		from ${hivevar:"+ (runType ? "DES1" : "DES1_TMP") +"} a1 \n";
 			rs += !StringUtils.isBlank(partition) ?
 				"			join (select SUBSTRING(ymds,1,6) ymds from ${hivevar:RUN_NOW} where trim(tablenm) = '${hivevar:Run_TableName}') run\n"
 				+ "			on a1." + partition + " = run.ymds\n" : "";
 			rs += "	) a\n"
 				+ "	, (\n"
 				+ "		select sum(total_row) as src_row\n"
-				+ "		from ${hivevar:SRC2_L07}\n"
+				+ "		from ${hivevar:"+ (runType ? "SRC2_L07" : "SRC2_T") +"}\n"
 				+ "	) b\n"
 				+ ")H\n"
 				+ "where des_cnt = src_row\n"
@@ -95,12 +113,12 @@ public class DW_L07_LoadDW {
 				+ "	select * \n"
 				+ "	from (\n"
 				+ "		select \n" + sumColLogic + "\n"
-				+ "		from ${hivevar:DES1} a1 ";
+				+ "		from ${hivevar:"+ (runType ? "DES1" : "DES1_TMP") +"} a1 ";
 			verifySum += !StringUtils.isBlank(partition) ? "join run on a1." + partition + " = run.ymds\n" : "\n";
 			verifySum += "	) a\n"
 				+ "	, (\n"
 				+ "		select \n" + sumODSColLogic + "\n"
-				+ "		from ${hivevar:SRC1_L07} a1 ";
+				+ "		from ${hivevar:"+ (runType ? "SRC1_L07" : "SRC1") +"} a1 ";
 			verifySum += !StringUtils.isBlank(partition) ? "join run on a1." + partition + " = run.ymds\n": "\n";
 			verifySum += "	) b\n"
 				+ "	where " + whereSumCol + "\n"
@@ -141,14 +159,14 @@ public class DW_L07_LoadDW {
 				+ "	from (\n"
 				+ "		select " + (!StringUtils.isBlank(partition) ? partition + "," : "") 
 				+ " [維度欄位], count(1) des_cnt\n"
-				+ "		from ${hivevar:DES1} a1 ";
+				+ "		from ${hivevar:"+ (runType ? "DES1" : "DES1_TMP") +"} a1 ";
 			rs += !StringUtils.isBlank(partition) ? "join run on a1." + partition + " = run.ymds\n" : "\n";
 			rs += "		group by " + (!StringUtils.isBlank(partition) ? partition+ "," : "") + "[維度欄位]\n";
 			rs += "	) a\n"
 				+ "	full outer join (\n"
 				+ "		select " + (!StringUtils.isBlank(partition) ? partition + "," : "") 
 				+ " [維度欄位], count(1) src_row\n"
-				+ "		from ${hivevar:SRC1_L07} a1 ";
+				+ "		from ${hivevar:"+ (runType ? "SRC1_L07" : "SRC1") +"} a1 ";
 			rs += !StringUtils.isBlank(partition) ? "join run on a1." + partition + " = run.ymds\n" : "\n";
 			rs += "		group by " + (!StringUtils.isBlank(partition) ? partition+ "," : "") + "[維度欄位]\n";
 			rs += "	) b\n";
@@ -178,7 +196,13 @@ public class DW_L07_LoadDW {
 	}
 	
 
-	public static String getVAR(Map<String, String> mapProp, String tableName, String odsTableName, String type) {
+	public static String getVAR(Map<String, String> mapProp, String tableName, String odsTableName) {
+		
+		String raw = mapProp.get("hadoop.raw.dbname");
+		String tmp = mapProp.get("hadoop.tmp.dbname");
+		String meta = mapProp.get("hadoop.meta.dbname");
+		boolean runType = "1".equals(mapProp.get("runType"));
+		String func_name = runType ? "_BackDW" : "_merge2DMTMP";
 		
 		String rs = "-----------------------------------------------------------------\n"
 				+ "-- parameter list\n"
@@ -186,24 +210,28 @@ public class DW_L07_LoadDW {
 				+ "set hivevar:BATCHID=20230609000000;\n"
 				+ "set hivevar:Run_TableName="+tableName+";\n"
 				+ "set hivevar:RUN_NOW=post1_post_poc_std.SYS_RUN_NOW;\n"
-				+ "set hivevar:RSLT="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+"_result;\n"
-				+ "set hivevar:SRC1_L07="+mapProp.get("hadoop.raw.dbname")+"."+odsTableName+";\n"
-				+ "set hivevar:SRC2_L07="+mapProp.get("hadoop.meta.dbname")+"."+odsTableName+"_done_files;\n"
-				+ "set hivevar:DES1="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
-				+ "set hivevar:SRC3_L07="+mapProp.get("hadoop.tmp.dbname")+".BKD_"+tableName+";\n"
-				+ "set hivevar:FUNC_NAME1="+tableName+"_Back"+type+"_TotalDataCount;\n"
-				+ "set hivevar:FUNC_NAME2="+tableName+"_Back"+type+"_SumNumData;\n"
-				+ "set hivevar:FUNC_NAME3="+tableName+"_Back"+type+"_GroupSum;\n"
+				+ "set hivevar:RSLT="+ tmp +"."+tableName+"_result;\n"
+				+ (runType ? "set hivevar:SRC1_L07="+ raw +"."+odsTableName+";\n"
+						: "set hivevar:SRC1="+ raw +"."+tableName+";\n")
+				+ (runType ? "set hivevar:SRC2_L07="+ meta +"."+odsTableName+"_done_files;\n"
+						: "set hivevar:SRC2_T="+ meta +".[***odsTableName***]_done_files;\n")
+				+ (runType ? "set hivevar:DES1="+ raw +"."+tableName+";\n"
+						:"set hivevar:DES1_TMP="+ tmp +".tmp_"+tableName+";\n")
+				+ (runType ? "set hivevar:SRC3_L07="+ tmp +".BKD_"+tableName+";\n"
+						:"set hivevar:SRC3_T="+ raw +"."+tableName+";\n")
+				+ "\n"
+				+ "set hivevar:FUNC_NAME1="+tableName+func_name+"_TotalDataCount;\n"
+				+ "set hivevar:FUNC_NAME2="+tableName+func_name+"_SumNumData;\n"
+				+ "set hivevar:FUNC_NAME3="+tableName+func_name+"_GroupSum;\n"
 				+ "set hivevar:KEY_NAME=return_code;\n"
 				+ "set hivevar:LOGIC_NAME="+tableName+";\n"
-				+ "set hivevar:TMP1=tmp_"+tableName+"_071;\n"
-				+ "set hivevar:TMP2=tmp_"+tableName+"_072;\n"
-				+ "set hivevar:TMP3=tmp_"+tableName+"_073;\n"
+				+ "set hivevar:TMP1=tmp_"+tableName+"_0"+(runType ? "7" : "1")+"1;\n"
+				+ "set hivevar:TMP2=tmp_"+tableName+"_0"+(runType ? "7" : "1")+"2;\n"
+				+ "set hivevar:TMP3=tmp_"+tableName+"_0"+(runType ? "7" : "1")+"3;\n"
 				+ "-----------------------------------------------------------------\n"
-				+ "\n"
 				+ "\n";
 		
 		return rs;
 	}
-
+	
 }

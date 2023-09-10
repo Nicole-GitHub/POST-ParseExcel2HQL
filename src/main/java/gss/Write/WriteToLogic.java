@@ -71,7 +71,6 @@ public class WriteToLogic {
 			layoutMap = layoutMapList.get(layoutMapListLastNum);
 			String tableName = layoutMap.get("TableName");
 	     	String odsTableName = "ODS" + tableName.substring(1);
-			String type = "1".equals(mapProp.get("runType")) ? "DW" : "DM";
 			String partition = layoutMap.get("Partition");
 			
 			// partition
@@ -149,8 +148,11 @@ public class WriteToLogic {
 					// 寫入HQL
 					if (!StringUtils.isBlank(formular))
 						colLogic = "\t" + formular + " as " + colEName + " ,\n";
-					else 
-						colLogic = "\t" + colLogic + " as " + colEName + " ,\n";
+					else
+						colLogic = "\t"
+								+ ("current_timestamp".equals(colLogic) || "1".equals(mapProp.get("runType")) 
+									? "" : "T1.")
+								+ colLogic + " as " + colEName + " ,\n";
 					
 					// Partiton欄位的位置要另外放
 					isPartition = false;
@@ -181,8 +183,8 @@ public class WriteToLogic {
 
 			// 組出完整hql (DW_L07_LoadDW)
 			String rsHQL = DW_L07_LoadDW.getHQL(partition, mapProp, rsTargetSelectCols, sumColLogic, sumODSColLogic,
-					whereSumCol, tableName, odsTableName, type);
-			String rsVAR = DW_L07_LoadDW.getVAR(mapProp, tableName, odsTableName, type);
+					whereSumCol, tableName, odsTableName);
+			String rsVAR = DW_L07_LoadDW.getVAR(mapProp, tableName, odsTableName);
 			
 			// 將整理好的比對結果另寫出Excel檔
 			// 收載才需產出Excel的邏輯頁籤，梳理則不需
@@ -193,7 +195,7 @@ public class WriteToLogic {
 			}
 			
 			outputPath += "bin/";
-			String codeFileName = type + "_L0"+("DW".equals(type) ? "7" : "2")+"_Load" + type;
+			String codeFileName = "1".equals(mapProp.get("runType")) ? "DW_L07_LoadDW" : "DM_T01" ;
 			FileTools.createFile(outputPath, codeFileName, "hql", rsHQL);
 			FileTools.createFile(outputPath, codeFileName, "var", rsVAR);
 		} catch (Exception ex) {
