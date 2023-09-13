@@ -25,10 +25,10 @@ public class ODS_C03_GetErrorData {
 				+ "drop table if exists ${hivevar:DES1_C03};\n"
 				+ "\n"
 				+ "create table if not exists ${hivevar:DES1_C03}\n"
-				+ "as\r\n"
+				+ "as\n"
 				
-				+ "select *,LENGTH("+(hasChinese ? "ENCODE(LINE,'BIG5')" : "LINE")+") as FIX_LENGTH\r\n"
-				+ "from  ${hivevar:SRC1_C03}\r\n"
+				+ "select *,LENGTH("+(hasChinese ? "ENCODE(LINE,'BIG5')" : "LINE")+") as FIX_LENGTH\n"
+				+ "from  ${hivevar:SRC1_C03}\n"
 				+ "WHERE LENGTH("+(hasChinese ? "ENCODE(LINE,'BIG5')" : "LINE")+") <> ${hivevar:FIX_LENGTH}\n"
 				+ ";\n"
 				+ "\n"
