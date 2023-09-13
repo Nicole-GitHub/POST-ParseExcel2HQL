@@ -58,38 +58,26 @@ public class ParseODS {
 				createScript = "\t" + dwColEName + " VARCHAR(" + datalen + ") ,\n";
 				
 
-				// 含有中文則需轉碼否則長度截取會出錯
-//				if (hasChineseForTable) {
-//					selectChineseScript = "toChinessHead(line," + dataStart + "," + datalen
-//							+ ")toChinessTail";
-//					selectChineseScript = "\tcase when " + selectScript + " = '' then NULL else " + selectScript
-//							+ " end AS " + dwColEName + " ,\n";
-//				} else {
-					selectScript = "TRIM(SUBSTRING(line," + dataStart + "," + datalen + "))";
-					selectScript = "\tcase when " + selectScript + " = '' then NULL else " + selectScript
-							+ " end AS " + dwColEName + " ,\n";
+				selectScript = "TRIM(SUBSTRING(line," + dataStart + "," + datalen + "))";
+				selectScript = "\tcase when " + selectScript + " = '' then NULL else " + selectScript
+						+ " end AS " + dwColEName + " ,\n";
 
-					selectChineseScript = "TRIM(CAST(ENCODE(DECODE(SUBSTRING(line," + dataStart + "," + datalen
-							+ "),'BIG5'),'UTF8') AS STRING))";
-					selectChineseScript = "\tcase when " + selectChineseScript + " = '' then NULL else "
-							+ selectChineseScript + " end AS " + dwColEName + " ,\n";
-//				}
+				// 含有中文則需轉碼否則長度截取會出錯
+				selectChineseScript = "TRIM(CAST(ENCODE(DECODE(SUBSTRING(line," + dataStart + "," + datalen
+						+ "),'BIG5'),'UTF8') AS STRING))";
+				selectChineseScript = "\tcase when " + selectChineseScript + " = '' then NULL else "
+						+ selectChineseScript + " end AS " + dwColEName + " ,\n";
 				
 				rsCreateCols += createScript;
 				rsSelectCols += selectScript;
 				rsSelectChineseCols += selectChineseScript;
 			}
-//			String a="TRIM(CAST(ENCODE(DECODE(SUBSTRING(line," + dataStart + "," + datalen
-//					+ "),'BIG5'),'UTF8') AS STRING))";
+			
 			/**
 			 *  若來源有中文時會先將文字檔轉為BIG5存入TEMP檔，
 			 *  但BIG5碼下TRIM會失敗，所以必需所有欄位皆用ENCODE,DECODE方式寫
 			 */
 			rsSelectCols = hasChineseForTable ? rsSelectChineseCols : rsSelectCols;
-			if (hasChineseForTable) {
-				rsSelectCols = rsSelectCols.replace("toChinessHead", "TRIM(CAST(ENCODE(DECODE(SUBSTRING"); 
-				rsSelectCols = rsSelectCols.replace("toChinessTail", ",'BIG5'),'UTF8') AS STRING))"); 
-			}
 						
 			String tableName = Tools.getCellValue(sheetODS.getRow(0), 4, "TABLE名稱");
 			String txtFileName = Tools.getCellValue(sheetODS.getRow(0), 8, "來源文字檔檔名");
