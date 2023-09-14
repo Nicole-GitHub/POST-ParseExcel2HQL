@@ -39,7 +39,7 @@ public class TRUNCATE_DW {
 			rs += !StringUtils.isBlank(partition) ? 
 				 "   join (select SUBSTRING(ymds,1,6) ymds from ${hivevar:RUN_NOW} where trim(tablenm) = '${hivevar:Run_TableName}') b\n"
 				+ "      on a."+partition+" = b.ymds" : "";
-			rs += ";\n\n"
+			rs += "\n;\n\n"
 				+ "-- 確認Truncate後的筆數\n"
 				+ "-- 0 => success\n"
 				+ "-- 1 => failure\n"
