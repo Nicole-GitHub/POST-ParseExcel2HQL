@@ -132,12 +132,11 @@ public class ParseLayout {
 			
 			// HADOOP CREATE TABLE Script
 			rsHPCols = rsHPCols.replace("DATETIME", "TIMESTAMP");
+			rsHPCols = rsHPCols.replace("NVARCHAR", "VARCHAR");
 			rsHADOOP = CreateTable_T.getHQL(partitionList, rsCreatePartition, rsHPCols, mapProp.get("hadoop.raw.dbname") + "." + tableName);
 			
 			mapReturn = new HashMap<String, String>();
 			mapReturn.put("MapType", "Main");
-//			mapReturn.put("HPSQL", rsHADOOP);
-//			mapReturn.put("MSSQL", rsMSSQL);
 			mapReturn.put("TableName", tableName);
 			mapReturn.put("Partition", partition);
 			mapReturn.put("TXTFileName", txtFileName);

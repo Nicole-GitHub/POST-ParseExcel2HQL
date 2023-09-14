@@ -132,6 +132,9 @@ public class WriteToLogic {
 							&& ("CREATEDDATE".equalsIgnoreCase(colEName)
 									|| "MODIFIEDDATE".equalsIgnoreCase(colEName)))
 						colLogic = "current_timestamp";
+
+					if ("CREATEDUSER".equalsIgnoreCase(colEName) || "MODIFIEDUSER".equalsIgnoreCase(colEName))
+						colLogic = "'ETL'";
 					
 					if (intTypeList.contains(colType) || "DECIMAL".equals(colType)) {
 						sumColLogic += "\t\t\tnvl(sum(" + colEName + "),0) as " + colEName + " ,\n";
@@ -150,7 +153,9 @@ public class WriteToLogic {
 						colLogic = "\t" + formular + " as " + colEName + " ,\n";
 					else
 						colLogic = "\t"
-								+ ("current_timestamp".equals(colLogic) || "1".equals(mapProp.get("runType")) 
+								+ ("current_timestamp".equals(colLogic) 
+										|| "1".equals(mapProp.get("runType"))
+										|| "'ETL'".equals(colLogic)
 									? "" : "T1.")
 								+ colLogic + " as " + colEName + " ,\n";
 					
