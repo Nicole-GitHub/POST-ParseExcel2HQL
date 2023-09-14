@@ -27,10 +27,10 @@ public class BACKUP_DW {
 		rs += !StringUtils.isBlank(partition) ? "-- 有" : "-- 無" ;
 		rs += "Partiton\n"
 				+ "Create table ${hivevar:DES1_BACKUP_"+type+"}_${hivevar:BATCHID} AS \n"
-				+ "SELECT * FROM ${hivevar:SRC1_BACKUP_"+type+"} a \n";
+				+ "SELECT T1.* FROM ${hivevar:SRC1_BACKUP_"+type+"} T1 \n";
 		rs += !StringUtils.isBlank(partition) ? 
 				"join (select SUBSTRING(ymds,1,6) ymds from ${hivevar:RUN_NOW} where trim(tablenm) = '${hivevar:Run_TableName}') b\n"
-				+ "on a."+partition+" = b.ymds" : "";
+				+ "on T1."+partition+" = b.ymds" : "";
 		rs += ";\n\n"
 				+ "-- verification 確認備份後的筆數與來源一致\n"
 				+ "-- group SRC1與DES1的筆數後找count為2的值\n"
