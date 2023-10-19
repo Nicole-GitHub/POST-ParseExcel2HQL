@@ -41,10 +41,8 @@ public class ChkSourceFileContent {
 				for (Map<String, String> layoutMap : layoutMapList) {
 					if ("Detail".equals(layoutMap.get("MapType"))) {
 						if (odsColName.equalsIgnoreCase(layoutMap.get("ColEName"))) {
-							isNotNull = 
-									// 二階程式即使設為PK也依然可以為NULLABLE
-									// "Y".equalsIgnoreCase(layoutMap.get("PK")) ||
-									"N".equalsIgnoreCase(layoutMap.get("Nullable")) ? true : false;
+							isNotNull = "Y".equalsIgnoreCase(layoutMap.get("PK"))
+									|| "N".equalsIgnoreCase(layoutMap.get("Nullable")) ? true : false;
 						}
 					}
 				}

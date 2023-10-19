@@ -78,7 +78,8 @@ public class RunParseTableLayout {
 						if(!StringUtils.isBlank(txtFileName)) {
 							try {
 								RunParseTXTFile.parseSourceFile(tableLayoutPath, fileName, layoutMapList, odsMap);
-								ChkSourceFileContent.run(outputPath, fileName, txtFileName, layoutMapList);
+								if("Y".equalsIgnoreCase(mapProp.get("runType")))
+										ChkSourceFileContent.run(outputPath, fileName, txtFileName, layoutMapList);
 							} catch(Exception ex) {
 								System.out.println(className + " Warn: \n" + ex.getMessage());
 							}
