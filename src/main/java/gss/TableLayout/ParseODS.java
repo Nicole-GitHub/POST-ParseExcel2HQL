@@ -59,14 +59,18 @@ public class ParseODS {
 				
 
 				selectScript = "TRIM(SUBSTRING(line," + dataStart + "," + datalen + "))";
-				selectScript = "\tcase when " + selectScript + " = '' then NULL else " + selectScript
-						+ " end AS " + dwColEName + " ,\n";
+				// 若TRIM完為空則設NULL
+//				selectScript = "\tcase when " + selectScript + " = '' then NULL else " + selectScript
+//						+ " end AS " + dwColEName + " ,\n";
+				selectScript = "\t" + selectScript + " AS " + dwColEName + " ,\n";
 
 				// 含有中文則需轉碼否則長度截取會出錯
 				selectChineseScript = "TRIM(CAST(ENCODE(DECODE(SUBSTRING(line," + dataStart + "," + datalen
 						+ "),'BIG5'),'UTF8') AS STRING))";
-				selectChineseScript = "\tcase when " + selectChineseScript + " = '' then NULL else "
-						+ selectChineseScript + " end AS " + dwColEName + " ,\n";
+				// 若TRIM完為空則設NULL
+//				selectChineseScript = "\tcase when " + selectChineseScript + " = '' then NULL else "
+//						+ selectChineseScript + " end AS " + dwColEName + " ,\n";
+				selectChineseScript = "\t" + selectChineseScript + " AS " + dwColEName + " ,\n";
 				
 				rsCreateCols += createScript;
 				rsSelectCols += selectScript;

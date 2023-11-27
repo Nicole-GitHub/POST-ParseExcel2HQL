@@ -21,6 +21,7 @@ public class DW_L07_LoadDW {
 				+ "set hivevar:BATCHID=20230329000000;\n"
 				+ "set hivevar:Run_TableName="+tableName+";\n"
 				+ "set hivevar:RUN_NOW=post1_post_poc_std.SYS_RUN_NOW;\n"
+				+ "set hivevar:DATE_CTRL=post1_post_poc_raw.T_CMMM_CCSYM_DTL;\n"
 				+ "set hivevar:RSLT="+ tmp +"."+tableName+"_result;\n"
 				+ (runType ? "set hivevar:SRC1_L07="+ raw +"."+odsTableName+";\n"
 						: "set hivevar:SRC1="+ raw +".[***SourceTableName***];\n")
