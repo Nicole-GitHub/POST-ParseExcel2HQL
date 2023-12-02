@@ -180,7 +180,8 @@ public class WriteToOther {
 	}
 	
 
-	public static String getRCPT(String tableName, String odsTableName, List<Map<String, String>> layoutMapList,
+	// 整理RCPT的SQL
+	private static String getRCPT(String tableName, String odsTableName, List<Map<String, String>> layoutMapList,
 			Map<String, String> mapProp) throws Exception {
 		
 		try {

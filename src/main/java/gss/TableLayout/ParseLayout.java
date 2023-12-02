@@ -13,7 +13,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import gss.ETLCode.CreateTable_MSSQL;
 import gss.ETLCode.CreateTable_T;
 import gss.Tools.FileTools;
-import gss.Tools.Tools;
+import gss.Tools.POITools;
 
 public class ParseLayout {
 	private static final String className = ParseLayout.class.getName();
@@ -40,36 +40,36 @@ public class ParseLayout {
 		List<String> len0Typelist = Arrays.asList(new String[] {"DATE","DATETIME","INTEGER","SMALLINT","BIGINT"});
 
 		try {
-			String tableName = Tools.getCellValue(sheetLayout.getRow(0), 4, "TABLE名稱");
-			String txtFileName = Tools.getCellValue(sheetLayout.getRow(1), 8, "文字檔檔名");
-			String partition = Tools.getCellValue(sheetLayout.getRow(0), 8, "Partition");
+			String tableName = POITools.getCellValue(sheetLayout.getRow(0), 4, "TABLE名稱");
+			String txtFileName = POITools.getCellValue(sheetLayout.getRow(1), 8, "文字檔檔名");
+			String partition = POITools.getCellValue(sheetLayout.getRow(0), 8, "Partition");
 			String[] partitionList = partition.split(",");
 
 			// 解析資料內容(從第五ROW開頭爬)
 			for (int r = 4; r <= sheetLayout.getLastRowNum(); r++) {
 				int c = 0; // 從第二CELL開頭爬(++c)
 				row = sheetLayout.getRow(r);
-				if (row == null || !Tools.isntBlank(row.getCell(1)))
+				if (row == null || !POITools.cellNotBlank(row.getCell(1)))
 					break;
 
 //				boolean delLine = false;
-				if (Tools.isDelLine(row, ++c)) continue;
-				String colEName = Tools.getCellValue(row, c, "欄位英文名稱");
-				if (Tools.isDelLine(row, ++c)) continue;
-				String colCName =Tools.getCellValue(row, c, "欄位中文名稱");
-				if (Tools.isDelLine(row, ++c)) continue;
-				String type =Tools.getCellValue(row, c, "資料型態");
-				if (Tools.isDelLine(row, ++c)) continue;
-				String len =Tools.getCellValue(row, c, "資料長度");
-				if (Tools.isDelLine(row, ++c)) continue;
-				String pk =Tools.getCellValue(row, c, "主鍵註記").toUpperCase();
-				if (Tools.isDelLine(row, ++c)) continue;
-				String nullable =Tools.getCellValue(row, c, "NULL註記").toUpperCase();
-				if (Tools.isDelLine(row, ++c)) continue;
-				String init =Tools.getCellValue(row, c, "初始值");
+				if (POITools.isDelLine(row, ++c)) continue;
+				String colEName = POITools.getCellValue(row, c, "欄位英文名稱");
+				if (POITools.isDelLine(row, ++c)) continue;
+				String colCName = POITools.getCellValue(row, c, "欄位中文名稱");
+				if (POITools.isDelLine(row, ++c)) continue;
+				String type = POITools.getCellValue(row, c, "資料型態");
+				if (POITools.isDelLine(row, ++c)) continue;
+				String len = POITools.getCellValue(row, c, "資料長度");
+				if (POITools.isDelLine(row, ++c)) continue;
+				String pk = POITools.getCellValue(row, c, "主鍵註記").toUpperCase();
+				if (POITools.isDelLine(row, ++c)) continue;
+				String nullable = POITools.getCellValue(row, c, "NULL註記").toUpperCase();
+				if (POITools.isDelLine(row, ++c)) continue;
+				String init = POITools.getCellValue(row, c, "初始值");
 				for(int i = 0 ; i < 9 ; i++) ++c; // 中間跳過9欄
-				if (Tools.isDelLine(row, ++c)) continue;
-				String formular = Tools.getCellValue(row, c, "公式");
+				if (POITools.isDelLine(row, ++c)) continue;
+				String formular = POITools.getCellValue(row, c, "公式");
 				
 				
 //				// 若此行有刪除線，則整行不讀取

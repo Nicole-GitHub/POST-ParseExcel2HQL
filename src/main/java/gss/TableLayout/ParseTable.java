@@ -10,7 +10,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import gss.Tools.Tools;
+import gss.Tools.POITools;
 
 public class ParseTable {
 	private static final String className = ParseTable.class.getName();
@@ -39,7 +39,7 @@ public class ParseTable {
 					break;
 				}
 				cell = row.getCell(1);
-				if (cell != null && "{raw}.TARGET".equalsIgnoreCase(Tools.getCellValue(row, 1, "目的"))) {
+				if (cell != null && "{raw}.TARGET".equalsIgnoreCase(POITools.getCellValue(row, 1, "目的"))) {
 					rowcount = i;
 					break;
 				}
@@ -52,19 +52,19 @@ public class ParseTable {
 				int c = 0; // 從第二CELL開頭爬
 				row = sheetTable.getRow(r);
 
-				String step = Tools.getCellValue(row, c++, "步驟").toUpperCase();
-				String target = Tools.getCellValue(row, c++, "目的");
+				String step = POITools.getCellValue(row, c++, "步驟").toUpperCase();
+				String target = POITools.getCellValue(row, c++, "目的");
 				// ================= 資料表1 ===================
-				String table1 = Tools.getCellValue(row, c++, "資料表");
-				String table1Alias = Tools.getCellValue(row, c++, "別名");
-				String table1JoinCols = Tools.getCellValue(row, c++, "JOIN欄位");
-				String table1Where = Tools.getCellValue(row, c++, "條件");
-				String joinType = Tools.getCellValue(row, c++, "關聯");
+				String table1 = POITools.getCellValue(row, c++, "資料表");
+				String table1Alias = POITools.getCellValue(row, c++, "別名");
+				String table1JoinCols = POITools.getCellValue(row, c++, "JOIN欄位");
+				String table1Where = POITools.getCellValue(row, c++, "條件");
+				String joinType = POITools.getCellValue(row, c++, "關聯");
 				// ================= 資料表2 ===================
-				String table2 = Tools.getCellValue(row, c++, "資料表");
-				String table2Alias = Tools.getCellValue(row, c++, "別名");
-				String table2JoinCols = Tools.getCellValue(row, c++, "JOIN欄位");
-				String table2Where = Tools.getCellValue(row, c++, "條件");
+				String table2 = POITools.getCellValue(row, c++, "資料表");
+				String table2Alias = POITools.getCellValue(row, c++, "別名");
+				String table2JoinCols = POITools.getCellValue(row, c++, "JOIN欄位");
+				String table2Where = POITools.getCellValue(row, c++, "條件");
 
 				String[] table1JoinColsArr = table1JoinCols.split(",");
 				String[] table2JoinColsArr = table2JoinCols.split(",");

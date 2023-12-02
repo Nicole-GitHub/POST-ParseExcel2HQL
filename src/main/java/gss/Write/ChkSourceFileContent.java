@@ -8,7 +8,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import gss.Tools.Tools;
+import gss.Tools.POITools;
 
 public class ChkSourceFileContent {
 	private static final String className = ChkSourceFileContent.class.getName();
@@ -27,7 +27,7 @@ public class ChkSourceFileContent {
 			List<Map<String, String>> layoutMapList) throws Exception {
 		
 		fileNamePath = fileNamePath+fileName+"/"+sourceFileName+"_"+fileName+".xlsx";
-		Workbook workbook = Tools.getWorkbook(fileNamePath);
+		Workbook workbook = POITools.getWorkbook(fileNamePath);
 		Sheet sheet = workbook.getSheet("Full Content");
 		Row rowTitle = null;
 		boolean isNotNull = false;
@@ -36,7 +36,7 @@ public class ChkSourceFileContent {
 			// 解析資料內容
 			rowTitle = sheet.getRow(0);
 			for (int c = 0; c <= rowTitle.getLastCellNum(); c++) {
-				String odsColName = Tools.getCellValue(rowTitle, c, "Title" + c);
+				String odsColName = POITools.getCellValue(rowTitle, c, "Title" + c);
 				isNotNull = false;
 				for (Map<String, String> layoutMap : layoutMapList) {
 					if ("Detail".equals(layoutMap.get("MapType"))) {
@@ -50,7 +50,7 @@ public class ChkSourceFileContent {
 				// 若有空值則報錯
 				if (isNotNull) {
 					for (int r = 1; r <= sheet.getLastRowNum(); r++) {
-						String odsColValue = Tools.getCellValue(sheet.getRow(r), c, odsColName);
+						String odsColValue = POITools.getCellValue(sheet.getRow(r), c, odsColName);
 						if (StringUtils.isBlank(odsColValue))
 							throw new Exception(odsColName + "欄位第 " + (r + 1) + " Row不可為空(Row:" + (r + 1) + ",Cell:"
 									+ (c + 1) + ")");

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import gss.Tools.POITools;
 import gss.Tools.Tools;
 
 public class ParseCols {
@@ -43,12 +44,12 @@ public class ParseCols {
 				row = sheetCols.getRow(r);
 				
 				c++; //來源
-				String col = Tools.getCellValue(row, c++, "欄位處理邏輯");
-				String group = Tools.getCellValue(row, c++, "群組");
-				String order = Tools.getCellValue(row, c++, "排序欄位");
-				String colAlias = Tools.getCellValue(row, c++, "欄位");
-				String colDataType = Tools.getCellValue(row, c++, "格式");
-				String targetTable = Tools.getCellValue(row, c++, "目的");
+				String col = POITools.getCellValue(row, c++, "欄位處理邏輯");
+				String group = POITools.getCellValue(row, c++, "群組");
+				String order = POITools.getCellValue(row, c++, "排序欄位");
+				String colAlias = POITools.getCellValue(row, c++, "欄位");
+				String colDataType = POITools.getCellValue(row, c++, "格式");
+				String targetTable = POITools.getCellValue(row, c++, "目的");
 				targetTableNew = StringUtils.isBlank(targetTable) ? targetTableOld : targetTable;
 				
 				if(StringUtils.isBlank(targetTableOld)) 

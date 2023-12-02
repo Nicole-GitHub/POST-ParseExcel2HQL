@@ -16,6 +16,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 
 import gss.ETLCode.bin.DW_L07_LoadDW;
 import gss.Tools.FileTools;
+import gss.Tools.POITools;
 import gss.Tools.Tools;
 
 /**
@@ -55,16 +56,16 @@ public class WriteToLogic {
 
 	     	List<String> charTypeList = Arrays.asList(new String[] { "VARCHAR", "CHAR" });
 			List<String> intTypeList = Arrays.asList(new String[] { "SMALLINT", "BIGINT", "INTEGER", "INT" });
-	        CellStyle style = Tools.setTitleStyle(workbook);
+	        CellStyle style = POITools.setTitleStyle(workbook);
 	        
 			sheet1 = workbook.createSheet("資料關聯");
 			sheet2 = workbook.createSheet("欄位處理邏輯");
 			
 
 			// 設定標題 & 凍結首欄 & 首欄篩選
-			Tools.setTitle(sheet1, "K", style,
+			POITools.setTitle(sheet1, "K", style,
 					Arrays.asList("步驟", "目的", "資料表", "別名", "JOIN欄位", "條件", "關聯", "資料表", "別名", "JOIN欄位", "條件"));
-			Tools.setTitle(sheet2, "H", style, Arrays.asList("步驟", "來源", "欄位處理邏輯", "群組", "排序欄位", "欄位", "格式", "目的"));
+			POITools.setTitle(sheet2, "H", style, Arrays.asList("步驟", "來源", "欄位處理邏輯", "群組", "排序欄位", "欄位", "格式", "目的"));
 	        
 	     	// list的最後一筆位置
 			int layoutMapListLastNum = layoutMapList.size() - 1;
@@ -77,12 +78,12 @@ public class WriteToLogic {
 			String[] partitionList = partition.split(",");
 			
 			// 設定內容
-			style = Tools.setStyle(workbook);
+			style = POITools.setStyle(workbook);
 			rowSheet1 = sheet1.createRow(1);
-			Tools.setStringCell(style, cell, rowSheet1, cSheet1++, "L01");
-			Tools.setStringCell(style, cell, rowSheet1, cSheet1++, "{raw}.TARGET");
-			Tools.setStringCell(style, cell, rowSheet1, cSheet1++, "{raw}." + odsTableName.toUpperCase());
-			Tools.setStringCell(style, cell, rowSheet1, cSheet1++, "T1");
+			POITools.setStringCell(style, cell, rowSheet1, cSheet1++, "L01");
+			POITools.setStringCell(style, cell, rowSheet1, cSheet1++, "{raw}.TARGET");
+			POITools.setStringCell(style, cell, rowSheet1, cSheet1++, "{raw}." + odsTableName.toUpperCase());
+			POITools.setStringCell(style, cell, rowSheet1, cSheet1++, "T1");
 
 			rowSheet2 = sheet2.createRow(1);
 			/**
@@ -108,12 +109,12 @@ public class WriteToLogic {
 //			RegionUtil.setBorderRight(1, cra1, sheet2, workbook); // 有邊框
 //			RegionUtil.setBorderTop(1, cra1, sheet2, workbook); // 上邊框
 
-			Tools.setStringCell(style, cell, rowSheet2, 0, "L01");
-			Tools.setStringCell(style, cell, rowSheet2, 1, "{raw}." + odsTableName.toLowerCase());
-			Tools.setStringCell(style, cell, rowSheet2, 3, "");
-			Tools.setStringCell(style, cell, rowSheet2, 4, "");
-			Tools.setStringCell(style, cell, rowSheet2, 6, "");
-			Tools.setStringCell(style, cell, rowSheet2, 7, "{raw}.TARGET");
+			POITools.setStringCell(style, cell, rowSheet2, 0, "L01");
+			POITools.setStringCell(style, cell, rowSheet2, 1, "{raw}." + odsTableName.toLowerCase());
+			POITools.setStringCell(style, cell, rowSheet2, 3, "");
+			POITools.setStringCell(style, cell, rowSheet2, 4, "");
+			POITools.setStringCell(style, cell, rowSheet2, 6, "");
+			POITools.setStringCell(style, cell, rowSheet2, 7, "{raw}.TARGET");
 			
 			String sumODSColLogic = "", sumColLogic = "", whereSumCol = "";
 			for (Map<String, String> layoutMapFor : layoutMapList) {
@@ -143,8 +144,8 @@ public class WriteToLogic {
 					}
 					
 					// 寫入Excel
-					Tools.setStringCell(style, cell, rowSheet2, 2, colLogic);
-					Tools.setStringCell(style, cell, rowSheet2, 5, colEName);
+					POITools.setStringCell(style, cell, rowSheet2, 2, colLogic);
+					POITools.setStringCell(style, cell, rowSheet2, 5, colEName);
 					// 因第二行已在Merge時create過了故此行寫在最後
 					rowSheet2 = sheet2.createRow(r++);
 
@@ -194,7 +195,9 @@ public class WriteToLogic {
 			// 將整理好的比對結果另寫出Excel檔
 			// 收載才需產出Excel的邏輯頁籤，梳理則不需
 			if("1".equals(mapProp.get("runType"))) {
-				Tools.output(workbook, outputPath, fileName);
+				// "資料關聯"、"欄位處理邏輯"頁籤用不到
+				// 故不另外產出Layout檔，以免與原Layout檔搞混
+//				POITools.output(workbook, outputPath, fileName);
 			} else {
 				workbook.close();
 			}

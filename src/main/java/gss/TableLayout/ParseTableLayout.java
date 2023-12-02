@@ -9,15 +9,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import gss.Tools.Tools;
+import gss.Tools.POITools;
 import gss.Write.ChkSourceFileContent;
 import gss.Write.RunParseTXTFile;
 import gss.Write.WriteToDataExport;
 import gss.Write.WriteToLogic;
 import gss.Write.WriteToOther;
 
-public class RunParseTableLayout {
-	private static final String className = RunParseTableLayout.class.getName();
+public class ParseTableLayout {
+	private static final String className = ParseTableLayout.class.getName();
 	
 	/**
 	 * 取得 Excel 內容
@@ -26,7 +26,8 @@ public class RunParseTableLayout {
 	 * @param map
 	 * @throws Exception
 	 */
-	public static void run(Map<String, String> mapProp, String tableLayoutPath, List<String> fileNameList) throws Exception {
+	public static void run(Map<String, String> mapProp, String tableLayoutPath, String outputPath,
+			List<String> fileNameList) throws Exception {
 		Map<String, String> layoutMap = new HashMap<String, String>();
 		Map<String, String> odsMap = new HashMap<String, String>();
 		List<Map<String, String>> layoutMapList = new ArrayList<Map<String, String>>();
@@ -34,13 +35,11 @@ public class RunParseTableLayout {
 
 		try {
 
-			String outputPath = tableLayoutPath + "../Output/";
-			
 			for (String fileName : fileNameList) {
 				String fileNamePath = tableLayoutPath + fileName;
 				System.out.println("\n\n=============================");
 				System.out.println("fileName:" + fileNamePath);
-				Workbook workbook = Tools.getWorkbook(fileNamePath);
+				Workbook workbook = POITools.getWorkbook(fileNamePath);
 				
 				// 防呆 Excel必需要有Layout頁籤
 				if (workbook.getSheet("Layout") == null)

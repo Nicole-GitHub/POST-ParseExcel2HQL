@@ -16,7 +16,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import gss.TableLayout.ParseLayout;
 import gss.Tools.FileTools;
-import gss.Tools.Tools;
+import gss.Tools.POITools;
 
 public class RunParseTXTFile {
 	private static final String className = RunParseTXTFile.class.getName();
@@ -75,7 +75,7 @@ public class RunParseTXTFile {
 				System.out.println("\n\n=============================");
 				System.out.println("fileName:" + fileNamePath);
 				
-				Workbook wbLayout = Tools.getWorkbook(fileNamePath);
+				Workbook wbLayout = POITools.getWorkbook(fileNamePath);
 				
 				// 防呆 Excel必需要有Layout頁籤
 				if (wbLayout.getSheet("Layout") == null)
@@ -163,24 +163,24 @@ public class RunParseTXTFile {
 	        XSSFSheet sheet2 = wbOut.createSheet("Number Type Content");
 	        XSSFSheet sheet3 = wbOut.createSheet("Number Type Summary");
 	
-	        CellStyle style = Tools.setTitleStyle(wbOut);
+	        CellStyle style = POITools.setTitleStyle(wbOut);
 	        CellStyle styleNum = null;
-	        String lastExcelColNameSheet1 = Tools.getLastExcelColName(dataColsList.size());
-	        String lastExcelColNameSheet2 = Tools.getLastExcelColName(listNumTypeColName.size());
+	        String lastExcelColNameSheet1 = POITools.getLastExcelColName(dataColsList.size());
+	        String lastExcelColNameSheet2 = POITools.getLastExcelColName(listNumTypeColName.size());
 	
 	     	int r = 1, cSheet1 = 0, cSheet3 = 0, line = 0;
 	     	Double[] sumNumCol = new Double[dataColsList.size()];
 	     	Integer[] decimalPlacesCol = new Integer[dataColsList.size()];
 	     	
 	        // 設定標題 & 凍結首欄 & 首欄篩選
-			Tools.setTitle(sheet1, lastExcelColNameSheet1, style, dataColsList);
+			POITools.setTitle(sheet1, lastExcelColNameSheet1, style, dataColsList);
 			if (listNumTypeColName.size() > 0) {
-				Tools.setTitle(sheet2, lastExcelColNameSheet2, style, listNumTypeColName);
-				Tools.setTitle(sheet3, lastExcelColNameSheet2, style, listNumTypeColName);
+				POITools.setTitle(sheet2, lastExcelColNameSheet2, style, listNumTypeColName);
+				POITools.setTitle(sheet3, lastExcelColNameSheet2, style, listNumTypeColName);
 			}
 			
 			// 設定內容
-			style = Tools.setStyle(wbOut);
+			style = POITools.setStyle(wbOut);
 			for (String content : txtFileContentList) {
 				// 去除表頭表尾
 				line ++;
@@ -198,7 +198,7 @@ public class RunParseTXTFile {
 					String odsColsName = dataColsList.get(dataColsListNum);
 					// 若文字檔內容長度 >= 資料終止位置 則寫入 sheet1
 					if (content.length() >= end) {
-						Tools.setStringCell(style, cell, rowSheet1, cSheet1++, content.substring(start, end));
+						POITools.setStringCell(style, cell, rowSheet1, cSheet1++, content.substring(start, end));
 						// 若此欄為數值型態欄位則也寫入一份至sheet2
 						for(int j = 0 ; j < listNumType.size() ; j++) {
 							int decimalPlaces = 0;
@@ -208,10 +208,10 @@ public class RunParseTXTFile {
 								Double numContentDouble = Double.parseDouble(numContentStr);
 								if("DECIMAL".equalsIgnoreCase(listNumType.get(j).get("ColType"))) {
 									decimalPlaces = Integer.parseInt(listNumType.get(j).get("ColLen").split(",")[1]);
-									styleNum = Tools.setNumStyle(wbOut,decimalPlaces);
-									Tools.setNumericCell(styleNum, cell, rowSheet2, j, numContentDouble);
+									styleNum = POITools.setNumStyle(wbOut,decimalPlaces);
+									POITools.setNumericCell(styleNum, cell, rowSheet2, j, numContentDouble);
 								}else {
-									Tools.setNumericCell(style, cell, rowSheet2, j, numContentDouble);
+									POITools.setNumericCell(style, cell, rowSheet2, j, numContentDouble);
 								}
 	
 								// 將數值欄位的值加總
@@ -234,13 +234,13 @@ public class RunParseTXTFile {
 			rowSheet3 = sheet3.createRow(1);
 			for(int i = 0 ; i < sumNumCol.length ; i++) {
 				if(sumNumCol[i] != null) {
-			        styleNum = Tools.setNumStyle(wbOut, decimalPlacesCol[i]);
-					Tools.setNumericCell(styleNum, cell, rowSheet3, cSheet3++, sumNumCol[i]);
+			        styleNum = POITools.setNumStyle(wbOut, decimalPlacesCol[i]);
+					POITools.setNumericCell(styleNum, cell, rowSheet3, cSheet3++, sumNumCol[i]);
 				}
 			}
 	
 			// 將整理好的比對結果另寫出Excel檔
-			Tools.output(wbOut, outputPath + fileName + "/", txtFileName + "_" + fileName);
+			POITools.output(wbOut, outputPath + fileName + "/", txtFileName + "_" + fileName);
 		} catch (Exception ex) {
 			throw new Exception(className + " " + funcName + " Error: \n" + ex);
 		}

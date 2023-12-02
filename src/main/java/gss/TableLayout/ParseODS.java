@@ -9,7 +9,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import gss.ETLCode.CreateTable_ODS;
 import gss.ETLCode.bin.ODS_L06_LoadODS;
 import gss.Tools.FileTools;
-import gss.Tools.Tools;
+import gss.Tools.POITools;
 
 public class ParseODS {
 	private static final String className = ParseODS.class.getName();
@@ -36,20 +36,20 @@ public class ParseODS {
 			for (int r = 3; r <= sheetODS.getLastRowNum(); r++) {
 				int c = 0; // 從第二CELL開頭爬(++c)
 				row = sheetODS.getRow(r);
-				if (row == null || !Tools.isntBlank(row.getCell(1)))
+				if (row == null || !POITools.cellNotBlank(row.getCell(1)))
 					break;
 
-				if (Tools.isDelLine(row, ++c)) continue;
-				String dwColEName =Tools.getCellValue(row, c, "DW欄位英文名稱");
+				if (POITools.isDelLine(row, ++c)) continue;
+				String dwColEName = POITools.getCellValue(row, c, "DW欄位英文名稱");
 				c++;// 來源欄位英文名稱
-				if (Tools.isDelLine(row, ++c)) continue;
-				int dataStart =Integer.parseInt(Tools.getCellValue(row, c, "資料起點"));
-				if (Tools.isDelLine(row, ++c)) continue;
-				int dataEnd =Integer.parseInt(Tools.getCellValue(row, c, "資料終點"));
+				if (POITools.isDelLine(row, ++c)) continue;
+				int dataStart = Integer.parseInt(POITools.getCellValue(row, c, "資料起點"));
+				if (POITools.isDelLine(row, ++c)) continue;
+				int dataEnd = Integer.parseInt(POITools.getCellValue(row, c, "資料終點"));
 				c++;// 備註
 				int datalen = dataEnd - dataStart + 1;
-				if (Tools.isDelLine(row, ++c)) continue;
-				boolean hasChinese ="Y".equalsIgnoreCase(Tools.getCellValue(row, c, "是否含有中文"));
+				if (POITools.isDelLine(row, ++c)) continue;
+				boolean hasChinese ="Y".equalsIgnoreCase(POITools.getCellValue(row, c, "是否含有中文"));
 				// 若有其中一個欄位含有中文，則整份Table都算含有中文(傳給外面用的)
 				hasChineseForTable = hasChineseForTable ? true : hasChinese;
 				
@@ -83,8 +83,8 @@ public class ParseODS {
 			 */
 			rsSelectCols = hasChineseForTable ? rsSelectChineseCols : rsSelectCols;
 						
-			String tableName = Tools.getCellValue(sheetODS.getRow(0), 4, "TABLE名稱");
-			String txtFileName = Tools.getCellValue(sheetODS.getRow(0), 8, "來源文字檔檔名");
+			String tableName = POITools.getCellValue(sheetODS.getRow(0), 4, "TABLE名稱");
+			String txtFileName = POITools.getCellValue(sheetODS.getRow(0), 8, "來源文字檔檔名");
 
 			// CREATE TABLE Script
 			rsCREATE = CreateTable_ODS.getHQL(mapProp, tableName, rsCreateCols, rsCreatePartition);
