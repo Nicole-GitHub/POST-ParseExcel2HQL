@@ -204,8 +204,8 @@ public class WriteToLogic {
 			
 			outputPath += "bin/";
 			String codeFileName = "1".equals(mapProp.get("runType")) ? "DW_L07_LoadDW" : "DM_T01" ;
-			FileTools.createFile(outputPath, codeFileName, "hql", rsHQL);
-			FileTools.createFile(outputPath, codeFileName, "var", rsVAR);
+			FileTools.createFileNotAppend(outputPath, codeFileName, "hql", rsHQL);
+			FileTools.createFileNotAppend(outputPath, codeFileName, "var", rsVAR);
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}

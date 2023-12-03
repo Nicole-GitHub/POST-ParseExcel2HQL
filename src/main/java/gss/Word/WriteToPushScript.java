@@ -115,7 +115,7 @@ public class WriteToPushScript {
 					+ "\n--insertRunNow\n" + insertRunNow
 					+ "\n--pipeShell\n" + pipeShell ;
 			
-			FileTools.createFile(outputPath, "PushScript", "sql", rs);
+			FileTools.createFileNotAppend(outputPath, "PushScript", "sql", rs);
 
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);

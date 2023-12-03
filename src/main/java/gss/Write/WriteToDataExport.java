@@ -70,9 +70,9 @@ public class WriteToDataExport {
 			String sh = EXPORTFILE.getShell(mapProp, tableName);
 			String var = EXPORTFILE.getShellVAR(mapProp, tableName);
 
-			FileTools.createFile(outputPath + fileName + "/bin/", "EXPORTFILE", "hql", hql);
-			FileTools.createFile(outputPath + fileName + "/bin/", "EXPORTFILE", "sh", sh);
-			FileTools.createFile(outputPath + fileName + "/bin/", "EXPORTFILE", "var", var);
+			FileTools.createFileNotAppend(outputPath + fileName + "/bin/", "EXPORTFILE", "hql", hql);
+			FileTools.createFileNotAppend(outputPath + fileName + "/bin/", "EXPORTFILE", "sh", sh);
+			FileTools.createFileNotAppend(outputPath + fileName + "/bin/", "EXPORTFILE", "var", var);
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}

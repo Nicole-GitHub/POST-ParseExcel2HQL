@@ -31,13 +31,18 @@ public class ParseControlSheet {
 			Row row;
 			
 			// 找出欲解析的資料有幾行
-			for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+			for (int i = 1; i <= sheet.getLastRowNum(); i++) {
 				int c = 0;
 				row = sheet.getRow(i);
+				
 				if (row == null) {
 					break;
 				}
 
+//				System.out.println(sheet.getLastRowNum() + "_" + i + ":" + row.getCell(0));
+//				if(i == 269) {
+//					System.out.println("Stop!");
+//				}
 				String targetTableEName = POITools.getCellValue(row, c++, "檔案名稱").toUpperCase();
 				// 只整理這次要解析的table即可
 				if (fileENameList.contains(targetTableEName)) {
@@ -45,7 +50,9 @@ public class ParseControlSheet {
 					String targetTableCName = POITools.getCellValue(row, c++, "中文檔案名稱").toUpperCase();
 					c++; // 舊檔案名稱
 					String sourceTableEName = POITools.getCellValue(row, c++, "來源檔").toUpperCase();
-					String sourceTableENameNoExt = sourceTableEName.substring(0, sourceTableEName.lastIndexOf("."));
+					String sourceTableENameNoExt = sourceTableEName.indexOf(".") > 0
+							? sourceTableEName.substring(0, sourceTableEName.lastIndexOf("."))
+							: sourceTableEName;
 					c++; // 來源檔(公式)
 					c++; // 狀態
 					c++; // Owner

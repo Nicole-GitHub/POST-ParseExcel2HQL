@@ -18,6 +18,33 @@ public class FileTools {
 	private static String filenameTemp;
 
 	/**
+	 * 建立檔案(保留舊資料)
+	 * @param path
+	 * @param fileName
+	 * @param extension
+	 * @param fileContent
+	 * @return
+	 * @throws Exception
+	 */
+	public static boolean createFileAppend(String path, String fileName, String extension, String fileContent)
+			throws Exception {
+		return createFile(path, fileName, extension, fileContent, true);
+	}
+	
+	/**
+	 * 建立檔案(不保留舊資料)
+	 * @param path
+	 * @param fileName
+	 * @param extension
+	 * @param fileContent
+	 * @return
+	 * @throws Exception
+	 */
+	public static boolean createFileNotAppend(String path, String fileName, String extension, String fileContent)
+			throws Exception {
+		return createFile(path, fileName, extension, fileContent, false);
+	}
+	/**
 	 * 建立檔案
 	 * 
 	 * @param path			檔路徑
@@ -26,7 +53,8 @@ public class FileTools {
 	 * @param fileContent	檔案內容
 	 * @return 是否建立成功，成功則返回true
 	 */
-	public static boolean createFile(String path, String fileName, String extension, String fileContent) throws Exception {
+	private static boolean createFile(String path, String fileName, String extension, String fileContent,
+			boolean append) throws Exception {
 		String funcName = "createFile";
 		Boolean bool = false;
 		File file ;
@@ -44,7 +72,7 @@ public class FileTools {
 //				System.out.println("success create file: " + filenameTemp);
 			}
 			// 建立檔案成功後，寫入內容到檔案裡
-			writeFileContent(filenameTemp, fileContent);
+			writeFileContent(filenameTemp, fileContent, append);
 		} catch (Exception ex) {
 			throw new Exception(className + " " + funcName + " Error: \n" + ex);
 		}
@@ -59,29 +87,32 @@ public class FileTools {
 	 * @return
 	 * @throws IOException
 	 */
-	public static boolean writeFileContent(String filePathName, String newstr) throws Exception {
+	private static boolean writeFileContent(String filePathName, String newstr, boolean append) throws Exception {
 		String funcName = "writeFileContent";
 		Boolean bool = false;
 //		String filein = "\r\n" + newstr + "\r\n";// 新寫入的行，換行
-//		String temp = "";
-//		FileInputStream fis = null;
-//		InputStreamReader isr = null;
-//		BufferedReader br = null;
+		String temp = "";
+		FileInputStream fis = null;
+		InputStreamReader isr = null;
+		BufferedReader br = null;
 		FileOutputStream fos = null;
 		PrintWriter pw = null;
 		try {
 			File file = new File(filePathName);// 檔案路徑(包括檔名稱)
-//			// 將原檔案內容讀入輸入流
-//			fis = new FileInputStream(file);
-//			isr = new InputStreamReader(fis);
-//			br = new BufferedReader(isr);
+			// 將原檔案內容讀入輸入流
+			fis = new FileInputStream(file);
+			isr = new InputStreamReader(fis);
+			br = new BufferedReader(isr);
 			StringBuffer buffer = new StringBuffer();
-//			// 寫入檔案原有內容
-//			while((temp = br.readLine()) != null) {
-//				buffer.append(temp);
-//				// 行與行之間的分隔符 相當於“\n”
-//				buffer = buffer.append(System.getProperty("line.separator"));
-//			}
+			if(append) {
+				// 寫入檔案原有內容
+				while((temp = br.readLine()) != null) {
+					buffer.append(temp);
+					// 行與行之間的分隔符 相當於“\n”
+					buffer = buffer.append(System.getProperty("line.separator"));
+				}
+			}
+			newstr = append ? "\r\n" + newstr + "\r\n" : newstr;
 			buffer.append(newstr);
 			fos = new FileOutputStream(file);
 			pw = new PrintWriter(fos);
@@ -93,9 +124,9 @@ public class FileTools {
 		} finally {
 			if (pw != null)	pw.close();
 			if (fos != null) fos.close();
-//			if (br != null) br.close();
-//			if (isr != null) isr.close();
-//			if (fis != null) fis.close();
+			if (br != null) br.close();
+			if (isr != null) isr.close();
+			if (fis != null) fis.close();
 		}
 		return bool;
 	}

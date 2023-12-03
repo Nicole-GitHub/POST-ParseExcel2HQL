@@ -14,6 +14,7 @@ import gss.ETLCode.CreateTable_MSSQL;
 import gss.ETLCode.CreateTable_T;
 import gss.Tools.FileTools;
 import gss.Tools.POITools;
+import gss.Tools.Tools;
 
 public class ParseLayout {
 	private static final String className = ParseLayout.class.getName();
@@ -143,10 +144,12 @@ public class ParseLayout {
 			listReturn.add(mapReturn);
 
 			outputPath += fileName + "/";
-//			// T_CMMW_VSAPC_TEMP.hql
-			FileTools.createFile(outputPath , tableName, "hql", rsHADOOP);
-//			// MS_T_CMMW_VSAPC_TEMP.sql
-			FileTools.createFile(outputPath , "MS_" + tableName, "sql", rsMSSQL);
+			// T_CMMW_VSAPC_TEMP.hql
+			FileTools.createFileNotAppend(outputPath , tableName, "hql", rsHADOOP);
+			// 因測試時需先CreateTable，故整理一份所有要Create的Table在同一份文件中
+			FileTools.createFileAppend(outputPath + "../" , "CreateTableScript"+Tools.getNOW("yyyyMMdd"), "hql", rsHADOOP);
+			// MS_T_CMMW_VSAPC_TEMP.sql
+			FileTools.createFileNotAppend(outputPath , "MS_" + tableName, "sql", rsMSSQL);
 			
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);

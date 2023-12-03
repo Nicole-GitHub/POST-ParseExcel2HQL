@@ -10,6 +10,7 @@ import gss.ETLCode.CreateTable_ODS;
 import gss.ETLCode.bin.ODS_L06_LoadODS;
 import gss.Tools.FileTools;
 import gss.Tools.POITools;
+import gss.Tools.Tools;
 
 public class ParseODS {
 	private static final String className = ParseODS.class.getName();
@@ -102,12 +103,15 @@ public class ParseODS {
 
 			outputPath += fileName + "/";
 			// ODS_CMMW_VSAPC_TEMP.hql
-			FileTools.createFile(outputPath , tableName, "hql", rsCREATE);
+			FileTools.createFileNotAppend(outputPath , tableName, "hql", rsCREATE);
+			// 因測試時需先CreateTable，故整理一份所有要Create的Table在同一份文件中
+			FileTools.createFileAppend(outputPath + "../", "CreateTableScript"+Tools.getNOW("yyyyMMdd"), "hql", rsCREATE);
+			
 			outputPath += "bin/";
 			// ODS_L06_LoadODS.hql
-			FileTools.createFile(outputPath , "ODS_L06_LoadODS", "hql", rsHQL);
+			FileTools.createFileNotAppend(outputPath , "ODS_L06_LoadODS", "hql", rsHQL);
 			// ODS_L06_LoadODS.var
-			FileTools.createFile(outputPath , "ODS_L06_LoadODS", "var", rsVAR);
+			FileTools.createFileNotAppend(outputPath , "ODS_L06_LoadODS", "var", rsVAR);
 			
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);

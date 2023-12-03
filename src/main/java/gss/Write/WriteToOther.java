@@ -103,28 +103,28 @@ public class WriteToOther {
 		     	String truncate_ods_var = TRUNCATE_ODS.getVAR(mapProp, tableName, odsTableName);
 		     	
 
-				FileTools.createFile(outputPathBin, "ODS_C01_UploadFile", "hql", o01_hql);
-				FileTools.createFile(outputPathBin, "ODS_C02_GetDataFileName", "hql", o02_hql);
-				FileTools.createFile(outputPathBin, "ODS_C03_GetErrorData", "hql", o03_hql);
-				FileTools.createFile(outputPathBin, "ODS_C04_GetData", "hql", o04_hql);
-				FileTools.createFile(outputPathBin, "ODS_C05_GetDoneFile", "hql", o05_hql);
-				FileTools.createFile(outputPathBin, "TRUNCATE_ODS", "hql", truncate_ods_hql);
+				FileTools.createFileNotAppend(outputPathBin, "ODS_C01_UploadFile", "hql", o01_hql);
+				FileTools.createFileNotAppend(outputPathBin, "ODS_C02_GetDataFileName", "hql", o02_hql);
+				FileTools.createFileNotAppend(outputPathBin, "ODS_C03_GetErrorData", "hql", o03_hql);
+				FileTools.createFileNotAppend(outputPathBin, "ODS_C04_GetData", "hql", o04_hql);
+				FileTools.createFileNotAppend(outputPathBin, "ODS_C05_GetDoneFile", "hql", o05_hql);
+				FileTools.createFileNotAppend(outputPathBin, "TRUNCATE_ODS", "hql", truncate_ods_hql);
 	
-				FileTools.createFile(outputPathBin, "ODS_C01_UploadFile", "var", o01_var);
-				FileTools.createFile(outputPathBin, "ODS_C02_GetDataFileName", "var", o02_var);
-				FileTools.createFile(outputPathBin, "ODS_C03_GetErrorData", "var", o03_var);
-				FileTools.createFile(outputPathBin, "ODS_C04_GetData", "var", o04_var);
-				FileTools.createFile(outputPathBin, "ODS_C05_GetDoneFile", "var", o05_var);
-				FileTools.createFile(outputPathBin, "FILE_UPLOAD", "var", file_upload_var);
-				FileTools.createFile(outputPathBin, "TRUNCATE_ODS", "var", truncate_ods_var);
+				FileTools.createFileNotAppend(outputPathBin, "ODS_C01_UploadFile", "var", o01_var);
+				FileTools.createFileNotAppend(outputPathBin, "ODS_C02_GetDataFileName", "var", o02_var);
+				FileTools.createFileNotAppend(outputPathBin, "ODS_C03_GetErrorData", "var", o03_var);
+				FileTools.createFileNotAppend(outputPathBin, "ODS_C04_GetData", "var", o04_var);
+				FileTools.createFileNotAppend(outputPathBin, "ODS_C05_GetDoneFile", "var", o05_var);
+				FileTools.createFileNotAppend(outputPathBin, "FILE_UPLOAD", "var", file_upload_var);
+				FileTools.createFileNotAppend(outputPathBin, "TRUNCATE_ODS", "var", truncate_ods_var);
 	
-				FileTools.createFile(outputPathBin, "FILE_UPLOAD", "sh", file_upload_sh);
+				FileTools.createFileNotAppend(outputPathBin, "FILE_UPLOAD", "sh", file_upload_sh);
 	     	} else {
 	     		String dm_l02_loaddm_tmp_hql = DM_L02_LoadDM.getHQL(partition, mapProp, tableName);
 		     	String dm_l02_loaddm_tmp_var = DM_L02_LoadDM.getVAR(mapProp, tableName);
 		     	
-		     	FileTools.createFile(outputPathBin, "DM_L02_LoadDM", "hql", dm_l02_loaddm_tmp_hql);
-				FileTools.createFile(outputPathBin, "DM_L02_LoadDM", "var", dm_l02_loaddm_tmp_var);
+		     	FileTools.createFileNotAppend(outputPathBin, "DM_L02_LoadDM", "hql", dm_l02_loaddm_tmp_hql);
+				FileTools.createFileNotAppend(outputPathBin, "DM_L02_LoadDM", "var", dm_l02_loaddm_tmp_var);
 	     	}
 	     	
 	     	String finish_hql = FINISH.getHQL(mapProp, tableName);
@@ -134,43 +134,43 @@ public class WriteToOther {
 	     	String truncate_dw_var = TRUNCATE_DW.getShellVAR(tableName, type);
 	     	
 			FileTools.copyFile(outputPath+"../../CopyFile",outputPath); // 將main檔案copy進來
-			FileTools.createFile(outputPath, "RCPT", "hql", rcpt);
-			FileTools.createFile(outputPath, "description", "txt", desc);
-			FileTools.createFile(outputPath, "flow.def_all", "txt", flowAll);
-			FileTools.createFile(outputPath, "flow.def_noExport", "txt", flowNoExport);
+			FileTools.createFileNotAppend(outputPath, "RCPT", "hql", rcpt);
+			FileTools.createFileNotAppend(outputPath, "description", "txt", desc);
+			FileTools.createFileNotAppend(outputPath, "flow.def_all", "txt", flowAll);
+			FileTools.createFileNotAppend(outputPath, "flow.def_noExport", "txt", flowNoExport);
 			
 			// bin/ 
 			// HQL
-			FileTools.createFile(outputPathBin, "BEFORE_C01_Run", "hql", b01_hql);
-			FileTools.createFile(outputPathBin, "BEFORE_C02_Check", "hql", b02_hql);
-			FileTools.createFile(outputPathBin, "BEFORE_C03_ExportDate2File", "hql", b03_hql);
-			FileTools.createFile(outputPathBin, "BEFORE_C04_FinishData", "hql", b04_hql);
-			FileTools.createFile(outputPathBin, "BACKUP_"+type, "hql", backup_dw_hql);
+			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C01_Run", "hql", b01_hql);
+			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C02_Check", "hql", b02_hql);
+			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C03_ExportDate2File", "hql", b03_hql);
+			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C04_FinishData", "hql", b04_hql);
+			FileTools.createFileNotAppend(outputPathBin, "BACKUP_"+type, "hql", backup_dw_hql);
 			String load_tmp_codeFileName = type+"_L0"+("DW".equals(type) ? "8" : "3")+"_Load"+type+"_TMP";
-			FileTools.createFile(outputPathBin, load_tmp_codeFileName, "hql", dw_l08_loaddw_tmp_hql);
-			FileTools.createFile(outputPathBin, "FINISH", "hql", finish_hql);
-			FileTools.createFile(outputPathBin, "TRUNCATE_"+type, "hql", truncate_dw_hql);
+			FileTools.createFileNotAppend(outputPathBin, load_tmp_codeFileName, "hql", dw_l08_loaddw_tmp_hql);
+			FileTools.createFileNotAppend(outputPathBin, "FINISH", "hql", finish_hql);
+			FileTools.createFileNotAppend(outputPathBin, "TRUNCATE_"+type, "hql", truncate_dw_hql);
 
 			// VAR
-			FileTools.createFile(outputPathBin, "BEFORE_C01_Run", "var", b01_var);
-			FileTools.createFile(outputPathBin, "BEFORE_C02_Check", "var", b02_var);
-			FileTools.createFile(outputPathBin, "BEFORE_C03_ExportDate2File", "var", b03_var);
-			FileTools.createFile(outputPathBin, "BEFORE_C04_FinishData", "var", b04_var);
-			FileTools.createFile(outputPathBin, "BACKUP_"+type, "var", backup_dw_var);
-			FileTools.createFile(outputPathBin, type+"_EXPORT_2SQL", "var", dw_export_2sql_var);
-			FileTools.createFile(outputPathBin, load_tmp_codeFileName, "var", dw_l08_loaddw_tmp_var);
-			FileTools.createFile(outputPathBin, "FINISH", "var", finish_var);
-			FileTools.createFile(outputPathBin, "TRUNCATE_"+type, "var", truncate_dw_var);
+			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C01_Run", "var", b01_var);
+			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C02_Check", "var", b02_var);
+			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C03_ExportDate2File", "var", b03_var);
+			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C04_FinishData", "var", b04_var);
+			FileTools.createFileNotAppend(outputPathBin, "BACKUP_"+type, "var", backup_dw_var);
+			FileTools.createFileNotAppend(outputPathBin, type+"_EXPORT_2SQL", "var", dw_export_2sql_var);
+			FileTools.createFileNotAppend(outputPathBin, load_tmp_codeFileName, "var", dw_l08_loaddw_tmp_var);
+			FileTools.createFileNotAppend(outputPathBin, "FINISH", "var", finish_var);
+			FileTools.createFileNotAppend(outputPathBin, "TRUNCATE_"+type, "var", truncate_dw_var);
 			
 			// SH
-			FileTools.createFile(outputPathBin, "BEFORE_C03_ExportDate2File", "sh", b03_sh);
-			FileTools.createFile(outputPathBin, "BEFORE_C04_FinishData", "sh", b04_sh);
-			FileTools.createFile(outputPathBin, type+"_EXPORT_2SQL", "sh", dw_export_2sql_sh);
-			FileTools.createFile(outputPathBin, "TRUNCATE_"+type, "sh", truncate_dw_sh);
+			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C03_ExportDate2File", "sh", b03_sh);
+			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C04_FinishData", "sh", b04_sh);
+			FileTools.createFileNotAppend(outputPathBin, type+"_EXPORT_2SQL", "sh", dw_export_2sql_sh);
+			FileTools.createFileNotAppend(outputPathBin, "TRUNCATE_"+type, "sh", truncate_dw_sh);
 			
 			// Other
-			FileTools.createFile(outputPathBin, type+"_EXPORT_2SQL", "dbc", dw_export_2sql_dbc);
-			FileTools.createFile(outputPathBin, "global-variables", "def", global_variables_def);
+			FileTools.createFileNotAppend(outputPathBin, type+"_EXPORT_2SQL", "dbc", dw_export_2sql_dbc);
+			FileTools.createFileNotAppend(outputPathBin, "global-variables", "def", global_variables_def);
 
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
