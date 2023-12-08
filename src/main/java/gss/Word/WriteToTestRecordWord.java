@@ -30,8 +30,8 @@ public class WriteToTestRecordWord {
 			List<Map<String, String>> controlSheetList, Map<String, String> testRecordNumMap) throws Exception {
 		
 //		String filePath = "C:\\Users\\nicole_tsou\\Dropbox\\POST\\ETL\\ETL 第二階\\程式\\_TESTING\\";
-		String inputPath1 = filePath + "Sample收載-測試紀錄-ETL_PMM_CM_01.doc";
-		String inputPath2 = filePath + "Sample梳理-測試紀錄-ETL_PMM_PI_63.doc";
+		String inputPath_ODS = filePath + "Sample收載-測試紀錄-ETL_PMM_CM_01.doc";
+		String inputPath_T = filePath + "Sample梳理-測試紀錄-ETL_PMM_PI_63.doc";
 
 		for(Map<String, String> controlSheetMap : controlSheetList) {
 
@@ -55,10 +55,9 @@ public class WriteToTestRecordWord {
 				}
 			}
 			System.out.println(finalOutputPath);
-			if(targetTableEName.startsWith("T_"))
-				readwriteWord(inputPath1, finalOutputPath, controlSheetMap);
-			else
-				readwriteWord(inputPath2, finalOutputPath, controlSheetMap);
+			
+			String inputPath = targetTableEName.startsWith("T_") ? inputPath_T : inputPath_ODS;
+			readwriteWord(inputPath, finalOutputPath, controlSheetMap);
 		}
 		
 	}
