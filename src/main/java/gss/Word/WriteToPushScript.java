@@ -117,7 +117,7 @@ public class WriteToPushScript {
 						+ runType + " --is-staged --is-bypass-pre-check --clear-cache \n";
 				
 				// Select Source Table Script
-				selectSourceScript = "select * from post1_post_poc_raw."+ sourceTableEName +"  t ;";
+				selectSourceScript = "select * from post1_post_poc_raw."+ sourceTableEName +"  t ; \n";
 				
 				// gssSQLConn
 				filePath = "/opt/gss/pipe-logic-deploy/post/";
