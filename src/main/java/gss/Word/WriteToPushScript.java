@@ -120,9 +120,14 @@ public class WriteToPushScript {
 				selectSourceScript = "select * from post1_post_poc_raw."+ sourceTableEName +"  t ; \n";
 				
 				// gssSQLConn
-				filePath = "/opt/gss/pipe-logic-deploy/post/";
-				gssSQLConn = "gssSQLConn --user hdfs --logic-file " + filePath + targetTableEName + "/bin/DM_T01.hql 1> " + filePath + targetTableEName + "/log/01.txt 2>&1\n"
-						+ "gssSQLConn --user hdfs --logic-file " + filePath + targetTableEName + "/bin/DM_L03_LoadDM.hql 1> " + filePath + targetTableEName + "/log/03.txt 2>&1\n\n"; 
+				filePath = "/opt/gss/pipe-logic-deploy/post/" + targetTableEName;
+				String gssSQLConnHead = "gssSQLConn --user hdfs --logic-file " + filePath;
+				gssSQLConn = gssSQLConnHead + "/bin/DM_T01.hql 1> " + filePath + "/log/01.txt 2>&1\n"
+						+ gssSQLConnHead + "/bin/DM_T02.hql 1> " + filePath + "/log/02.txt 2>&1\n"
+						+ gssSQLConnHead + "/bin/DM_T03.hql 1> " + filePath + "/log/03.txt 2>&1\n"
+						+ gssSQLConnHead + "/bin/DM_T04.hql 1> " + filePath + "/log/04.txt 2>&1\n"
+						+ gssSQLConnHead + "/bin/DM_T05.hql 1> " + filePath + "/log/05.txt 2>&1\n"
+						+ gssSQLConnHead + "/bin/DM_L06_LoadDM.hql 1> " + filePath + "/log/06.txt 2>&1\n\n"; 
 
 			}
 			
