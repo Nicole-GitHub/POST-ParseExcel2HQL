@@ -117,12 +117,12 @@ public class WriteToPushScript {
 						+ runType + " --is-staged --is-bypass-pre-check --clear-cache \n";
 				
 				// Select Source Table Script
-				selectSourceScript = "select * from post1_post_poc_raw."+ sourceTableEName +"  t ; \n";
+				selectSourceScript += "select * from post1_post_poc_raw."+ sourceTableEName +"  t ; \n";
 				
 				// gssSQLConn
 				filePath = "/opt/gss/pipe-logic-deploy/post/" + targetTableEName;
 				String gssSQLConnHead = "gssSQLConn --user hdfs --logic-file " + filePath;
-				gssSQLConn = gssSQLConnHead + "/bin/DM_T01.hql 1> " + filePath + "/log/01.txt 2>&1\n"
+				gssSQLConn += gssSQLConnHead + "/bin/DM_T01.hql 1> " + filePath + "/log/01.txt 2>&1\n"
 						+ gssSQLConnHead + "/bin/DM_T02.hql 1> " + filePath + "/log/02.txt 2>&1\n"
 						+ gssSQLConnHead + "/bin/DM_T03.hql 1> " + filePath + "/log/03.txt 2>&1\n"
 						+ gssSQLConnHead + "/bin/DM_T04.hql 1> " + filePath + "/log/04.txt 2>&1\n"
