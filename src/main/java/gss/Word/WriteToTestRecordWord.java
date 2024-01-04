@@ -38,13 +38,16 @@ public class WriteToTestRecordWord {
 			String targetTableEName = controlSheetMap.get("targetTableEName");
 			String targetTableCName = controlSheetMap.get("targetTableCName");
 			String testRecordNumStr = testRecordNumMap.get(targetTableEName);
-			
+			// 去掉最後的逗號
+			String sourceTableENameArr = controlSheetMap.get("sourceTableENameArr");
+			sourceTableENameArr = sourceTableENameArr.substring(0,sourceTableENameArr.length() - 1);
+
 			controlSheetMap.put("[Replace_測試規格編號]", testRecordNumStr);
 			controlSheetMap.put("[Replace_測試規格名稱]", targetTableEName);
 			controlSheetMap.put("[Replace_規格描述]", targetTableCName);
 			controlSheetMap.put("[Replace_TargetTable]", targetTableEName);
 			controlSheetMap.put("[Replace_ODSTable]", "ODS_"+targetTableEName.substring(2));
-			controlSheetMap.put("[Replace_SourceTable]", controlSheetMap.get("sourceTableEName"));
+			controlSheetMap.put("[Replace_SourceTable]", sourceTableENameArr.replace(",", "\u000B")); // word換行符
 			controlSheetMap.put("[Replace_測試日期]", Tools.getNowForROCYear("yyyy/MM/dd"));
 			
 			String finalOutputPath = "";

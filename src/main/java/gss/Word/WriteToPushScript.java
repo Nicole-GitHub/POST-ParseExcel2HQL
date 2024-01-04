@@ -14,7 +14,7 @@ public class WriteToPushScript {
 		try {
 
 			String targetTableEName = "", 
-				sourceTableEName = "",
+				sourceTableENameArr = "",
 				mkdirDownloadFolder = "", 
 				mkdirHadoopFolder = "", 
 				chmod = "", 
@@ -35,13 +35,14 @@ public class WriteToPushScript {
 				runType = "", 
 				pipeShell = "",
 				selectSourceScript = "",
+				selectTDSourceScript = "",
 				filePath = "",
 				gssSQLConn = "";
 			
 			for(Map<String, String> controlSheetMap : controlSheetList) {
 
 				targetTableEName = controlSheetMap.get("targetTableEName");
-				sourceTableEName = controlSheetMap.get("sourceTableEName");
+				sourceTableENameArr = controlSheetMap.get("sourceTableENameArr");
 
 				if("1".equals(mapProp.get("runType"))){
 					// mkdir Download Folder
@@ -54,9 +55,14 @@ public class WriteToPushScript {
 					mkdirHadoopFolder += "gssShell fs -mkdir /user/post1/Upload/tmp/" + targetTableEName + "/\n";
 					
 					// zip
-					zip += sourceTableEName.startsWith("T_") ? "" 
-							: "zip -jmqP POST@23931261 /home/post1/DW_WORK/download/"+controlSheetMap.get("sourceTableENameNoExt")+".zip "
-								+"/home/post1/DW_WORK/download/"+ sourceTableEName + "\n";
+					for(String sourceTableEName : sourceTableENameArr.split(",")) {
+						String sourceTableENameNoExt = sourceTableEName.indexOf(".") > 0
+								? sourceTableEName.substring(0, sourceTableEName.lastIndexOf("."))
+								: sourceTableEName;
+						zip += sourceTableEName.startsWith("T_") ? "" 
+								: "zip -jmqP POST@23931261 /home/post1/DW_WORK/download/" + sourceTableENameNoExt + ".zip "
+									+"/home/post1/DW_WORK/download/"+ sourceTableEName + "\n";
+					}
 				}
 
 				// chmod
@@ -117,7 +123,18 @@ public class WriteToPushScript {
 						+ runType + " --is-staged --is-bypass-pre-check --clear-cache \n";
 				
 				// Select Source Table Script
-				selectSourceScript += "select * from post1_post_poc_raw."+ sourceTableEName +"  t ; \n";
+				String whereScript = "X".equals(dataTransferInterval) ? ""
+						: "where YR || MON between '" + runNowS + "' and '" + runNowE + "'";
+				
+				for(String sourceTableEName : sourceTableENameArr.split(",")) {
+					selectSourceScript += "select * from post1_post_poc_raw."+ sourceTableEName +" t " + whereScript + " ; \n";
+				}
+				
+				// Select Teradata Source Table Script
+				for(String tdSourceTableEName : controlSheetMap.get("tdSourceTableENameArr").split(",")) {
+					selectTDSourceScript += "select * from "+ tdSourceTableEName +" t " + whereScript + " ; \n";
+				}
+				
 				
 				// gssSQLConn
 				filePath = "/opt/gss/pipe-logic-deploy/post/" + targetTableEName;
@@ -143,7 +160,8 @@ public class WriteToPushScript {
 					+ "\n--insertRunInfo\n" + insertRunInfo
 					+ "\n--insertRunNow\n" + insertRunNow
 					+ "\n--pipeShell\n" + pipeShell
-					+ "\n--selectSourceScript\n" + selectSourceScript
+					+ "\n--selectTDSourceScript\n" + selectTDSourceScript
+					+ "\n--selectSourceScript\n" + selectSourceScript 
 					+ "\n--gssSQLConn\n" + gssSQLConn ;
 			
 			FileTools.createFileNotAppend(outputPath, "PushScript", "sql", rs);
