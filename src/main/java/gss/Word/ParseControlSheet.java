@@ -21,7 +21,6 @@ public class ParseControlSheet {
 	public static List<Map<String, String>> run(String fileNamePath, List<String> fileENameList) throws Exception {
 		Map<String, String> map = new HashMap<String, String>();
 		List<Map<String, String>> mapList = new ArrayList<Map<String, String>>();
-//		List<String> include = new ArrayList<String>();
 		
 		try {
 		
@@ -33,6 +32,7 @@ public class ParseControlSheet {
 			Row row;
 
 			String targetTableEName = ""
+				, tdTargetTableEName = ""
 				, targetTableEName_old = ""
 				, targetTableCName = ""
 				, sourceTableEName = ""
@@ -64,14 +64,13 @@ public class ParseControlSheet {
 				// 只整理這次要解析的table即可
 				if (fileENameList.contains(targetTableEName_Temp)) {
 					targetTableEName = targetTableEName_Temp;
-//					if(!include.contains(targetTableEName)) {
-//						include.add(targetTableEName);
 					if(!targetTableEName_old.equals(targetTableEName)) {
 
 						if(!StringUtils.isBlank(targetTableEName_old)) {
 							map = new HashMap<String, String>();
 							map.put("targetTableEName", targetTableEName_old);
 							map.put("targetTableCName", targetTableCName);
+							map.put("tdTargetTableEName", tdTargetTableEName);
 							map.put("sourceTableENameArr", sourceTableENameArr);
 //							map.put("sourceTableENameNoExtArr", sourceTableENameNoExtArr);
 							map.put("dataTransferInterval", dataTransferInterval);
@@ -79,6 +78,7 @@ public class ParseControlSheet {
 		
 							mapList.add(map);
 						
+							tdTargetTableEName = "";
 							targetTableCName = "";
 							sourceTableEName = "";
 //							sourceTableENameNoExt = "";
@@ -91,7 +91,7 @@ public class ParseControlSheet {
 						targetTableEName_old = targetTableEName;
 						
 						targetTableCName = POITools.getCellValue(row, c++, "中文檔案名稱").toUpperCase();
-						c++; // 舊檔案名稱
+						tdTargetTableEName = POITools.getCellValue(row, c++, "舊檔案名稱").toUpperCase();
 						sourceTableEName = POITools.getCellValue(row, c++, "來源檔").toUpperCase();
 //						sourceTableENameNoExt = sourceTableEName.indexOf(".") > 0
 //								? sourceTableEName.substring(0, sourceTableEName.lastIndexOf("."))
@@ -116,7 +116,7 @@ public class ParseControlSheet {
 
 					} else {
 						targetTableCName = POITools.getCellValue(row, c++, "中文檔案名稱").toUpperCase();
-						c++; // 舊檔案名稱
+						tdTargetTableEName = POITools.getCellValue(row, c++, "舊檔案名稱").toUpperCase();
 						sourceTableEName = POITools.getCellValue(row, c++, "來源檔").toUpperCase();
 //						sourceTableENameNoExt = sourceTableEName.indexOf(".") > 0
 //								? sourceTableEName.substring(0, sourceTableEName.lastIndexOf("."))
@@ -148,6 +148,7 @@ public class ParseControlSheet {
 				map = new HashMap<String, String>();
 				map.put("targetTableEName", targetTableEName);
 				map.put("targetTableCName", targetTableCName);
+				map.put("tdTargetTableEName", tdTargetTableEName);
 				map.put("sourceTableENameArr", sourceTableENameArr);
 //				map.put("sourceTableENameNoExtArr", sourceTableENameNoExtArr);
 				map.put("dataTransferInterval", dataTransferInterval);
@@ -155,6 +156,7 @@ public class ParseControlSheet {
 
 				mapList.add(map);
 			
+				tdTargetTableEName = "";
 				targetTableCName = "";
 				sourceTableEName = "";
 //				sourceTableENameNoExt = "";

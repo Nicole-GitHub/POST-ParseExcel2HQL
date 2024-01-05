@@ -14,6 +14,7 @@ public class WriteToPushScript {
 		try {
 
 			String targetTableEName = "", 
+				tdTargetTableEName = "",
 				sourceTableENameArr = "",
 				mkdirDownloadFolder = "", 
 				mkdirHadoopFolder = "", 
@@ -34,14 +35,15 @@ public class WriteToPushScript {
 				insertRunNow = "", 
 				runType = "", 
 				pipeShell = "",
-				selectSourceScript = "",
-				selectTDSourceScript = "",
+				selectTDScript = "",
+				selectHPScript = "",
 				filePath = "",
 				gssSQLConn = "";
 			
 			for(Map<String, String> controlSheetMap : controlSheetList) {
 
 				targetTableEName = controlSheetMap.get("targetTableEName");
+				tdTargetTableEName = controlSheetMap.get("tdTargetTableEName");
 				sourceTableENameArr = controlSheetMap.get("sourceTableENameArr");
 
 				if("1".equals(mapProp.get("runType"))){
@@ -126,15 +128,16 @@ public class WriteToPushScript {
 				String whereScript = "X".equals(dataTransferInterval) ? ""
 						: "where YR || MON between '" + runNowS + "' and '" + runNowE + "'";
 				
+				selectHPScript += "\nselect * from post1_post_poc_raw."+ targetTableEName +" t " + whereScript + " ; \n";
 				for(String sourceTableEName : sourceTableENameArr.split(",")) {
-					selectSourceScript += "select * from post1_post_poc_raw."+ sourceTableEName +" t " + whereScript + " ; \n";
+					selectHPScript += "select * from post1_post_poc_raw."+ sourceTableEName +" t " + whereScript + " ; \n";
 				}
 				
 				// Select Teradata Source Table Script
+				selectTDScript += "\nselect * from "+ tdTargetTableEName +" t " + whereScript + " ; \n";
 				for(String tdSourceTableEName : controlSheetMap.get("tdSourceTableENameArr").split(",")) {
-					selectTDSourceScript += "select * from "+ tdSourceTableEName +" t " + whereScript + " ; \n";
+					selectTDScript += "select * from "+ tdSourceTableEName +" t " + whereScript + " ; \n";
 				}
-				
 				
 				// gssSQLConn
 				filePath = "/opt/gss/pipe-logic-deploy/post/" + targetTableEName;
@@ -160,8 +163,8 @@ public class WriteToPushScript {
 					+ "\n--insertRunInfo\n" + insertRunInfo
 					+ "\n--insertRunNow\n" + insertRunNow
 					+ "\n--pipeShell\n" + pipeShell
-					+ "\n--selectTDSourceScript\n" + selectTDSourceScript
-					+ "\n--selectSourceScript\n" + selectSourceScript 
+					+ "\n--selectTDScript\n" + selectTDScript
+					+ "\n--selectHPScript\n" + selectHPScript
 					+ "\n--gssSQLConn\n" + gssSQLConn ;
 			
 			FileTools.createFileNotAppend(outputPath, "PushScript", "sql", rs);
