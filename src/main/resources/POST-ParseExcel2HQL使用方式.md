@@ -1,19 +1,3 @@
-# 使用方式:
-```sh
-	一、將以下四個檔案放在同一目錄下
-		1.TableLayout
-		2.CopyFile
-		3.bat檔
-		4.jar檔
-		5.config.properties檔
-	二、修改config.properties檔裡的參數值
-		runType:
-			1: Excel無邏輯相關頁籤時使用 (單純1對1抄，程式會整理出對應的邏輯相關頁籤)
-			3: 只需將資料提供的文字檔轉成Excel時使用
-				(Layout頁籤的"文字檔檔名"為必填，並須將對應的TXT檔放入"POST-ParseExcel2HQL/TableLayout/TXTFile/"目錄下)
-			2: 其它情況皆為2
-
-```
 
 # 執行方式:
 ```sh
@@ -21,13 +5,61 @@
 
 ```
 
+# 使用方式:
+```sh
+	一、先更新SVN:dw2209\DOCUMENT\5-ST\測試紀錄清單.doc
+	二、將整理好的layout文件放入TableLayout目錄下
+		* "TableLayout\SAMPLE TableLayout"裡面的Excel為範例檔，黃底部份為程式會抓的欄位
+		* 一次只能執行同類型的layout
+			1.同為DW的收載
+			2.同為DW的梳理
+			3.同為DM的收載
+			4.同為DM的梳理
+
+	三、若為收載則可將來源文字檔放入"TableLayout\TXTFile\"下
+		單檔大小不可超過10M(視執行的pc效能而訂)，不然會爆OutOfMemory
+
+	四、修改config.properties檔裡的參數值
+		* hadoop.raw.dbname: Hadoop raw的DBNAME
+		* hadoop.tmp.dbname: Hadoop tmp的DBNAME
+		* hadoop.meta.dbname: Hadoop meta的DBNAME
+		* hadoop.std.dbname: Hadoop std的DBNAME
+		* mssql.dbname: CREATE MSSQL TABLE所屬DBNAME
+			DDWQDWSA: DW
+			DDWQDMSA: DM
+
+		* runType:
+			1: 產出收載所需程式時使用(需含有ODS頁籤)
+			2: 其它情況皆為2
+		
+		* exportfile: 是否需產出資料提供exportfile檔案
+			Y: 是
+			N: 否
+		
+		* exportfile.dbname: 資料提供的資料來源從何而來
+			post1_post_poc_tmp: 從邏輯梳理而來
+			post1_post_poc_raw: 從AP載入後直接提供出去(例:ACACCOUNT)
+
+		* chksourcefilecontent: 是否檢查來源文字檔的資料內容
+			(目前固定為N)
+		* svnPath: 本機的svn路徑(特殊符號需加跳脫字元)
+			例:C:\\SVN\\dw2209\\
+
+```
+
 # 產出結果:
 ```sh
-	執行完後會將產出的HQL會對應Excel檔名分別放入同檔名的資料夾下
-	1.若Excel無邏輯相關頁籤則程式會自動產出1對1抄的簡易邏輯頁籤與對應HQL
-	2.若Excel有邏輯相關頁籤則程式會依頁籤內容產出對應HQL
-	3.若有放置來源文字檔則程式會自動將來源文字檔轉成Excel並整理出數值型態欄位的加總值,另會再判斷NotNull欄位是否有Null值，若有則報錯但程式不會中斷
-	4.程式會自動產出驗測時所需SQL(含DW/M與ODS)，但維度分群與資料抽樣的SQL需再自行調整
+	產出的檔案會放在"Output"目錄下
+	一、程式上版{執行日}.xlsx: 列出"測試紀錄清單"裡所需資訊(測試者需改成你自己)
+	二、PushScript.sql: 列出程式要上至POST環境時所需的Script(取自己需要的即可)
+	三、CreateTableScript{執行日}.hql: 列出上至POST環境時所需的Create Table Script
+	四、程式相關Sample檔(會放入對應layout的Excel檔名資料夾下)
+		1.{來源文字檔檔名}_{Layout的Excel檔名}.xlsx: 
+			若有放置來源文字檔則程式會自動將來源文字檔轉成Excel並整理出數值型態欄位的加總值
+		2.	測試紀錄-{測試紀錄編號}(對應"程式上版{執行日}.xlsx"的編號).doc: 
+			Sample的測試紀錄檔(需自行修改)
+		3.RCPT.hql: 驗測時所需SQL(需自行修改)
+		註:上述三個檔案可自行獨立放置，其餘檔案才是ETL程式所需的Sample Code
 ```
 
 
