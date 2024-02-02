@@ -128,15 +128,29 @@ public class WriteToPushScript {
 				String whereScript = "X".equals(dataTransferInterval) ? ""
 						: "where YR || MON between '" + runNowS + "' and '" + runNowE + "'";
 				
-				selectHPScript += "\nselect * from post1_post_poc_raw."+ targetTableEName +" t " + whereScript + " ; \n";
-				for(String sourceTableEName : sourceTableENameArr.split(",")) {
-					selectHPScript += "select * from post1_post_poc_raw."+ sourceTableEName +" t " + whereScript + " ; \n";
-				}
-				
 				// Select Teradata Source Table Script
 				selectTDScript += "\nselect * from "+ tdTargetTableEName +" t " + whereScript + " ; \n";
 				for(String tdSourceTableEName : controlSheetMap.get("tdSourceTableENameArr").split(",")) {
 					selectTDScript += "select * from "+ tdSourceTableEName +" t " + whereScript + " ; \n";
+				}
+				
+				// Select Hadoop Source Table Script (CNT)
+				selectHPScript += "\nselect '" + targetTableEName + "', count(1) cnt from post1_post_poc_raw."+ targetTableEName +" t " + whereScript + " \n";
+				for(String sourceTableEName : sourceTableENameArr.split(",")) {
+					selectHPScript += "union all select '" + sourceTableEName + "', count(1) cnt from post1_post_poc_raw."+ sourceTableEName +" t " + whereScript + " \n";
+				}
+				selectHPScript += "; \n";
+				
+				// Truncate Hadoop Source Table Script
+				selectHPScript += "\nTRUNCATE TABLE post1_post_poc_raw."+ targetTableEName +" ; \n";
+				for(String sourceTableEName : sourceTableENameArr.split(",")) {
+					selectHPScript += "TRUNCATE TABLE post1_post_poc_raw."+ sourceTableEName +" ; \n";
+				}
+				
+				// Select Hadoop Source Table Script
+				selectHPScript += "\nselect * from post1_post_poc_raw."+ targetTableEName +" t " + whereScript + " ; \n";
+				for(String sourceTableEName : sourceTableENameArr.split(",")) {
+					selectHPScript += "select * from post1_post_poc_raw."+ sourceTableEName +" t " + whereScript + " ; \n";
 				}
 				
 				// gssSQLConn
