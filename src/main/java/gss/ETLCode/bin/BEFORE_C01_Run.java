@@ -118,4 +118,28 @@ public class BEFORE_C01_Run {
 		return rs;
 	}
 
+	public static String getHQL_airflow(String partition, Map<String, String> mapProp, String tableName ) {
+		
+		String rs = "-----------------------------------------------------------------\n"
+				+ "-- parameter list\n"
+				+ "-----------------------------------------------------------------\n"
+				+ "set hivevar:RSLT="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+"_result;\n"
+				+ "-----------------------------------------------------------------\n"
+				+ "\n"
+				+ "\n"
+				+ "-- 清空驗証結果檔並重建\n"
+				+ "drop table if exists ${hivevar:RSLT};\n"
+				+ "create table if not exists ${hivevar:RSLT}\n"
+				+ "(\n"
+				+ "   alias       string,\n"
+				+ "   batchid     bigint,\n"
+				+ "   func_name   string,\n"
+				+ "   msg         string,\n"
+				+ "   msg_lvl     string,\n"
+				+ "   rc          int,\n"
+				+ "   create_time TIMESTAMP\n"
+				+ ");\n" ;
+		
+		return rs;
+	}
 }

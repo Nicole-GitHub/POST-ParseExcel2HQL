@@ -206,6 +206,14 @@ public class WriteToLogic {
 			String codeFileName = "1".equals(mapProp.get("runType")) ? "DW_L07_LoadDW" : "DM_T01" ;
 			FileTools.createFileNotAppend(outputPath, codeFileName, "hql", rsHQL);
 			FileTools.createFileNotAppend(outputPath, codeFileName, "var", rsVAR);
+			
+			/******************
+			 * airflow
+			 ******************/
+			String rsHQL_airflow = DW_L07_LoadDW.getHQL_airflow(partition, mapProp, rsTargetSelectCols, sumColLogic, sumODSColLogic,
+					whereSumCol, tableName, odsTableName);
+			FileTools.createFileNotAppend(outputPath+"../airflow/", codeFileName, "hql", rsHQL_airflow);
+
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}

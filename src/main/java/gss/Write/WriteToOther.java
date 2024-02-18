@@ -24,6 +24,7 @@ import gss.ETLCode.bin.ODS_C02_GetDataFileName;
 import gss.ETLCode.bin.ODS_C03_GetErrorData;
 import gss.ETLCode.bin.ODS_C04_GetData;
 import gss.ETLCode.bin.ODS_C05_GetDoneFile;
+import gss.ETLCode.bin.Python_Airflow;
 import gss.ETLCode.bin.TRUNCATE_DW;
 import gss.ETLCode.bin.TRUNCATE_ODS;
 import gss.ETLCode.bin.global_variables;
@@ -43,6 +44,7 @@ public class WriteToOther {
 
 			outputPath += fileName + "/";
 			String outputPathBin = outputPath + "bin/";
+			String outputPathBin_airflow = outputPath + "airflow/";
 			
 			// list的最後一筆位置
 			Map<String, String> layoutMap = layoutMapList.get(layoutMapList.size() - 1);
@@ -61,6 +63,9 @@ public class WriteToOther {
 				}
 			}
 			
+			/******************
+			 * pipe-shell
+			 ******************/
 	     	String desc = description.get();
 	     	String flowAll = flow.get_def_all(mapProp);
 	     	String flowNoExport = flow.get_def_noExport(mapProp);
@@ -171,6 +176,59 @@ public class WriteToOther {
 			// Other
 			FileTools.createFileNotAppend(outputPathBin, type+"_EXPORT_2SQL", "dbc", dw_export_2sql_dbc);
 			FileTools.createFileNotAppend(outputPathBin, "global-variables", "def", global_variables_def);
+			
+			
+
+			/******************
+			 * airflow
+			 ******************/
+	     	String b01_hql_airflow = BEFORE_C01_Run.getHQL_airflow(partition, mapProp, tableName);
+	     	String backup_dw_hql_airflow = BACKUP_DW.getHQL_airflow(partition, mapProp, tableName, type);
+	     	String dw_export_2sql_dbc_airflow = DW_EXPORT_2SQL.getDBC(type, mapProp, tableName);
+	     	String dw_export_2sql_sh_airflow = DW_EXPORT_2SQL.getShell(type, mapProp, tableName);
+	     	String dw_l08_loaddw_tmp_hql_airflow = DW_L08_LoadDW_TMP.getHQL_airflow(partition, mapProp, tableName, selectStr, type);
+	     	
+	     	if("1".equals(runType)) {
+		     	String python_airflow = Python_Airflow.getDW(tableName, txtFileName);
+		     	String o01_hql_airflow = ODS_C01_UploadFile.getHQL_airflow(mapProp, tableName, odsTableName);
+		     	String o02_hql_airflow = ODS_C02_GetDataFileName.getHQL_airflow(mapProp, tableName, odsTableName);
+		     	String o03_hql_airflow = ODS_C03_GetErrorData.getHQL_airflow(mapProp, tableName, odsTableName, finalLen, hasChinese);
+		     	String o04_hql_airflow = ODS_C04_GetData.getHQL_airflow(mapProp, tableName, odsTableName, finalLen, hasChinese);
+		     	String o05_hql_airflow = ODS_C05_GetDoneFile.getHQL_airflow(mapProp, tableName, odsTableName, finalLen, hasChinese);
+		     	String truncate_ods_hql_airflow = TRUNCATE_ODS.getHQL_airflow(mapProp, tableName, odsTableName);
+		     	
+
+				FileTools.createFileNotAppend(outputPathBin_airflow, "ODS_C01_UploadFile", "hql", o01_hql_airflow);
+				FileTools.createFileNotAppend(outputPathBin_airflow, "ODS_C02_GetDataFileName", "hql", o02_hql_airflow);
+				FileTools.createFileNotAppend(outputPathBin_airflow, "ODS_C03_GetErrorData", "hql", o03_hql_airflow);
+				FileTools.createFileNotAppend(outputPathBin_airflow, "ODS_C04_GetData", "hql", o04_hql_airflow);
+				FileTools.createFileNotAppend(outputPathBin_airflow, "ODS_C05_GetDoneFile", "hql", o05_hql_airflow);
+				FileTools.createFileNotAppend(outputPathBin_airflow, "TRUNCATE_ODS", "hql", truncate_ods_hql_airflow);
+				FileTools.createFileNotAppend(outputPathBin_airflow, tableName, "py", python_airflow);
+
+	     	} else {
+//		     	String python_airflow = Python_Airflow.getDM(tableName, txtFileName);
+	     		String dm_l02_loaddm_tmp_hql_airflow = DM_L02_LoadDM.getHQL_airflow(partition, mapProp, tableName);
+		     	
+		     	FileTools.createFileNotAppend(outputPathBin_airflow, "DM_L02_LoadDM", "hql", dm_l02_loaddm_tmp_hql_airflow);
+//				FileTools.createFileNotAppend(outputPathBin_airflow, tableName, "py", python_airflow);
+
+	     	}
+	     	
+	     	String truncate_dw_hql_airflow = TRUNCATE_DW.getHQL_airflow(partition, mapProp, tableName, type);
+	     	
+			// bin/ 
+			// HQL
+			FileTools.createFileNotAppend(outputPathBin_airflow, "BEFORE_C01_Run", "hql", b01_hql_airflow);
+			FileTools.createFileNotAppend(outputPathBin_airflow, "BACKUP_"+type, "hql", backup_dw_hql_airflow);
+			FileTools.createFileNotAppend(outputPathBin_airflow, load_tmp_codeFileName, "hql", dw_l08_loaddw_tmp_hql_airflow);
+			FileTools.createFileNotAppend(outputPathBin_airflow, "TRUNCATE_"+type, "hql", truncate_dw_hql_airflow);
+			
+			// SH
+			FileTools.createFileNotAppend(outputPathBin_airflow, type+"_EXPORT_2SQL", "sh", dw_export_2sql_sh_airflow);
+			
+			// Other
+			FileTools.createFileNotAppend(outputPathBin_airflow, type+"_EXPORT_2SQL", "dbc", dw_export_2sql_dbc_airflow);
 
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);

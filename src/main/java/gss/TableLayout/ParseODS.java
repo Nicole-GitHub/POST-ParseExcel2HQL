@@ -113,6 +113,12 @@ public class ParseODS {
 			// ODS_L06_LoadODS.var
 			FileTools.createFileNotAppend(outputPath , "ODS_L06_LoadODS", "var", rsVAR);
 			
+			/******************
+			 * airflow
+			 ******************/
+			String rsHQL_airflow = ODS_L06_LoadODS.getHQL_airflow(mapProp, rsSelectCols + rsSelectPartition, tableName, hasChineseForTable);
+			FileTools.createFileNotAppend(outputPath+"../airflow/" , "ODS_L06_LoadODS", "hql", rsHQL_airflow);
+
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}
