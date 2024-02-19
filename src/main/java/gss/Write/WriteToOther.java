@@ -207,12 +207,11 @@ public class WriteToOther {
 				FileTools.createFileNotAppend(outputPathBin_airflow, tableName, "py", python_airflow);
 
 	     	} else {
-//		     	String python_airflow = Python_Airflow.getDM(tableName, txtFileName);
+		     	String python_airflow = Python_Airflow.getDM(tableName, txtFileName);
 	     		String dm_l02_loaddm_tmp_hql_airflow = DM_L02_LoadDM.getHQL_airflow(partition, mapProp, tableName);
 		     	
 		     	FileTools.createFileNotAppend(outputPathBin_airflow, "DM_L02_LoadDM", "hql", dm_l02_loaddm_tmp_hql_airflow);
-//				FileTools.createFileNotAppend(outputPathBin_airflow, tableName, "py", python_airflow);
-
+				FileTools.createFileNotAppend(outputPathBin_airflow, tableName, "py", python_airflow);
 	     	}
 	     	
 	     	String truncate_dw_hql_airflow = TRUNCATE_DW.getHQL_airflow(partition, mapProp, tableName, type);
