@@ -189,7 +189,7 @@ public class WriteToOther {
 	     	String dw_l08_loaddw_tmp_hql_airflow = DW_L08_LoadDW_TMP.getHQL_airflow(partition, mapProp, tableName, selectStr, type);
 	     	
 	     	if("1".equals(runType)) {
-		     	String python_airflow = Python_Airflow.getDW(tableName, txtFileName);
+		     	String python_airflow = Python_Airflow.getDW(tableName, txtFileName, layoutMap.get("SourceFileIsZip"));
 		     	String o01_hql_airflow = ODS_C01_UploadFile.getHQL_airflow(mapProp, tableName, odsTableName);
 		     	String o02_hql_airflow = ODS_C02_GetDataFileName.getHQL_airflow(mapProp, tableName, odsTableName);
 		     	String o03_hql_airflow = ODS_C03_GetErrorData.getHQL_airflow(mapProp, tableName, odsTableName, finalLen, hasChinese);

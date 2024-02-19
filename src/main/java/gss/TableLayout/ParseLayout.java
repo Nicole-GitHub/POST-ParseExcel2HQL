@@ -44,6 +44,7 @@ public class ParseLayout {
 			String tableName = POITools.getCellValue(sheetLayout.getRow(0), 4, "TABLE名稱");
 			String txtFileName = POITools.getCellValue(sheetLayout.getRow(1), 8, "文字檔檔名");
 			String partition = POITools.getCellValue(sheetLayout.getRow(0), 8, "Partition");
+			String sourceFileIsZip = POITools.getCellValue(sheetLayout.getRow(1), 8, "來源文字檔是否壓縮");
 			String[] partitionList = partition.split(",");
 
 			// 解析資料內容(從第五ROW開頭爬)
@@ -140,6 +141,7 @@ public class ParseLayout {
 			mapReturn.put("MapType", "Main");
 			mapReturn.put("TableName", tableName);
 			mapReturn.put("Partition", partition);
+			mapReturn.put("SourceFileIsZip", sourceFileIsZip);
 			mapReturn.put("TXTFileName", txtFileName);
 			listReturn.add(mapReturn);
 
