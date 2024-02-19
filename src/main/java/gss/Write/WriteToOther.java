@@ -218,7 +218,7 @@ public class WriteToOther {
 	     	
 			// bin/ 
 			// HQL
-			FileTools.createFileNotAppend(outputPathBin_airflow, "BEFORE_C01_Run", "hql", b01_hql_airflow);
+			FileTools.createFileNotAppend(outputPathBin_airflow, "BEFORE_C01", "hql", b01_hql_airflow);
 			FileTools.createFileNotAppend(outputPathBin_airflow, "BACKUP_"+type, "hql", backup_dw_hql_airflow);
 			FileTools.createFileNotAppend(outputPathBin_airflow, load_tmp_codeFileName, "hql", dw_l08_loaddw_tmp_hql_airflow);
 			FileTools.createFileNotAppend(outputPathBin_airflow, "TRUNCATE_"+type, "hql", truncate_dw_hql_airflow);

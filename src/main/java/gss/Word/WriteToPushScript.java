@@ -24,6 +24,7 @@ public class WriteToPushScript {
 				dataTransferInterval = "", 
 				runInfo = "", 
 				insertRunInfo = "", 
+				insertRunInfo_MSSQL = "",
 				yyyy = "", 
 				yyyyMM = "", 
 				yyyyMMDD = "", 
@@ -86,9 +87,13 @@ public class WriteToPushScript {
 												: "系統日".equals(dataTransferInterval) ? "'D',0,0"
 													: "系統日-1".equals(dataTransferInterval) ? "'D',-1,-1"
 														: "";
-				
+				// HADOOP
 				insertRunInfo += "INSERT OVERWRITE TABLE post1_post_poc_std.SYS_RUN_INFO PARTITION(TABLENM) "
 						+"SELECT "+runInfo+", CURRENT_TIMESTAMP, '" + targetTableEName + "';\n";
+				
+				// MSSQL
+				insertRunInfo_MSSQL += "INSERT INTO SYS_RUN_INFO "
+						+"SELECT '" + targetTableEName + "',"+runInfo+", GETDATA() ;\n";
 				
 				// SYS_RUN_NOW
 				yyyy = Tools.getNOW("yyyy");
@@ -173,8 +178,8 @@ public class WriteToPushScript {
 						+ "\n--zip\n" + zip )
 					)
 					+ "\n--chmod\n" + chmod
-					+ "\n--createRSLT\n" + createRSLT
 					+ "\n--insertRunInfo\n" + insertRunInfo
+					+ "\n--createRSLT\n" + createRSLT
 					+ "\n--insertRunNow\n" + insertRunNow
 					+ "\n--pipeShell\n" + pipeShell
 					+ "\n--selectTDScript\n" + selectTDScript
@@ -182,6 +187,28 @@ public class WriteToPushScript {
 					+ "\n--gssSQLConn\n" + gssSQLConn ;
 			
 			FileTools.createFileNotAppend(outputPath, "PushScript", "sql", rs);
+			
+			// 收載時才會有前三項
+			String rs_airflow =	(
+					!"1".equals(mapProp.get("runType")) ? ""
+						: ("--mkdirDownloadFolder\n" + mkdirDownloadFolder
+						+ "\n--mkdirHadoopFolder\n" + mkdirHadoopFolder
+						+ "\n--zip\n" + zip )
+					)
+//					+ "\n--chmod\n" + chmod
+//					+ "\n--insertRunInfo\n" + insertRunInfo
+					+ "\n--insertRunInfo_MSSQL\n" + insertRunInfo_MSSQL
+//					+ "\n--createRSLT\n" + createRSLT
+//					+ "\n--insertRunNow\n" + insertRunNow
+//					+ "\n--pipeShell\n" + pipeShell
+					+ "\n--selectTDScript\n" + selectTDScript
+					+ "\n--selectHPScript\n" + selectHPScript
+//					+ "\n--gssSQLConn\n" + gssSQLConn 
+					;
+			
+			FileTools.createFileNotAppend(outputPath, "PushScript_airflow", "sql", rs_airflow);
+			
+			
 
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
