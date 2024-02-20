@@ -419,7 +419,7 @@ public class Python_Airflow {
 				+ "# L系列的編號要對應HQL檔名\n"
 				+ "DM_L02_LoadDM = BashOperator(\n"
 				+ "	task_id='DM_L02_LoadDM',\n"
-				+ "	bash_command=f\"sh {DAG_WORKSPACE}scripts/gssSQLConn.sh --logic-file {PROG_PATH}{target_table}/bin/DM_L02_LoadDM.hql --var ACT_YM={{{{ ti.xcom_pull(task_ids='get_xcoms' , key='YMS') }}}}\",\n"
+				+ "	bash_command=f\"sh {DAG_WORKSPACE}scripts/gssSQLConn.sh --logic-file {PROG_PATH}{target_table}/bin/DM_L02_LoadDM.hql --var BATCHID={{{{ ti.xcom_pull(task_ids='get_xcoms' , key='BATCHID') }}}} --var ACT_YM={{{{ ti.xcom_pull(task_ids='get_xcoms' , key='YMS') }}}}\",\n"
 				+ "	dag=dag\n"
 				+ ")\n"
 				+ "\n"

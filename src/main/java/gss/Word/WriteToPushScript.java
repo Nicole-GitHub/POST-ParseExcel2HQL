@@ -93,7 +93,7 @@ public class WriteToPushScript {
 				
 				// MSSQL
 				insertRunInfo_MSSQL += "INSERT INTO SYS_RUN_INFO "
-						+"SELECT '" + targetTableEName + "',"+runInfo+", GETDATA() ;\n";
+						+"SELECT '" + targetTableEName + "',"+runInfo+", GETDATE() ;\n";
 				
 				// SYS_RUN_NOW
 				yyyy = Tools.getNOW("yyyy");

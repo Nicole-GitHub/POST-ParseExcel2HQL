@@ -61,6 +61,7 @@ public class DM_L02_LoadDM {
 		String rs = "-----------------------------------------------------------------\n"
 				+ "-- parameter list\n"
 				+ "-----------------------------------------------------------------\n"
+				+ "set hivevar:BATCHID=20230329000000;\n"
 				+ "set hivevar:ACT_YM=202303;\n"
 				+ "set hivevar:Run_TableName="+tableName+";\n"
 				+ "set hivevar:SRC1_L="+mapProp.get("hadoop.tmp.dbname")+".tmp_"+tableName+";\n"

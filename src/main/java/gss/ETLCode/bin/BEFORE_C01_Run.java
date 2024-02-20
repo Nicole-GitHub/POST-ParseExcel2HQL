@@ -129,7 +129,7 @@ public class BEFORE_C01_Run {
 				+ "\n"
 				+ "-- 清空驗証結果檔並重建\n"
 				+ "drop table if exists ${hivevar:RSLT};\n"
-				+ "create table if ${hivevar:RSLT}\n"
+				+ "create table ${hivevar:RSLT}\n"
 				+ "(\n"
 				+ "   alias       string,\n"
 				+ "   func_name   string,\n"
