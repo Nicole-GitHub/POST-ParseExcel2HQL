@@ -90,9 +90,9 @@ public class ParseODS {
 			// CREATE TABLE Script
 			rsCREATE = CreateTable_ODS.getHQL(mapProp, tableName, rsCreateCols, rsCreatePartition);
 			
-			// INSERT INTO Script
-			rsHQL = ODS_L06_LoadODS.getHQL(mapProp, rsSelectCols + rsSelectPartition, tableName, hasChineseForTable);
-			rsVAR = ODS_L06_LoadODS.getVAR(mapProp, tableName, hasChineseForTable);
+//			// INSERT INTO Script
+//			rsHQL = ODS_L06_LoadODS.getHQL(mapProp, rsSelectCols + rsSelectPartition, tableName, hasChineseForTable);
+//			rsVAR = ODS_L06_LoadODS.getVAR(mapProp, tableName, hasChineseForTable);
 			
 			mapReturn.put("TableName", tableName);
 			mapReturn.put("TXTFileName", txtFileName);
@@ -108,16 +108,16 @@ public class ParseODS {
 			FileTools.createFileAppend(outputPath + "../", "CreateTableScript"+Tools.getNOW("yyyyMMdd"), "hql", rsCREATE);
 			
 			outputPath += "bin/";
-			// ODS_L06_LoadODS.hql
-			FileTools.createFileNotAppend(outputPath , "ODS_L06_LoadODS", "hql", rsHQL);
-			// ODS_L06_LoadODS.var
-			FileTools.createFileNotAppend(outputPath , "ODS_L06_LoadODS", "var", rsVAR);
+//			// ODS_L06_LoadODS.hql
+//			FileTools.createFileNotAppend(outputPath , "ODS_L06_LoadODS", "hql", rsHQL);
+//			// ODS_L06_LoadODS.var
+//			FileTools.createFileNotAppend(outputPath , "ODS_L06_LoadODS", "var", rsVAR);
 			
 			/******************
 			 * airflow
 			 ******************/
 			String rsHQL_airflow = ODS_L06_LoadODS.getHQL_airflow(mapProp, rsSelectCols + rsSelectPartition, tableName, hasChineseForTable);
-			FileTools.createFileNotAppend(outputPath+"../airflow/" , "ODS_L06_LoadODS", "hql", rsHQL_airflow);
+			FileTools.createFileNotAppend(outputPath , "ODS_L06_LoadODS", "hql", rsHQL_airflow);
 
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
