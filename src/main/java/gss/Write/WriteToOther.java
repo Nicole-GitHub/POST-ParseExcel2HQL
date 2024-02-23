@@ -176,7 +176,7 @@ public class WriteToOther {
 	     	String b01_hql_airflow = BEFORE_C01_Run.getHQL_airflow(partition, mapProp, tableName);
 	     	String backup_dw_hql_airflow = BACKUP_DW.getHQL_airflow(partition, mapProp, tableName, type);
 	     	String dw_export_2sql_dbc_airflow = DW_EXPORT_2SQL.getDBC(type, mapProp, tableName);
-	     	String dw_export_2sql_sh_airflow = DW_EXPORT_2SQL.getShell(type, mapProp, tableName);
+//	     	String dw_export_2sql_sh_airflow = DW_EXPORT_2SQL.getShell(type, mapProp, tableName);
 	     	String dw_l08_loaddw_tmp_hql_airflow = DW_L08_LoadDW_TMP.getHQL_airflow(partition, mapProp, tableName, selectStr, type);
 	     	
 	     	if("1".equals(runType)) {
@@ -215,10 +215,10 @@ public class WriteToOther {
 			FileTools.createFileNotAppend(outputPathBin, "TRUNCATE_"+type, "hql", truncate_dw_hql_airflow);
 			
 			// SH
-			FileTools.createFileNotAppend(outputPathBin, type+"_EXPORT_2SQL", "sh", dw_export_2sql_sh_airflow);
+//			FileTools.createFileNotAppend(outputPathBin, type+"_EXPORT_2SQL", "sh", dw_export_2sql_sh_airflow);
 			
 			// Other
-			FileTools.createFileNotAppend(outputPathBin, type+"_EXPORT_2SQL", "dbc", dw_export_2sql_dbc_airflow);
+			FileTools.createFileNotAppend(outputPathBin, "EXPORT_2SQL", "dbc", dw_export_2sql_dbc_airflow);
 
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);

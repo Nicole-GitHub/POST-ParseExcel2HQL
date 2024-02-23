@@ -30,6 +30,7 @@ public class WriteToPushScript {
 				yyyyMMDD = "", 
 				yyyy1 = "", 
 				yyyyMM1 = "", 
+				yyyyMM2 = "", 
 				yyyyMMDD1 = "", 
 				runNowS = "", 
 				runNowE = "", 
@@ -80,13 +81,14 @@ public class WriteToPushScript {
 				// SYS_RUN_INFO
 				dataTransferInterval = controlSheetMap.get("dataTransferInterval").toUpperCase();
 				runInfo = "X".equals(dataTransferInterval) ? "'A',0,0"
-								: "系統年".equals(dataTransferInterval) ? "'Y',0,0"
-									: "系統年-1".equals(dataTransferInterval) ? "'Y',-1,-1"
-										: "系統月".equals(dataTransferInterval) ? "'M',0,0"
-											: "系統月-1".equals(dataTransferInterval) ? "'M',-1,-1"
-												: "系統日".equals(dataTransferInterval) ? "'D',0,0"
-													: "系統日-1".equals(dataTransferInterval) ? "'D',-1,-1"
-														: "";
+						: "系統年".equals(dataTransferInterval) ? "'Y',0,0"
+							: "系統年-1".equals(dataTransferInterval) ? "'Y',-1,-1"
+								: "系統月".equals(dataTransferInterval) ? "'M',0,0"
+									: "系統月-1".equals(dataTransferInterval) ? "'M',-1,-1"
+										: "系統月-2".equals(dataTransferInterval) ? "'M',-2,-2"
+											: "系統日".equals(dataTransferInterval) ? "'D',0,0"
+												: "系統日-1".equals(dataTransferInterval) ? "'D',-1,-1"
+													: "";
 				// HADOOP
 				insertRunInfo += "INSERT OVERWRITE TABLE post1_post_poc_std.SYS_RUN_INFO PARTITION(TABLENM) "
 						+"SELECT "+runInfo+", CURRENT_TIMESTAMP, '" + targetTableEName + "';\n";
@@ -101,24 +103,27 @@ public class WriteToPushScript {
 				yyyyMMDD = Tools.getNOW("yyyyMMdd");
 				yyyy1 = String.valueOf(Integer.parseInt(Tools.getNOW("yyyy"))-1);
 				yyyyMM1 = String.valueOf(Integer.parseInt(Tools.getNOW("yyyyMM"))-1);
+				yyyyMM2 = String.valueOf(Integer.parseInt(Tools.getNOW("yyyyMM"))-2);
 				yyyyMMDD1 = String.valueOf(Integer.parseInt(Tools.getNOW("yyyyMMdd"))-1);
 				runNowS = "X".equals(dataTransferInterval) ? "00000000"
 						: "系統年".equals(dataTransferInterval) ? yyyy+"0101"
 							: "系統年-1".equals(dataTransferInterval) ? yyyy1 +"0101"
 								: "系統月".equals(dataTransferInterval) ? yyyyMM+"01"
 									: "系統月-1".equals(dataTransferInterval) ? yyyyMM1+"01"
-										: "系統日".equals(dataTransferInterval) ? yyyyMMDD
-											: "系統日-1".equals(dataTransferInterval) ? yyyyMMDD1
-												: "";
+										: "系統月-2".equals(dataTransferInterval) ? yyyyMM2+"01"
+											: "系統日".equals(dataTransferInterval) ? yyyyMMDD
+												: "系統日-1".equals(dataTransferInterval) ? yyyyMMDD1
+													: "";
 
 				runNowE = "X".equals(dataTransferInterval) ? "00000000"
 						: "系統年".equals(dataTransferInterval) ? yyyy+"1231"
 							: "系統年-1".equals(dataTransferInterval) ? yyyy1+"1231"
 								: "系統月".equals(dataTransferInterval) ? yyyyMM+"31"
 									: "系統月-1".equals(dataTransferInterval) ? yyyyMM1+"31"
-										: "系統日".equals(dataTransferInterval) ? yyyyMMDD
-											: "系統日-1".equals(dataTransferInterval) ? yyyyMMDD
-												: "";
+										: "系統月-2".equals(dataTransferInterval) ? yyyyMM2+"31"
+											: "系統日".equals(dataTransferInterval) ? yyyyMMDD
+												: "系統日-1".equals(dataTransferInterval) ? yyyyMMDD
+													: "";
 				
 				insertRunNow += "INSERT OVERWRITE TABLE post1_post_poc_std.SYS_RUN_NOW PARTITION(TABLENM) "
 						+"SELECT '" + runNowS + "', '" + runNowE + "', CURRENT_TIMESTAMP, '" + targetTableEName + "';\n";

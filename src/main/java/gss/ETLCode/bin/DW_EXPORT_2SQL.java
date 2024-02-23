@@ -6,14 +6,12 @@ public class DW_EXPORT_2SQL {
 	
 	public static String getDBC(String type, Map<String, String> mapProp, String tableName) {
 		
-		String rs = "source ${"+type+"_DB_STR}\n"
-				+ "JOB_NAME=\""+tableName+"\"\n"
+		String rs = "TABLE=\""+tableName+"\"\n"
 				+ "FUNCTION=\"export\"\n"
-				+ "DESTINATION_TABLE=\""+tableName+"\"\n"
-				+ "EXPORT_DIRECTORY=\"/user/hive/dw/post_poc_tmp/"+tableName.toLowerCase()+"\"\n"
-				+ "FIELDS_TERMINATED_BY='\\001'\n"
-				+ "NULL_STRING='\\\\N'\n"
-				+ "NULL_NON_STRING='\\\\N'\n"
+				+ "export-dir='/user/hive/dw/post_poc_tmp/"+tableName.toLowerCase()+"'\n"
+				+ "input-fields-terminated-by='\\001'\n"
+				+ "input-null-string='\\\\N'\n"
+				+ "input-null-non-string='\\\\N'\n"
 				+ "";
 
 		return rs;
