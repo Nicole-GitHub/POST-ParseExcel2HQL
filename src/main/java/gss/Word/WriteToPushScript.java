@@ -17,7 +17,7 @@ public class WriteToPushScript {
 				tdTargetTableEName = "",
 				sourceTableENameArr = "",
 				mkdirDownloadFolder = "", 
-				mkdirHadoopFolder = "", 
+//				mkdirHadoopFolder = "", 
 				chmod = "", 
 				zip = "", 
 				createRSLT = "", 
@@ -55,8 +55,8 @@ public class WriteToPushScript {
 							+"mkdir /home/post1/DW_WORK/download/" + targetTableEName + "/DONE\n"
 							+"mkdir /home/post1/DW_WORK/download/" + targetTableEName + "/WORK\n\n";
 					
-					// mkdir Hadoop Folder
-					mkdirHadoopFolder += "gssShell fs -mkdir /user/post1/Upload/tmp/" + targetTableEName + "/\n";
+//					// mkdir Hadoop Folder
+//					mkdirHadoopFolder += "gssShell fs -mkdir /user/post1/Upload/tmp/" + targetTableEName + "/\n";
 					
 					// zip
 					for(String sourceTableEName : sourceTableENameArr.split(",")) {
@@ -179,7 +179,7 @@ public class WriteToPushScript {
 			String rs =	(
 					!"1".equals(mapProp.get("runType")) ? ""
 						: ("--mkdirDownloadFolder\n" + mkdirDownloadFolder
-						+ "\n--mkdirHadoopFolder\n" + mkdirHadoopFolder
+//						+ "\n--mkdirHadoopFolder\n" + mkdirHadoopFolder
 						+ "\n--zip\n" + zip )
 					)
 					+ "\n--chmod\n" + chmod
@@ -197,7 +197,7 @@ public class WriteToPushScript {
 			String rs_airflow =	(
 					!"1".equals(mapProp.get("runType")) ? ""
 						: ("--mkdirDownloadFolder\n" + mkdirDownloadFolder
-						+ "\n--mkdirHadoopFolder\n" + mkdirHadoopFolder
+//						+ "\n--mkdirHadoopFolder\n" + mkdirHadoopFolder
 						+ "\n--zip\n" + zip )
 					)
 //					+ "\n--chmod\n" + chmod
