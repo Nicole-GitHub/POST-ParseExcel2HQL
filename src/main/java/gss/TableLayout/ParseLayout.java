@@ -148,11 +148,17 @@ public class ParseLayout {
 			outputPath += fileName + "/";
 			// T_CMMW_VSAPC_TEMP.hql
 			FileTools.createFileNotAppend(outputPath , tableName, "hql", rsHADOOP);
-			// 因測試時需先CreateTable，故整理一份所有要Create的Table在同一份文件中
-			FileTools.createFileAppend(outputPath + "../" , "CreateTableScript"+Tools.getNOW("yyyyMMdd"), "hql", rsHADOOP);
 			// MS_T_CMMW_VSAPC_TEMP.sql
 			FileTools.createFileNotAppend(outputPath , "MS_" + tableName, "sql", rsMSSQL);
 			
+			// 因測試時需先CreateTable，故整理一份所有要Create的Table在同一份文件中
+			FileTools.createFileAppend(outputPath + "../" , "Hadoop_CreateTableScript"+Tools.getNOW("yyyyMMdd"), "hql", rsHADOOP);
+			FileTools.createFileAppend(outputPath + "../" , "MSSQL_CreateTableScript"+Tools.getNOW("yyyyMMdd"), "sql", rsMSSQL);
+			
+			// INSERT SYS_CLEANCOLS
+			String insCleanCols = "INSERT INTO SYS_CLEANCOLS values('"+tableName+"','"+partition+"');";
+			FileTools.createFileAppend(outputPath + "../" , "MSSQL_InsCleanColsScript"+Tools.getNOW("yyyyMMdd"), "sql", insCleanCols);
+
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);
 		}

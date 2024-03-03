@@ -132,7 +132,7 @@ public class TRUNCATE_DW {
 				+ "select count(1) as row_count\n"
 				+ "from ${hivevar:DES1_Truncate"+type+"} a \n";
 			rs += !StringUtils.isBlank(partition) ? 
-				 "where ACT_YM=${hivevar:ACT_YM}" : "";
+				 "where a."+partition+"=${hivevar:ACT_YM}" : "";
 			rs += "\n;\n\n"
 				+ "-- 確認Truncate後的筆數\n"
 				+ "-- 0 => success\n"

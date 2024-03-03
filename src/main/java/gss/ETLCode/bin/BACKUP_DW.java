@@ -120,7 +120,7 @@ public class BACKUP_DW {
 				+ "Create table ${hivevar:DES1_BACKUP_"+type+"}_${hivevar:BATCHID} AS \n"
 				+ "SELECT a.* FROM ${hivevar:SRC1_BACKUP_"+type+"} a \n";
 		rs += !StringUtils.isBlank(partition) ? 
-				"where ACT_YM=${hivevar:ACT_YM}" : "";
+				"where a."+partition+"=${hivevar:ACT_YM}" : "";
 		rs += "\n;\n\n"
 				+ "-- verification 確認備份後的筆數與來源一致\n"
 				+ "-- group SRC1與DES1的筆數後找count為2的值\n"
@@ -137,7 +137,7 @@ public class BACKUP_DW {
 				+ "		select count(1) as row_count\n"
 				+ "		from ${hivevar:SRC1_BACKUP_"+type+"} a \n";
 			rs += !StringUtils.isBlank(partition) ?
-				 "		where ACT_YM=${hivevar:ACT_YM}\n" : "";
+				 "		where a."+partition+"=${hivevar:ACT_YM}\n" : "";
 			rs += "	) a1\n"
 				+ "	group by row_count\n"
 				+ "	having count(1) = 2\n"
