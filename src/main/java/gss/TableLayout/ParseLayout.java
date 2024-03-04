@@ -156,7 +156,7 @@ public class ParseLayout {
 			FileTools.createFileAppend(outputPath + "../" , "MSSQL_CreateTableScript"+Tools.getNOW("yyyyMMdd"), "sql", rsMSSQL);
 			
 			// INSERT SYS_CLEANCOLS
-			String insCleanCols = "INSERT INTO SYS_CLEANCOLS values('"+tableName+"','"+partition+"');";
+			String insCleanCols = "INSERT INTO SYS_CLEANCOLS values('"+tableName+"','"+partition+"', GETDATE() );";
 			FileTools.createFileAppend(outputPath + "../" , "MSSQL_InsCleanColsScript"+Tools.getNOW("yyyyMMdd"), "sql", insCleanCols);
 
 		} catch (Exception ex) {
