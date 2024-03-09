@@ -93,7 +93,6 @@ public class DW_L08_LoadDW_TMP {
 				+ "-- parameter list\n"
 				+ "-----------------------------------------------------------------\n"
 				+ "set hivevar:ACT_YM=202303;\n"
-				+ "set hivevar:Run_TableName="+tableName+";\n"
 				+ "set hivevar:RSLT="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+"_result;\n"
 				+ "set hivevar:SRC1_L08="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
 				+ "set hivevar:DES1_L08="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+";\n"

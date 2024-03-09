@@ -69,10 +69,10 @@ public class Main {
 			ParseTableLayout.run(mapProp, tableLayoutPath, outputPath, tableLayoutFileNameList);
 			
 
-			String refFilePath = jarPath + "RefFile\\";
+			String refFilePath = jarPath + "RefFile/";
 			
 			// 整理測試紀錄各項目的編號最大值
-			String testRecordListWordPath = mapProp.get("svnPath") + "DOCUMENT\\5-ST\\測試紀錄清單.doc";
+			String testRecordListWordPath = mapProp.get("svnPath") + "DOCUMENT/5-ST/測試紀錄清單.doc";
 			Map<String, Integer> testRecordMap = ParseTestRecordList.getTestRecordMaxNum(testRecordListWordPath);
 			
 			// 欲解析的layout完整檔名整理出純table名

@@ -109,7 +109,6 @@ public class TRUNCATE_DW {
 				+ "-- parameter list\n"
 				+ "-----------------------------------------------------------------\n"
 				+ "set hivevar:ACT_YM=202212;\n"
-				+ "set hivevar:Run_TableName="+tableName+";\n"
 				+ "set hivevar:RSLT="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+"_result;\n"
 				+ "set hivevar:DES1_Truncate"+type+"="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
 				+ "set hivevar:FUNC_NAME="+tableName+"_Truncate"+type+";\n"

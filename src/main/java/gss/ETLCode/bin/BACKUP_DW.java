@@ -105,7 +105,6 @@ public class BACKUP_DW {
 				+ "set hivevar:BATCHID=20230329000000;\n"
 				+ "set hivevar:ACT_YM=202303;\n"
 				+ "set hivevar:DES1_BACKUP_"+type+"="+mapProp.get("hadoop.tmp.dbname")+".BKD_"+tableName+";\n"
-				+ "set hivevar:Run_TableName="+tableName+";\n"
 				+ "set hivevar:RSLT="+mapProp.get("hadoop.tmp.dbname")+"."+tableName+"_result;\n"
 				+ "set hivevar:SRC1_BACKUP_"+type+"="+mapProp.get("hadoop.raw.dbname")+"."+tableName+";\n"
 				+ "set hivevar:FUNC_NAME="+tableName+"_Backup"+type+";\n"

@@ -249,7 +249,6 @@ public class DW_L07_LoadDW {
 				+ "-- parameter list\n"
 				+ "-----------------------------------------------------------------\n"
 				+ "set hivevar:ACT_YM=202303;\n"
-				+ "set hivevar:Run_TableName="+tableName+";\n"
 				+ "set hivevar:DATE_CTRL=post1_post_poc_raw.T_CMMM_CCSYM_DTL;\n"
 				+ "set hivevar:RSLT="+ tmp +"."+tableName+"_result;\n"
 				+ (runType ? "set hivevar:SRC1_L07="+ raw +"."+odsTableName+";\n"

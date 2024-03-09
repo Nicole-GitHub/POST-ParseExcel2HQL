@@ -54,7 +54,7 @@ public class WriteToTestRecordWord {
 			for(String tableLayoutFileName : tableLayoutFileNameList) {
 				if(targetTableEName.equals((tableLayoutFileName.split("-")[0]).trim())) {
 					String fileName = tableLayoutFileName.substring(0, tableLayoutFileName.lastIndexOf("."));
-					finalOutputPath = outputPath + fileName + "\\測試紀錄-" + testRecordNumStr + ".doc";
+					finalOutputPath = outputPath + fileName + "/測試紀錄-" + testRecordNumStr + ".doc";
 				}
 			}
 			System.out.println(finalOutputPath);
