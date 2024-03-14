@@ -12,8 +12,7 @@ public class CreateTable_MSSQL {
 		
 		rs += StringUtils.isBlank(pkStr) 
 			? rsMSCols.substring(0, rsMSCols.lastIndexOf(","))
-			: rsMSCols + "\tPRIMARY KEY (" + pkStr.substring(0, pkStr.length() - 1) + ")";
-		
+			: rsMSCols + "\tCONSTRAINT u_"+mssqlTableName+"_Id UNIQUE (" + pkStr.substring(0, pkStr.length() - 1) + ")";
 		rs += "\n);\n";
 
 		return rs;
