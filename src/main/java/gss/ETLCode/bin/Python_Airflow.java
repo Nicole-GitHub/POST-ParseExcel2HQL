@@ -379,7 +379,7 @@ public class Python_Airflow {
 				+ "# default params\n"
 				+ "PROG_PATH=Variable.get(\"PROG_PATH\")\n"
 				+ "DAG_WORKSPACE=Variable.get(\"DAG_WORKSPACE\")\n"
-				+ "target_table = \"" + tableName + "\"\n"
+				+ "target_table=\"" + tableName + "\"\n"
 				+ "date_target_table=\"post1_post_poc_raw.T_CMMM_CCSYM_DTL\"\n"
 				+ "DB_CONN=Variable.get(\"DB_CONN\")\n"
 				+ "DB_NAME=Variable.get(\"DM_DB\")\n"
