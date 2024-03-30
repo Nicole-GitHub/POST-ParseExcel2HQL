@@ -33,7 +33,7 @@ public class WriteToPushScript {
 				yyyyMM2 = "", 
 				yyyyMMDD1 = "", 
 				runNowS = "", 
-				runNowE = "", 
+//				runNowE = "", 
 //				insertRunNow = "", 
 //				runType = "", 
 //				pipeShell = "",
@@ -115,15 +115,15 @@ public class WriteToPushScript {
 												: "系統日-1".equals(dataTransferInterval) ? yyyyMMDD1
 													: "";
 
-				runNowE = "X".equals(dataTransferInterval) ? "00000000"
-						: "系統年".equals(dataTransferInterval) ? yyyy+"1231"
-							: "系統年-1".equals(dataTransferInterval) ? yyyy1+"1231"
-								: "系統月".equals(dataTransferInterval) ? yyyyMM+"31"
-									: "系統月-1".equals(dataTransferInterval) ? yyyyMM1+"31"
-										: "系統月-2".equals(dataTransferInterval) ? yyyyMM2+"31"
-											: "系統日".equals(dataTransferInterval) ? yyyyMMDD
-												: "系統日-1".equals(dataTransferInterval) ? yyyyMMDD
-													: "";
+//				runNowE = "X".equals(dataTransferInterval) ? "00000000"
+//						: "系統年".equals(dataTransferInterval) ? yyyy+"1231"
+//							: "系統年-1".equals(dataTransferInterval) ? yyyy1+"1231"
+//								: "系統月".equals(dataTransferInterval) ? yyyyMM+"31"
+//									: "系統月-1".equals(dataTransferInterval) ? yyyyMM1+"31"
+//										: "系統月-2".equals(dataTransferInterval) ? yyyyMM2+"31"
+//											: "系統日".equals(dataTransferInterval) ? yyyyMMDD
+//												: "系統日-1".equals(dataTransferInterval) ? yyyyMMDD
+//													: "";
 				
 //				insertRunNow += "INSERT OVERWRITE TABLE post1_post_poc_std.SYS_RUN_NOW PARTITION(TABLENM) "
 //						+"SELECT '" + runNowS + "', '" + runNowE + "', CURRENT_TIMESTAMP, '" + targetTableEName + "';\n";
@@ -136,7 +136,7 @@ public class WriteToPushScript {
 				
 				// Select Source Table Script
 				String whereScript = "X".equals(dataTransferInterval) ? ""
-						: "where YR || MON between '" + runNowS + "' and '" + runNowE + "'";
+						: "where YR || MON = '" + runNowS.substring(0,6) + "'";
 				
 				// Select Teradata Source Table Script
 				selectTDScript += "\nselect * from "+ tdTargetTableEName +" t " + whereScript + " ; \n";
