@@ -157,7 +157,8 @@ public class ParseLayout {
 			
 			// INSERT SYS_CLEANCOLS
 			String insCleanCols = "INSERT INTO SYS_CLEANCOLS values('"+tableName+"','"+partition+"', GETDATE() );";
-			FileTools.createFileAppend(outputPath + "../" , "MSSQL_InsCleanColsScript"+Tools.getNOW("yyyyMMdd"), "sql", insCleanCols);
+//			FileTools.createFileAppend(outputPath + "../" , "MSSQL_InsCleanColsScript"+Tools.getNOW("yyyyMMdd"), "sql", insCleanCols);
+			FileTools.createFileAppend(outputPath + "../" , "PushScript_airflow", "sql", "\n--insertCleanCols_MSSQL\n" + insCleanCols);
 
 		} catch (Exception ex) {
 			throw new Exception(className + " Error: \n" + ex);

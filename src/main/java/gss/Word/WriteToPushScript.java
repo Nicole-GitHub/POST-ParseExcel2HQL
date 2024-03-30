@@ -18,12 +18,12 @@ public class WriteToPushScript {
 				sourceTableENameArr = "",
 				mkdirDownloadFolder = "", 
 //				mkdirHadoopFolder = "", 
-				chmod = "", 
+//				chmod = "", 
 				zip = "", 
 				createRSLT = "", 
 				dataTransferInterval = "", 
 				runInfo = "", 
-				insertRunInfo = "", 
+//				insertRunInfo = "", 
 				insertRunInfo_MSSQL = "",
 				yyyy = "", 
 				yyyyMM = "", 
@@ -34,9 +34,9 @@ public class WriteToPushScript {
 				yyyyMMDD1 = "", 
 				runNowS = "", 
 				runNowE = "", 
-				insertRunNow = "", 
-				runType = "", 
-				pipeShell = "",
+//				insertRunNow = "", 
+//				runType = "", 
+//				pipeShell = "",
 				selectTDScript = "",
 				selectHPScript = "",
 				filePath = "",
@@ -69,10 +69,10 @@ public class WriteToPushScript {
 					}
 				}
 
-				// chmod
-				chmod += "cd /opt/gss/pipe-logic-deploy/post/" + targetTableEName + "\n"
-						+"chmod 777 main\n"
-						+"cp flow.def_noExport.txt flow.def\n\n";
+//				// chmod
+//				chmod += "cd /opt/gss/pipe-logic-deploy/post/" + targetTableEName + "\n"
+//						+"chmod 777 main\n"
+//						+"cp flow.def_noExport.txt flow.def\n\n";
 				
 				// Result Table
 				createRSLT += "create table post1_post_poc_tmp." + targetTableEName + "_result "
@@ -89,9 +89,9 @@ public class WriteToPushScript {
 											: "系統日".equals(dataTransferInterval) ? "'D',0,0"
 												: "系統日-1".equals(dataTransferInterval) ? "'D',-1,-1"
 													: "";
-				// HADOOP
-				insertRunInfo += "INSERT OVERWRITE TABLE post1_post_poc_std.SYS_RUN_INFO PARTITION(TABLENM) "
-						+"SELECT "+runInfo+", CURRENT_TIMESTAMP, '" + targetTableEName + "';\n";
+//				// HADOOP
+//				insertRunInfo += "INSERT OVERWRITE TABLE post1_post_poc_std.SYS_RUN_INFO PARTITION(TABLENM) "
+//						+"SELECT "+runInfo+", CURRENT_TIMESTAMP, '" + targetTableEName + "';\n";
 				
 				// MSSQL
 				insertRunInfo_MSSQL += "INSERT INTO SYS_RUN_INFO "
@@ -125,14 +125,14 @@ public class WriteToPushScript {
 												: "系統日-1".equals(dataTransferInterval) ? yyyyMMDD
 													: "";
 				
-				insertRunNow += "INSERT OVERWRITE TABLE post1_post_poc_std.SYS_RUN_NOW PARTITION(TABLENM) "
-						+"SELECT '" + runNowS + "', '" + runNowE + "', CURRENT_TIMESTAMP, '" + targetTableEName + "';\n";
+//				insertRunNow += "INSERT OVERWRITE TABLE post1_post_poc_std.SYS_RUN_NOW PARTITION(TABLENM) "
+//						+"SELECT '" + runNowS + "', '" + runNowE + "', CURRENT_TIMESTAMP, '" + targetTableEName + "';\n";
 				
 				// pipeShell
-				runType = "X".equals(dataTransferInterval) ? "--var RUN_TYPE=A"
-							: "--var RUN_TYPE=M --var DATA_S=" + runNowS + " --var DATA_E=" + runNowE;
-				pipeShell += "pipe-shell --logic-uri /opt/gss/pipe-logic-deploy/post/" + targetTableEName + " "
-						+ runType + " --is-staged --is-bypass-pre-check --clear-cache \n";
+//				runType = "X".equals(dataTransferInterval) ? "--var RUN_TYPE=A"
+//							: "--var RUN_TYPE=M --var DATA_S=" + runNowS + " --var DATA_E=" + runNowE;
+//				pipeShell += "pipe-shell --logic-uri /opt/gss/pipe-logic-deploy/post/" + targetTableEName + " "
+//						+ runType + " --is-staged --is-bypass-pre-check --clear-cache \n";
 				
 				// Select Source Table Script
 				String whereScript = "X".equals(dataTransferInterval) ? ""
@@ -165,7 +165,7 @@ public class WriteToPushScript {
 				
 				// gssSQLConn
 				filePath = "/opt/gss/pipe-logic-deploy/post/" + targetTableEName;
-				String gssSQLConnHead = "gssSQLConn --user hdfs --logic-file " + filePath;
+				String gssSQLConnHead = "sh /DAG_WORK/scripts/gssSQLConn.sh --logic-file " + filePath;
 				gssSQLConn += gssSQLConnHead + "/bin/DM_T01.hql 1> " + filePath + "/log/01.txt 2>&1\n"
 						+ gssSQLConnHead + "/bin/DM_T02.hql 1> " + filePath + "/log/02.txt 2>&1\n"
 						+ gssSQLConnHead + "/bin/DM_T03.hql 1> " + filePath + "/log/03.txt 2>&1\n"
@@ -175,23 +175,23 @@ public class WriteToPushScript {
 
 			}
 			
-			// 收載時才會有前三項
-			String rs =	(
-					!"1".equals(mapProp.get("runType")) ? ""
-						: ("--mkdirDownloadFolder\n" + mkdirDownloadFolder
-//						+ "\n--mkdirHadoopFolder\n" + mkdirHadoopFolder
-						+ "\n--zip\n" + zip )
-					)
-					+ "\n--chmod\n" + chmod
-					+ "\n--insertRunInfo\n" + insertRunInfo
-					+ "\n--createRSLT\n" + createRSLT
-					+ "\n--insertRunNow\n" + insertRunNow
-					+ "\n--pipeShell\n" + pipeShell
-					+ "\n--selectTDScript\n" + selectTDScript
-					+ "\n--selectHPScript\n" + selectHPScript
-					+ "\n--gssSQLConn\n" + gssSQLConn ;
+//			// 收載時才會有前三項
+//			String rs =	(
+//					!"1".equals(mapProp.get("runType")) ? ""
+//						: ("--mkdirDownloadFolder\n" + mkdirDownloadFolder
+////						+ "\n--mkdirHadoopFolder\n" + mkdirHadoopFolder
+//						+ "\n--zip\n" + zip )
+//					)
+//					+ "\n--chmod\n" + chmod
+//					+ "\n--insertRunInfo\n" + insertRunInfo
+//					+ "\n--createRSLT\n" + createRSLT
+//					+ "\n--insertRunNow\n" + insertRunNow
+//					+ "\n--pipeShell\n" + pipeShell
+//					+ "\n--selectTDScript\n" + selectTDScript
+//					+ "\n--selectHPScript\n" + selectHPScript
+//					+ "\n--gssSQLConn\n" + gssSQLConn ;
 			
-			FileTools.createFileNotAppend(outputPath, "PushScript", "sql", rs);
+//			FileTools.createFileNotAppend(outputPath, "PushScript", "sql", rs);
 			
 			// 收載時才會有前三項
 			String rs_airflow =	(
@@ -203,15 +203,15 @@ public class WriteToPushScript {
 //					+ "\n--chmod\n" + chmod
 //					+ "\n--insertRunInfo\n" + insertRunInfo
 					+ "\n--insertRunInfo_MSSQL\n" + insertRunInfo_MSSQL
-//					+ "\n--createRSLT\n" + createRSLT
+					+ "\n--createRSLT\n" + createRSLT
 //					+ "\n--insertRunNow\n" + insertRunNow
 //					+ "\n--pipeShell\n" + pipeShell
 					+ "\n--selectTDScript\n" + selectTDScript
 					+ "\n--selectHPScript\n" + selectHPScript
-//					+ "\n--gssSQLConn\n" + gssSQLConn 
+					+ "\n--gssSQLConn\n" + gssSQLConn 
 					;
 			
-			FileTools.createFileNotAppend(outputPath, "PushScript_airflow", "sql", rs_airflow);
+			FileTools.createFileAppend(outputPath, "PushScript_airflow", "sql", rs_airflow);
 			
 			
 
