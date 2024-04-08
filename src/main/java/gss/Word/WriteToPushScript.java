@@ -3,6 +3,8 @@ package gss.Word;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import gss.Tools.FileTools;
 import gss.Tools.Tools;
 
@@ -135,7 +137,7 @@ public class WriteToPushScript {
 //						+ runType + " --is-staged --is-bypass-pre-check --clear-cache \n";
 				
 				// Select Source Table Script
-				String whereScript = "X".equals(dataTransferInterval) ? ""
+				String whereScript = (StringUtils.isBlank(dataTransferInterval) || "X".equals(dataTransferInterval)) ? ""
 						: "where YR || MON = '" + runNowS.substring(0,6) + "'";
 				
 				// Select Teradata Source Table Script
