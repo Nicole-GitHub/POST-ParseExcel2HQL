@@ -43,7 +43,8 @@ public class WriteToOther {
 	     	String odsTableName = "ODS" + tableName.substring(1);
 	     	String partition = layoutMap.get("Partition");
 			String runType = mapProp.get("runType");
-			String type = "1".equals(runType) ? "DW" : "DM";
+			String type = "D"+tableName.substring(5,6);
+//			String type = "1".equals(runType) ? "DW" : "DM";
 			boolean hasChinese = "Y".equals(hasChineseForTable);
 			
 			// 將所有欄位名稱合在一起
@@ -142,7 +143,7 @@ public class WriteToOther {
 //			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C03_ExportDate2File", "hql", b03_hql);
 //			FileTools.createFileNotAppend(outputPathBin, "BEFORE_C04_FinishData", "hql", b04_hql);
 //			FileTools.createFileNotAppend(outputPathBin, "BACKUP_"+type, "hql", backup_dw_hql);
-			String load_tmp_codeFileName = type+"_L0"+("DW".equals(type) ? "8" : "3")+"_Load"+type+"_TMP";
+			String load_tmp_codeFileName = type+"_L0"+("1".equals(runType) ? "8" : "3")+"_Load"+type+"_TMP";
 //			FileTools.createFileNotAppend(outputPathBin, load_tmp_codeFileName, "hql", dw_l08_loaddw_tmp_hql);
 //			FileTools.createFileNotAppend(outputPathBin, "FINISH", "hql", finish_hql);
 //			FileTools.createFileNotAppend(outputPathBin, "TRUNCATE_"+type, "hql", truncate_dw_hql);
@@ -175,12 +176,12 @@ public class WriteToOther {
 			 ******************/
 	     	String b01_hql_airflow = BEFORE_C01_Run.getHQL_airflow(partition, mapProp, tableName);
 	     	String backup_dw_hql_airflow = BACKUP_DW.getHQL_airflow(partition, mapProp, tableName, type);
-	     	String dw_export_2sql_dbc_airflow = DW_EXPORT_2SQL.getDBC(type, mapProp, tableName);
+	     	String dw_export_2sql_dbc_airflow = DW_EXPORT_2SQL.getDBC(mapProp, tableName);
 //	     	String dw_export_2sql_sh_airflow = DW_EXPORT_2SQL.getShell(type, mapProp, tableName);
 	     	String dw_l08_loaddw_tmp_hql_airflow = DW_L08_LoadDW_TMP.getHQL_airflow(partition, mapProp, tableName, selectStr, type);
 	     	
 	     	if("1".equals(runType)) {
-		     	String python_airflow = Python_Airflow.getDW(tableName, txtFileName, layoutMap.get("SourceFileIsZip"));
+		     	String python_airflow = Python_Airflow.getDW(tableName, txtFileName, layoutMap.get("SourceFileIsZip"), type);
 		     	String o01_hql_airflow = ODS_C01_UploadFile.getHQL_airflow(mapProp, tableName, odsTableName);
 		     	String o02_hql_airflow = ODS_C02_GetDataFileName.getHQL_airflow(mapProp, tableName, odsTableName);
 		     	String o03_hql_airflow = ODS_C03_GetErrorData.getHQL_airflow(mapProp, tableName, odsTableName, finalLen, hasChinese);
@@ -198,10 +199,10 @@ public class WriteToOther {
 				FileTools.createFileNotAppend(outputPath, tableName, "py", python_airflow);
 
 	     	} else {
-		     	String python_airflow = Python_Airflow.getDM(tableName, txtFileName);
-	     		String dm_l02_loaddm_tmp_hql_airflow = DM_L02_LoadDM.getHQL_airflow(partition, mapProp, tableName);
+		     	String python_airflow = Python_Airflow.getDM(tableName, txtFileName, type);
+	     		String dm_l02_loaddm_tmp_hql_airflow = DM_L02_LoadDM.getHQL_airflow(partition, mapProp, tableName, type);
 		     	
-		     	FileTools.createFileNotAppend(outputPathBin, "DM_L02_LoadDM", "hql", dm_l02_loaddm_tmp_hql_airflow);
+		     	FileTools.createFileNotAppend(outputPathBin, type+"_L02_Load"+type, "hql", dm_l02_loaddm_tmp_hql_airflow);
 				FileTools.createFileNotAppend(outputPath, tableName, "py", python_airflow);
 	     	}
 	     	

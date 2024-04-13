@@ -137,7 +137,7 @@ public class WriteToPushScript {
 //						+ runType + " --is-staged --is-bypass-pre-check --clear-cache \n";
 				
 				// Select Source Table Script
-				String whereScript = (StringUtils.isBlank(dataTransferInterval) || "X".equals(dataTransferInterval)) ? ""
+				String whereScript = (StringUtils.isBlank(dataTransferInterval) || StringUtils.isBlank(runNowS) || "X".equals(dataTransferInterval)) ? ""
 						: "where YR || MON = '" + runNowS.substring(0,6) + "'";
 				
 				// Select Teradata Source Table Script
@@ -165,15 +165,16 @@ public class WriteToPushScript {
 					selectHPScript += "select * from post1_post_poc_raw."+ sourceTableEName +" t " + whereScript + " ; \n";
 				}
 				
+				String type_wm = targetTableEName.substring(5,6);
 				// gssSQLConn
 				filePath = "/opt/gss/pipe-logic-deploy/post/" + targetTableEName;
 				String gssSQLConnHead = "sh /DAG_WORK/scripts/gssSQLConn.sh --logic-file " + filePath;
-				gssSQLConn += gssSQLConnHead + "/bin/DM_T01.hql 1> " + filePath + "/log/01.txt 2>&1\n"
-						+ gssSQLConnHead + "/bin/DM_T02.hql 1> " + filePath + "/log/02.txt 2>&1\n"
-						+ gssSQLConnHead + "/bin/DM_T03.hql 1> " + filePath + "/log/03.txt 2>&1\n"
-						+ gssSQLConnHead + "/bin/DM_T04.hql 1> " + filePath + "/log/04.txt 2>&1\n"
-						+ gssSQLConnHead + "/bin/DM_T05.hql 1> " + filePath + "/log/05.txt 2>&1\n"
-						+ gssSQLConnHead + "/bin/DM_L06_LoadDM.hql 1> " + filePath + "/log/06.txt 2>&1\n\n"; 
+				gssSQLConn += gssSQLConnHead + "/bin/D"+type_wm+"_T01.hql 1> " + filePath + "/log/01.txt 2>&1\n"
+						+ gssSQLConnHead + "/bin/D"+type_wm+"_T02.hql 1> " + filePath + "/log/02.txt 2>&1\n"
+						+ gssSQLConnHead + "/bin/D"+type_wm+"_T03.hql 1> " + filePath + "/log/03.txt 2>&1\n"
+						+ gssSQLConnHead + "/bin/D"+type_wm+"_T04.hql 1> " + filePath + "/log/04.txt 2>&1\n"
+						+ gssSQLConnHead + "/bin/D"+type_wm+"_T05.hql 1> " + filePath + "/log/05.txt 2>&1\n"
+						+ gssSQLConnHead + "/bin/D"+type_wm+"_L06_LoadD"+type_wm+".hql 1> " + filePath + "/log/06.txt 2>&1\n\n"; 
 
 			}
 			

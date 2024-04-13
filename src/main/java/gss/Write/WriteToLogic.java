@@ -201,9 +201,10 @@ public class WriteToLogic {
 			} else {
 				workbook.close();
 			}
-			
+
+			String type = "D"+tableName.substring(5,6);
 			outputPath += "bin/";
-			String codeFileName = "1".equals(mapProp.get("runType")) ? "DW_L07_LoadDW" : "DM_T01" ;
+			String codeFileName = "1".equals(mapProp.get("runType")) ? "DW_L07_LoadDW" : type+"_T01" ;
 //			FileTools.createFileNotAppend(outputPath, codeFileName, "hql", rsHQL);
 //			FileTools.createFileNotAppend(outputPath, codeFileName, "var", rsVAR);
 			
@@ -211,7 +212,7 @@ public class WriteToLogic {
 			 * airflow
 			 ******************/
 			String rsHQL_airflow = DW_L07_LoadDW.getHQL_airflow(partition, mapProp, rsTargetSelectCols, sumColLogic, sumODSColLogic,
-					whereSumCol, tableName, odsTableName);
+					whereSumCol, tableName, odsTableName, type);
 			FileTools.createFileNotAppend(outputPath, codeFileName, "hql", rsHQL_airflow);
 
 		} catch (Exception ex) {

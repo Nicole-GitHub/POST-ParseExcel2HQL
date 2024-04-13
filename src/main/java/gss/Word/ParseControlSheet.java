@@ -112,7 +112,7 @@ public class ParseControlSheet {
 						dataTransferInterval = StringUtils.isBlank(dataTransferInterval)
 								? POITools.getCellValue(row, c++, "資料轉檔區間").toUpperCase()
 								: dataTransferInterval;
-						tdSourceTableENameArr += POITools.getCellValue(row, 18, "來源檔對應舊檔案名稱").toUpperCase() + ",";
+						tdSourceTableENameArr += POITools.getCellValue(row, 13, "來源檔對應舊檔案名稱").toUpperCase() + ",";
 
 					} else {
 						targetTableCName = POITools.getCellValue(row, c++, "中文檔案名稱").toUpperCase();
@@ -137,7 +137,7 @@ public class ParseControlSheet {
 						dataTransferInterval = StringUtils.isBlank(dataTransferInterval)
 								? POITools.getCellValue(row, c++, "資料轉檔區間").toUpperCase()
 								: dataTransferInterval;
-						tdSourceTableENameArr += POITools.getCellValue(row, 18, "來源檔對應舊檔案名稱").toUpperCase() + ",";
+						tdSourceTableENameArr += POITools.getCellValue(row, 13, "來源檔對應舊檔案名稱").toUpperCase() + ",";
 
 					}
 				}

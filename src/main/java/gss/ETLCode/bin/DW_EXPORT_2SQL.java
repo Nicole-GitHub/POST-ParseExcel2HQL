@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class DW_EXPORT_2SQL {
 	
-	public static String getDBC(String type, Map<String, String> mapProp, String tableName) {
+	public static String getDBC( Map<String, String> mapProp, String tableName) {
 		
 		String rs = "TABLE=\""+tableName+"\"\n"
 				+ "FUNCTION=\"export\"\n"
