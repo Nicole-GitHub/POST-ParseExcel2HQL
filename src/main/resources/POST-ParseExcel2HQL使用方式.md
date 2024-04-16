@@ -1,12 +1,11 @@
+### 參考:C:\22\_POST\JavaTools\POST-ParseExcel2HQL
+
 
 # 執行方式:
-```sh
 	點兩下bat檔即會跳出CMD畫面並自動執行
 
-```
-
 # 使用方式:
-```sh
+
 	一、先更新SVN:dw2209\DOCUMENT\5-ST\測試紀錄清單.doc
 	二、將整理好的layout文件放入TableLayout目錄下
 		* "TableLayout\SAMPLE TableLayout"裡面的Excel為範例檔，黃底部份為程式會抓的欄位
@@ -45,7 +44,7 @@
 		* svnPath: 本機的svn路徑(特殊符號需加跳脫字元)
 			例:C:\\SVN\\dw2209\\
 
-```
+
 
 # 產出結果:
 ```sh
